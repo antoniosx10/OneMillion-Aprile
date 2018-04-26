@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
             switch(menuItem.getItemId()) {
                 case R.id.nav_Home:
                     fragmentClass = HomeFragment.class;
+                    Toast.makeText(getApplicationContext(), "Home: ", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.nav_profilo:
 

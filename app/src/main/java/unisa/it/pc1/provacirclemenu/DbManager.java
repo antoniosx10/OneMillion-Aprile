@@ -35,7 +35,7 @@ public class DbManager {
         ContentValues cv=new ContentValues();
         cv.put(DatabaseStrings.TESTO, task.getContenuto());
         SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                "yyyy-MM-dd");
         Date date = new Date();
         String data = dateFormat.format(date);
         cv.put(DatabaseStrings.DATA,data);

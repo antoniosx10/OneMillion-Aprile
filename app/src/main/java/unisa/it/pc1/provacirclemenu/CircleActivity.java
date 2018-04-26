@@ -48,6 +48,7 @@ public class CircleActivity extends Activity {
 
         testo = i.getStringExtra("testoCopiato");
 
+
         dbManager = new DbManager(getApplicationContext());
 
         startTimerHead();

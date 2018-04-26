@@ -13,10 +13,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.hitomi.cmlibrary.CircleMenu;
 import com.hitomi.cmlibrary.OnMenuSelectedListener;
+import com.hitomi.cmlibrary.OnMenuStatusChangeListener;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,8 +32,12 @@ public class CircleActivity extends Activity {
     private WindowManager mWindowManager;
     private CircleMenu circleMenu;
 
+    private Task task;
+
     private Handler handler;
     private Runnable runnable;
+
+    private Boolean isDettagli = false;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -43,9 +50,6 @@ public class CircleActivity extends Activity {
 
         dbManager = new DbManager(getApplicationContext());
 
-
-        getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-
         startTimerHead();
 
         final String arrayName[] = {"Contatto1",
@@ -57,7 +61,7 @@ public class CircleActivity extends Activity {
                 "Aggiungi Dettagli"
         };
 
-        CircleMenu circleMenu = (CircleMenu) findViewById(R.id.circle_menu);
+        circleMenu = (CircleMenu) findViewById(R.id.circle_menu);
 
         circleMenu.setMainMenu(Color.parseColor("#CCCCCC"), R.drawable.ic_menu_black_24dp, R.drawable.ic_remove_circle_black_24dp)
                 .addSubMenu(Color.parseColor("#1db58c"), R.drawable.ic_person_black_24dp)
@@ -73,19 +77,42 @@ public class CircleActivity extends Activity {
                         switch (i) {
                             case 5:
                                 dbManager.open();
-                                Task task = new Task(testo, new Date(), R.mipmap.ic_launcher);
-
+                                task = new Task(testo, new Date(), R.mipmap.ic_launcher);
                                 dbManager.save(task);
-
                                 dbManager.close();
-
                                 Toast.makeText(getApplicationContext(), "Hai salvato: " + testo, Toast.LENGTH_SHORT).show();
+                                break;
+
+                            case 6:
+                                isDettagli = true;
+                                task = new Task(testo, new Date(), R.mipmap.ic_launcher);
+                                Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
+                                dettagliIntent.putExtra("task",task);
+                                startActivityForResult(dettagliIntent,15);
+                                break;
                         }
                     }
                 });
         //---Fine CircleMenu
 
 
+        circleMenu.setOnMenuStatusChangeListener(new OnMenuStatusChangeListener() {
+            @Override
+            public void onMenuOpened() {
+
+            }
+
+            @Override
+            public void onMenuClosed() {
+                if(!isDettagli) {
+                    startTimerHead();
+                } else {
+                    isDettagli = false;
+                    circleMenu.setVisibility(View.INVISIBLE);
+
+                }
+            }
+        });
 
         final WindowManager.LayoutParams params =  createHead();
 
@@ -196,4 +223,13 @@ public class CircleActivity extends Activity {
     private void stopTimerHead(){
         handler.removeCallbacks(runnable);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+            circleMenu.setVisibility(View.VISIBLE);
+            if(data != null) {
+                task = (Task) data.getSerializableExtra("taskDettagli");
+            }
+    }
+
 }

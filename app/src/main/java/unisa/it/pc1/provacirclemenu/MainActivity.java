@@ -21,18 +21,24 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.hitomi.cmlibrary.CircleMenu;
 import com.hitomi.cmlibrary.OnMenuSelectedListener;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
+    private FirebaseAuth mAuth;
+    private Intent serviceIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent serviceIntent = new Intent(getApplicationContext(), ListenerService.class);
+        serviceIntent = new Intent(getApplicationContext(), ListenerService.class);
         startService(serviceIntent);
+
+
+        mAuth = FirebaseAuth.getInstance();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
                 //If the draw over permission is not available open the settings screen
@@ -128,7 +134,9 @@ public class MainActivity extends AppCompatActivity {
                     fragmentClass = HomeFragment.class;
                     Toast.makeText(getApplicationContext(), "Home: ", Toast.LENGTH_SHORT).show();
                     break;
-                case R.id.nav_profilo:
+                case R.id.nav_esci:
+                    fragmentClass = null;
+                    break;
 
                 default:
                     fragmentClass = HomeFragment.class;
@@ -138,6 +146,11 @@ public class MainActivity extends AppCompatActivity {
                 fragment = (Fragment) fragmentClass.newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+
+            //ha cliccato su esci
+            if (fragment == null){
+                signOut();
             }
 
             // Insert the fragment by replacing any existing fragment
@@ -153,6 +166,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+
+    private void signOut() {
+        mAuth.signOut();
+        stopService(serviceIntent);
+        Intent i = new Intent(getApplicationContext(),Autenticazione.class);
+        startActivity(i);
+    }
 
 
     }

@@ -1,8 +1,7 @@
 package unisa.it.pc1.provacirclemenu;
 
-import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -15,26 +14,37 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.hitomi.cmlibrary.CircleMenu;
-import com.hitomi.cmlibrary.OnMenuSelectedListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+import unisa.it.pc1.provacirclemenu.model.User;
+
+public class MainActivity extends AppCompatActivity{
     private DrawerLayout mDrawerLayout;
     private FirebaseAuth mAuth;
     private Intent serviceIntent;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        serviceIntent = new Intent(getApplicationContext(), ListenerService.class);
+
+
+
+
+                serviceIntent = new Intent(getApplicationContext(), ListenerService.class);
         startService(serviceIntent);
 
 
@@ -48,10 +58,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1000);
             }
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Class fragmentClass = HomeFragment.class;
+            FragmentManager fm = getSupportFragmentManager();
             try {
-                fragmentManager.beginTransaction().replace(R.id.switch_fragment, HomeFragment.class.newInstance()).commit();
+
+
+                fm.beginTransaction().replace(R.id.switch_fragment, HomeFragment.class.newInstance()).commit();
+
+
+
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -119,20 +133,25 @@ public class MainActivity extends AppCompatActivity {
                     new NavigationView.OnNavigationItemSelectedListener() {
                         @Override
                         public boolean onNavigationItemSelected(MenuItem menuItem) {
-                            selectDrawerItem(menuItem);
+                            try {
+                                selectDrawerItem(menuItem);
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            } catch (InstantiationException e) {
+                                e.printStackTrace();
+                            }
                             return true;
                         }
                     });
         }
 
-        public void selectDrawerItem(MenuItem menuItem) {
+        public void selectDrawerItem(MenuItem menuItem) throws IllegalAccessException, InstantiationException {
             // Create a new fragment and specify the fragment to show based on nav item clicked
             Fragment fragment = null;
             Class fragmentClass;
             switch(menuItem.getItemId()) {
                 case R.id.nav_Home:
                     fragmentClass = HomeFragment.class;
-                    Toast.makeText(getApplicationContext(), "Home: ", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.nav_esci:
                     fragmentClass = null;
@@ -154,8 +173,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Insert the fragment by replacing any existing fragment
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.switch_fragment, fragment).commit();
+           FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.switch_fragment, (Fragment) fragmentClass.newInstance()).commit();
 
             // Highlight the selected item has been done by NavigationView
             menuItem.setChecked(true);
@@ -175,6 +194,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    }
+}
 
 

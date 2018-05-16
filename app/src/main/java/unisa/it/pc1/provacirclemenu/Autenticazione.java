@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,10 +29,14 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+
+import unisa.it.pc1.provacirclemenu.model.User;
 
 public class Autenticazione extends AppCompatActivity {
 
@@ -47,6 +52,9 @@ public class Autenticazione extends AppCompatActivity {
     private PhoneAuthProvider.ForceResendingToken mResendToken;
 
 
+    private DatabaseReference mUsersDBref;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +62,8 @@ public class Autenticazione extends AppCompatActivity {
         phoneed = (EditText) findViewById(R.id.numbered);
         codeed = (EditText) findViewById(R.id.verificationed);
         fabbutton = (FloatingActionButton) findViewById(R.id.sendverifybt);
-        timertext = (TextView) findViewById(R.id.timertv);
+        timertext = (
+                TextView) findViewById(R.id.timertv);
         verifiedimg = (ImageView) findViewById(R.id.verifiedsign);
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
@@ -173,7 +182,13 @@ public class Autenticazione extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("TAG", "signInWithCredential:success");
 
+
+
                             FirebaseUser user = task.getResult().getUser();
+
+                            createUserInDb(user.getUid(), user.getDisplayName(), user.getPhoneNumber());
+
+
                             mVerified = true;
                             timer.cancel();
                             verifiedimg.setVisibility(View.VISIBLE);
@@ -198,6 +213,17 @@ public class Autenticazione extends AppCompatActivity {
                         }
                     }
                 });
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            Intent i = new Intent(Autenticazione.this,MainActivity.class);
+            startActivity(i);
+            finish();
+        }
     }
 
     private void startPhoneNumberVerification(String phoneNumber) {
@@ -253,4 +279,20 @@ public class Autenticazione extends AppCompatActivity {
                 token);             // ForceResendingToken from callbacks
     }
 
+
+    private void createUserInDb(String userId, String displayName, String number){
+        mUsersDBref = FirebaseDatabase.getInstance().getReference().child("Users");
+        User user = new User(userId, displayName, number);
+        mUsersDBref.child(userId).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(!task.isSuccessful()){
+                    //error
+
+                }else{
+
+                }
+            }
+        });
+    }
 }

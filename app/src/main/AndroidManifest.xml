@@ -13,8 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".MainActivity">
-        </activity>
+        <activity android:name=".MainActivity"></activity>
         <activity
             android:name=".CircleActivity"
             android:theme="@style/Theme.CustomDialog" />
@@ -32,15 +31,16 @@
         <activity
             android:name=".DettagliActivity"
             android:theme="@style/Theme.DialogWithoutTitleBar" />
-        <activity
-            android:name=".Autenticazione">
-
+        <activity android:name=".Autenticazione">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ChatMessagesActivity"/>
     </application>
 
 </manifest>

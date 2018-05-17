@@ -1,5 +1,8 @@
 package unisa.it.pc1.provacirclemenu;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -141,6 +144,18 @@ public class ChatMessagesActivity extends AppCompatActivity {
                     }
 
                 }
+
+                Notification.Builder notificationBuilder = new Notification.Builder(
+                        getApplicationContext())
+                        .setTicker("Messaggio breve")
+                        .setSmallIcon(R.drawable.head)
+                        .setAutoCancel(true)
+                        .setContentTitle("Antonio")
+                        .setContentText(""+mMessagesList.get(mMessagesList.size()-1).getMessage());
+
+                // Pass the Notification to the NotificationManager:
+                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(1,notificationBuilder.build());
 
                 /**populate messages**/
                 populateMessagesRecyclerView();

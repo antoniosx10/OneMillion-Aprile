@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -17,6 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.hitomi.cmlibrary.CircleMenu;
 import com.hitomi.cmlibrary.OnMenuSelectedListener;
 import com.hitomi.cmlibrary.OnMenuStatusChangeListener;
@@ -24,7 +28,14 @@ import com.hitomi.cmlibrary.OnMenuStatusChangeListener;
 import java.util.ArrayList;
 import java.util.Date;
 
+import unisa.it.pc1.provacirclemenu.model.ChatMessage;
+
 public class CircleActivity extends Activity {
+    //PROVA
+    private DatabaseReference mMessagesDBRef;
+    private DatabaseReference mUsersRef;
+
+
 
     private String testo;
     private DbManager dbManager;
@@ -43,6 +54,11 @@ public class CircleActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_circle);
+
+        //PROVA
+        //init Firebase
+        mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Messages");
+        mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         Intent i = getIntent();
 
@@ -76,6 +92,10 @@ public class CircleActivity extends Activity {
                     @Override
                     public void onMenuSelected(int i) {
                         switch (i) {
+                            case 0:
+                                //PROVE
+                                sendMessageToFirebase(testo, "HoqUAbqQpGNAqfbHon5dA2bDpMt1","E1f84RhKMhOA49X696T1Y0vNvBA3");
+
                             case 5:
                                 dbManager.open();
                                 task = new Task(testo, new Date(), R.mipmap.ic_launcher);
@@ -231,6 +251,27 @@ public class CircleActivity extends Activity {
             if(data != null) {
                 task = (Task) data.getSerializableExtra("taskDettagli");
             }
+    }
+
+
+    //PROVA
+    private void sendMessageToFirebase(String message, String senderId, String receiverId) {
+        //mMessagesList.clear();
+
+        ChatMessage newMsg = new ChatMessage(message, senderId, receiverId);
+        mMessagesDBRef.push().setValue(newMsg).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                if (!task.isSuccessful()) {
+                    //error
+                    // Toast.makeText(ChatMessagesActivity.this, "Error " + task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                } else {
+                    //Toast.makeText(ChatMessagesActivity.this, "Message sent successfully!", Toast.LENGTH_SHORT).show();
+                    //mMessageEditText.setText(null);
+                    //hideSoftKeyboard();
+                }
+            }
+        });
     }
 
 }

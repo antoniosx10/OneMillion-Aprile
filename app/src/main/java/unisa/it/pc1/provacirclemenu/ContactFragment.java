@@ -94,7 +94,7 @@ public class ContactFragment extends Fragment {
                 if(dataSnapshot.getChildrenCount() > 0){
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
                         User user = snap.getValue(User.class);
-                        user.setNumber(snap.child("email").getValue(String.class));
+                        user.setNumber(snap.child("number").getValue(String.class));
                         //if not current user, as we do not want to show ourselves then chat with ourselves lol
                         try {
                             if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){

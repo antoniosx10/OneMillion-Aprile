@@ -166,7 +166,7 @@ public class ChatMessagesActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User recepient = dataSnapshot.getValue(User.class);
-                recepient.setNumber(dataSnapshot.child("email").getValue(String.class));
+                recepient.setNumber(dataSnapshot.child("number").getValue(String.class));
                 mReceiverName = recepient.getNumber();
 
 

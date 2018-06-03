@@ -37,6 +37,7 @@ import unisa.it.pc1.provacirclemenu.model.UtentiModel;
 
 public class ContactFragment extends Fragment {
     private UtentiModel utentiModel;
+    private ArrayList<String> listaNumeri;
 
     View v;
     private RecyclerView recyclerView;
@@ -44,15 +45,10 @@ public class ContactFragment extends Fragment {
 
     private Boolean firstTime = false;
 
-
     private FirebaseAuth userFirebase;
     private DatabaseReference mUsersDBRef;
 
-
-
     private ArrayList<User> mUsersList = new ArrayList<>();
-
-
 
     public ContactFragment() {
     }
@@ -65,7 +61,8 @@ public class ContactFragment extends Fragment {
         mUsersDBRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         utentiModel = new UtentiModel();
-
+        //Trovare modo per non far caricare sempre listaNumeri
+        listaNumeri = utentiModel.getContattiTelefono(getContext());
     }
 
     @Nullable
@@ -95,7 +92,6 @@ public class ContactFragment extends Fragment {
 
         final ArrayList<User> lista = new ArrayList<User>();
         mUsersDBRef.addValueEventListener(new ValueEventListener() {
-            ArrayList<String> listaNumeri = new ArrayList<String>();
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getChildrenCount() > 0){
@@ -105,14 +101,12 @@ public class ContactFragment extends Fragment {
                         //if not current user, as we do not want to show ourselves then chat with ourselves lol
                         try {
                             if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){
-
-                                if(!firstTime) {
-                                    listaNumeri = utentiModel.getContattiTelefono(getContext());
-                                }
+                                Log.d("NUMERO DA FIREBASE", user.getNumber());
 
                                 for(String s : listaNumeri) {
                                     Log.d("Num",s);
                                     if(s.equals(user.getNumber())) {
+                                        Log.d("quante volte",s);
                                         lista.add(user);
                                     }
                                 }

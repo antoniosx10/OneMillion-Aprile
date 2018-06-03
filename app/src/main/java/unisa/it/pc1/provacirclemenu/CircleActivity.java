@@ -97,16 +97,13 @@ public class CircleActivity extends Activity {
                                 sendMessageToFirebase(testo, "HoqUAbqQpGNAqfbHon5dA2bDpMt1","E1f84RhKMhOA49X696T1Y0vNvBA3");
 
                             case 5:
-                                dbManager.open();
-                                task = new Task(testo, new Date(), R.mipmap.ic_launcher);
-                                dbManager.save(task);
-                                dbManager.close();
+
                                 Toast.makeText(getApplicationContext(), "Hai salvato: " + testo, Toast.LENGTH_SHORT).show();
                                 break;
 
                             case 6:
                                 isDettagli = true;
-                                task = new Task(testo, new Date(), R.mipmap.ic_launcher);
+                                task = new Task(testo, new Date(), "3");
                                 Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
                                 dettagliIntent.putExtra("task",task);
                                 startActivityForResult(dettagliIntent,15);

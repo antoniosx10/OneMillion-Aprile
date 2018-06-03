@@ -9,6 +9,8 @@ import java.util.Date;
 
 public class Task implements Serializable{
 
+    private String taskId;
+
     private String contenuto;
     private Date data;
     private int foto;
@@ -17,24 +19,27 @@ public class Task implements Serializable{
     private String descrizione;
     private String categoria;
 
-    public Task(String contenuto, Date data, int foto) {
+    public Task(String contenuto, Date data, int foto, String taskId) {
         this.contenuto = contenuto;
         this.data = data;
         this.foto = foto;
+        this.taskId = taskId;
     }
 
-    public Task(String contenuto, Date data) {
+    public Task(String contenuto, Date data,String taskId) {
         this.contenuto = contenuto;
         this.data = data;
+        this.taskId = taskId;
     }
 
-    public Task(String contenuto, Date data, int foto, Date deadline, String descrizione, String categoria) {
+    public Task(String contenuto, Date data, int foto, Date deadline, String descrizione, String categoria,String taskId) {
         this.contenuto = contenuto;
         this.data = data;
         this.foto = foto;
         this.deadline = deadline;
         this.descrizione = descrizione;
         this.categoria = categoria;
+        this.taskId = taskId;
     }
 
     public Task(){
@@ -87,5 +92,9 @@ public class Task implements Serializable{
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
+    }
+
+    public String getTaskId() {
+        return taskId;
     }
 }

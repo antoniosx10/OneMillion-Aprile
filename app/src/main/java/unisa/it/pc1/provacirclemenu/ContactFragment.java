@@ -1,5 +1,7 @@
 package unisa.it.pc1.provacirclemenu;
 
+import android.database.Cursor;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.FloatRange;
@@ -27,12 +29,15 @@ import java.util.List;
 
 import unisa.it.pc1.provacirclemenu.RecyclerViewAdapter;
 import unisa.it.pc1.provacirclemenu.model.User;
+import unisa.it.pc1.provacirclemenu.model.UtentiModel;
 
 /**
  * Created by Antonio on 24/03/2018.
  */
 
 public class ContactFragment extends Fragment {
+    private UtentiModel utentiModel;
+
     View v;
     private RecyclerView recyclerView;
     private List<User> listContact;
@@ -58,6 +63,8 @@ public class ContactFragment extends Fragment {
 
         userFirebase = FirebaseAuth.getInstance();
         mUsersDBRef = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        utentiModel = new UtentiModel();
 
     }
 
@@ -86,9 +93,9 @@ public class ContactFragment extends Fragment {
 
     private ArrayList<User> queryUsersAndAddthemToList(){
 
-
         final ArrayList<User> lista = new ArrayList<User>();
         mUsersDBRef.addValueEventListener(new ValueEventListener() {
+            ArrayList<String> listaNumeri = new ArrayList<String>();
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getChildrenCount() > 0){
@@ -98,8 +105,17 @@ public class ContactFragment extends Fragment {
                         //if not current user, as we do not want to show ourselves then chat with ourselves lol
                         try {
                             if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){
-                                lista.add(user);
-                                Toast.makeText(getContext(),"Entrato"+user.getNumber(),Toast.LENGTH_LONG).show();
+
+                                if(!firstTime) {
+                                    listaNumeri = utentiModel.getContattiTelefono(getContext());
+                                }
+
+                                for(String s : listaNumeri) {
+                                    Log.d("Num",s);
+                                    if(s.equals(user.getNumber())) {
+                                        lista.add(user);
+                                    }
+                                }
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

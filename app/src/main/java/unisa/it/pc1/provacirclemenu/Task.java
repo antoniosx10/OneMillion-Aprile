@@ -97,4 +97,8 @@ public class Task implements Serializable{
     public String getTaskId() {
         return taskId;
     }
+
+    public void setTaskId(String id) {
+        taskId = id;
+    }
 }

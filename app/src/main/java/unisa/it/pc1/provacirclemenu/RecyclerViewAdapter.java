@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
 
-    Context mContext;
+    final Context mContext;
     List<Task> mData;
     Dialog myDialog;
 
@@ -42,6 +43,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.foto.setImageResource(mData.get(position).getFoto());
     }
 
+    public void deleteItem(int taskDaElim) {
+        Task t = mData.get(taskDaElim);
+        mData.remove(t);
+    }
+
     @Override
     public int getItemCount() {
         return mData.size();
@@ -53,13 +59,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         private TextView contenuto;
         private TextView data;
         private ImageView foto;
-        public MyViewHolder(View itemView) {
+
+        public  MyViewHolder(View itemView) {
             super(itemView);
 
             item_contact = itemView.findViewById(R.id.task_item);
             contenuto = itemView.findViewById(R.id.name_task);
             data = itemView.findViewById(R.id.data_task);
             foto = itemView.findViewById(R.id.img_contact);
+
+
         }
     }
 }

@@ -1,11 +1,13 @@
 package unisa.it.pc1.provacirclemenu;
 
 import android.database.Cursor;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,12 +35,11 @@ public class TaskFragment extends Fragment {
 
     View v;
     private RecyclerView recyclerView;
-    private List<User> listContact;
 
     private Boolean firstTime = false;
 
     private FirebaseAuth userFirebase;
-    private DatabaseReference mUsersDBRef;
+    private DatabaseReference mMessagesDBRef;
 
     private ArrayList<Task> mMessagesList = new ArrayList<>();
 
@@ -50,11 +51,10 @@ public class TaskFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         userFirebase = FirebaseAuth.getInstance();
-        mUsersDBRef = FirebaseDatabase.getInstance().getReference().child("Messages");
+        mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Messages");
 
         utentiModel = new UtentiModel();
-        //Trovare modo per non far caricare sempre listaNumeri
-        listaNumeri = utentiModel.getContattiTelefono(getContext());
+
     }
 
     @Nullable
@@ -63,9 +63,38 @@ public class TaskFragment extends Fragment {
 
         v = inflater.inflate(R.layout.task_fragment,container,false);
         recyclerView = v.findViewById(R.id.task_recyclerview);
-        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
+
+
+        final RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(1, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                Log.d(" swipeee","yeee");
+
+                Task t = recyclerViewAdapter.mData.get(viewHolder.getAdapterPosition());
+                recyclerViewAdapter.deleteItem(viewHolder.getAdapterPosition());
+
+                queryDeleteTask(t.getTaskId());
+                recyclerViewAdapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                // view the background view
+            }
+        };
+
+        // attaching the touch helper to recycler view
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
         return v;
     }
@@ -83,12 +112,13 @@ public class TaskFragment extends Fragment {
     private ArrayList<Task> queryMessagesAndAddthemToList(){
 
         final ArrayList<Task> lista = new ArrayList<Task>();
-        mUsersDBRef.addValueEventListener(new ValueEventListener() {
+        mMessagesDBRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getChildrenCount() > 0){
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
                         Task task = snap.getValue(Task.class);
+                        task.setTaskId(snap.getKey());
                         task.setContenuto(snap.child("message").getValue(String.class));
                         //if not current user, as we do not want to show ourselves then chat with ourselves lol
                         try {
@@ -116,5 +146,12 @@ public class TaskFragment extends Fragment {
         return lista;
     }
 
+    private void queryDeleteTask(String id) {
+
+        Log.d("ASDAS",id);
+
+        mMessagesDBRef.child(id).removeValue();
+
+    }
 
 }

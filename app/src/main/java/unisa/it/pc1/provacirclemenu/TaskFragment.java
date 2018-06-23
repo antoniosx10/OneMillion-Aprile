@@ -12,8 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Spinner;
-import android.widget.Toast;
+
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -23,10 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
-import unisa.it.pc1.provacirclemenu.model.User;
 import unisa.it.pc1.provacirclemenu.model.UtentiModel;
 
 public class TaskFragment extends Fragment {
@@ -42,6 +38,9 @@ public class TaskFragment extends Fragment {
     private DatabaseReference mMessagesDBRef;
 
     private ArrayList<Task> mMessagesList = new ArrayList<>();
+
+    private ItemTouchHelper.Callback itemTouchHelperCallback;
+    private RecyclerViewAdapter recyclerViewAdapter;
 
     public TaskFragment() {
     }
@@ -63,38 +62,11 @@ public class TaskFragment extends Fragment {
 
         v = inflater.inflate(R.layout.task_fragment,container,false);
         recyclerView = v.findViewById(R.id.task_recyclerview);
+        recyclerView.setHasFixedSize(true);
 
-
-        final RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
+        recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
-
-        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(1, ItemTouchHelper.LEFT) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                Log.d(" swipeee","yeee");
-
-                Task t = recyclerViewAdapter.mData.get(viewHolder.getAdapterPosition());
-                recyclerViewAdapter.deleteItem(viewHolder.getAdapterPosition());
-
-                queryDeleteTask(t.getTaskId());
-                recyclerViewAdapter.notifyDataSetChanged();
-
-            }
-
-            @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                // view the background view
-            }
-        };
-
-        // attaching the touch helper to recycler view
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
         return v;
     }
@@ -103,8 +75,55 @@ public class TaskFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         mMessagesList = queryMessagesAndAddthemToList();
+
+        itemTouchHelperCallback = new ItemTouchHelper.Callback() {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                //recyclerViewAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                return true;
+            }
+
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+                return true;
+            }
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true;
+            }
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView,
+                                        RecyclerView.ViewHolder viewHolder) {
+                return makeMovementFlags(1, ItemTouchHelper.LEFT);
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+                Task t = recyclerViewAdapter.mData.get(viewHolder.getAdapterPosition());
+                recyclerViewAdapter.deleteItem(viewHolder.getAdapterPosition());
+
+                recyclerViewAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+
+                queryDeleteTask(t.getTaskId());
+
+                return;
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                                    float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                float translationX = Math.min(-dX, viewHolder.itemView.getWidth());
+                viewHolder.itemView.setTranslationX(-translationX);
+                return;
+            }
+        };
+        // attaching the touch helper to recycler view
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+
 
 
     }
@@ -148,10 +167,9 @@ public class TaskFragment extends Fragment {
 
     private void queryDeleteTask(String id) {
 
-        Log.d("ASDAS",id);
-
         mMessagesDBRef.child(id).removeValue();
 
     }
 
 }
+

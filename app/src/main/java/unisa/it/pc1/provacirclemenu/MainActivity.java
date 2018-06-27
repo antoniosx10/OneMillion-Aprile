@@ -46,12 +46,25 @@ public class MainActivity extends AppCompatActivity{
 
     private TabLayout mTabLayout;
 
+    private Intent serviceIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         mAuth = FirebaseAuth.getInstance();
+
+        serviceIntent = new Intent(getApplicationContext(), ListenerService.class);
+        startService(serviceIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            //If the draw over permission is not available open the settings screen
+            //to grant the permission.
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, 1000);
+        }
 
         mToolbar = findViewById(R.id.main_app_bar);
         setSupportActionBar(mToolbar);

@@ -1,19 +1,18 @@
 package unisa.it.pc1.provacirclemenu;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -42,11 +41,7 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
-import static android.app.Activity.RESULT_OK;
-
-public class ProfiloFragment extends Fragment {
-
-    private static final int GALLERY_PICK = 1;
+public class SettingActivity extends Activity {
 
     private DatabaseReference databaseReference;
     private FirebaseUser currentUsers;
@@ -60,23 +55,16 @@ public class ProfiloFragment extends Fragment {
 
     private ProgressDialog progressDialog;
 
-
-    View v;
-
-    public ProfiloFragment() {
-
-    }
-
-    @Nullable
+    private static final int GALLERY_PICK = 1;
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.activity_setting,container,false);
-        Button b = v.findViewById(R.id.cambia_img_btn);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_setting);
 
-        text_nome = v.findViewById(R.id.text_display_name);
-        circleImageView = v.findViewById(R.id.immagine_setting);
+        text_nome = findViewById(R.id.text_display_name);
+        circleImageView = findViewById(R.id.immagine_setting);
 
-        cambiaImmagine = v.findViewById(R.id.cambia_img_btn);
+        cambiaImmagine = findViewById(R.id.cambia_img_btn);
 
         currentUsers = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -87,39 +75,72 @@ public class ProfiloFragment extends Fragment {
         databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUid);
         databaseReference.keepSynced(true);
 
-
-        b.setOnClickListener(new View.OnClickListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                Log.d("PROVA"   ,"prova");
-                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(getActivity());
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String nome = dataSnapshot.child("displayName").getValue().toString();
+
+                final String image = dataSnapshot.child("image").getValue().toString();
+                String thumb_image = dataSnapshot.child("thumb_image").getValue().toString();
+
+                text_nome.setText(nome);
 
 
+                    Picasso.with(SettingActivity.this).load(thumb_image).networkPolicy(NetworkPolicy.OFFLINE)
+                            .placeholder(R.mipmap.ic_launcher).into(circleImageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
 
-                Intent galleryIntent = new Intent();
-                galleryIntent.setType("image/*");
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                getActivity().startActivityForResult(Intent.createChooser(galleryIntent,"Setta immagine"),GALLERY_PICK);
+                        }
+
+                        @Override
+                        public void onError() {
+                            Picasso.with(SettingActivity.this).load(image)
+                                    .placeholder(R.mipmap.ic_launcher).into(circleImageView);
+                        }
+                    });
+
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
 
 
-        return v;
+
+        cambiaImmagine.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("PROVA"   ,"prova");
+
+                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(SettingActivity.this);
+
+                Intent galleryIntent = new Intent();
+                galleryIntent.setType("image/*");
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(galleryIntent,"Setta immagine"),GALLERY_PICK);
+            }
+        });
+
+
+
     }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        Log.d("primo"   ,"primo");
         if (requestCode == GALLERY_PICK && requestCode == RESULT_OK) {
             Uri imageUri = data.getData();
-            CropImage .activity(imageUri).setAspectRatio(1,1).start(getActivity());
+            CropImage .activity(imageUri).setAspectRatio(1,1).start(this);
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            Log.d("ActivityForResult"   ,"prova");
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                progressDialog = new ProgressDialog(getActivity());
+                progressDialog = new ProgressDialog(SettingActivity.this);
                 progressDialog.setTitle("Caricamento immagine profilo");
                 progressDialog.setMessage("Attendi il caricamnto dell'immagine");
                 progressDialog.setCanceledOnTouchOutside(false);
@@ -135,7 +156,7 @@ public class ProfiloFragment extends Fragment {
 
                 Bitmap thumb_bitMap = null;
                 try {
-                    thumb_bitMap = new Compressor(getContext())
+                    thumb_bitMap = new Compressor(this)
                             .setMaxHeight(200)
                             .setMaxWidth(200)
                             .setQuality(75)
@@ -145,8 +166,8 @@ public class ProfiloFragment extends Fragment {
                 }
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                thumb_bitMap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                final byte[] thumb_byte = baos.toByteArray();
+                    thumb_bitMap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                    final byte[] thumb_byte = baos.toByteArray();
 
 
                 StorageReference filePath = imageStorage.child("immagini_profilo").child(currentUser+" .jpg");
@@ -154,7 +175,7 @@ public class ProfiloFragment extends Fragment {
 
                 filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if(task.isSuccessful()){
                             final String downloadUrl = task.getResult().getDownloadUrl().toString();
 
@@ -162,7 +183,7 @@ public class ProfiloFragment extends Fragment {
                             uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
 
                                 @Override
-                                public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> thumb_task) {
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
                                     String thumb_downloadUrl = thumb_task.getResult().getDownloadUrl().toString();
                                     if(thumb_task.isSuccessful()){
 
@@ -194,41 +215,4 @@ public class ProfiloFragment extends Fragment {
         }
     }
 
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String nome = dataSnapshot.child("displayName").getValue().toString();
-
-                final String image = dataSnapshot.child("image").getValue().toString();
-                String thumb_image = dataSnapshot.child("thumb_image").getValue().toString();
-
-                text_nome.setText(nome);
-
-
-                Picasso.with(getContext()).load(image).networkPolicy(NetworkPolicy.OFFLINE)
-                        .placeholder(R.mipmap.ic_launcher).into(circleImageView, new Callback() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onError() {
-                        Picasso.with(getContext()).load(image)
-                                .placeholder(R.mipmap.ic_launcher).into(circleImageView);
-                    }
-                });
-
-
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        super.onActivityCreated(savedInstanceState);
-    }
 }

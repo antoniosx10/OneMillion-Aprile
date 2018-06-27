@@ -1,5 +1,6 @@
 package unisa.it.pc1.provacirclemenu;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,7 +32,9 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +54,10 @@ public class Autenticazione extends AppCompatActivity {
     Boolean mVerified = false;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
 
+    private ProgressDialog progressDialog;
+
+    private TextView nome;
+
 
     private DatabaseReference mUsersDBref;
 
@@ -64,21 +71,20 @@ public class Autenticazione extends AppCompatActivity {
         fabbutton = (FloatingActionButton) findViewById(R.id.sendverifybt);
         timertext = (
                 TextView) findViewById(R.id.timertv);
+
+        nome = findViewById(R.id.displayName);
         verifiedimg = (ImageView) findViewById(R.id.verifiedsign);
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
+
+        progressDialog = new ProgressDialog(this);
+
 
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             @Override
             public void onVerificationCompleted(PhoneAuthCredential credential) {
-                // This callback will be invoked in two situations:
-                // 1 - Instant verification. In some cases the phone number can be instantly
-                //     verified without needing to send or enter a verification code.
-                // 2 - Auto-retrieval. On some devices Google Play services can automatically
-                //     detect the incoming verification SMS and perform verificaiton without
-                //     user action.
-                Log.d("TAG", "onVerificationCompleted:" + credential);
+
 
                 signInWithPhoneAuthCredential(credential);
             }
@@ -107,12 +113,6 @@ public class Autenticazione extends AppCompatActivity {
             @Override
             public void onCodeSent(String verificationId,
                                    PhoneAuthProvider.ForceResendingToken token) {
-                // The SMS verification code has been sent to the provided phone number, we
-                // now need to ask the user to enter the code and then construct a credential
-                // by combining the code with a verification ID.
-                Log.d("TAG", "onCodeSent:" + verificationId);
-
-                // Save verification ID and resending token so we can use them later
                 mVerificationId = verificationId;
                 mResendToken = token;
             }
@@ -121,7 +121,7 @@ public class Autenticazione extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (fabbutton.getTag().equals(getResources().getString(R.string.tag_send))) {
-                    if (!phoneed.getText().toString().trim().isEmpty() && phoneed.getText().toString().trim().length() >= 10) {
+                    if (!phoneed.getText().toString().trim().isEmpty() && phoneed.getText().toString().trim().length() >= 10 && !nome.getText().toString().trim().isEmpty()) {
                         startPhoneNumberVerification(phoneed.getText().toString().trim());
                         mVerified = false;
                         starttimer();
@@ -179,14 +179,13 @@ public class Autenticazione extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("TAG", "signInWithCredential:success");
+
 
 
 
                             FirebaseUser user = task.getResult().getUser();
 
-                            createUserInDb(user.getUid(), user.getDisplayName(), user.getPhoneNumber());
+                            createUserInDb(user.getUid(), nome.getText().toString(), user.getPhoneNumber());
 
 
                             mVerified = true;
@@ -201,8 +200,7 @@ public class Autenticazione extends AppCompatActivity {
                             snackbar.show();
                             // ...
                         } else {
-                            // Sign in failed, display a message and update the UI
-                            Log.w("TAG", "signInWithCredential:failure", task.getException());
+
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 // The verification code entered was invalid
                                 Snackbar snackbar = Snackbar
@@ -281,16 +279,31 @@ public class Autenticazione extends AppCompatActivity {
 
 
     private void createUserInDb(String userId, String displayName, String number){
-        mUsersDBref = FirebaseDatabase.getInstance().getReference().child("Users");
-        User user = new User(userId, displayName, number);
-        mUsersDBref.child(userId).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+        String uid = mAuth.getUid();
+
+        mUsersDBref = FirebaseDatabase.getInstance().getReference().child("Users")
+                .child(uid);
+
+
+        String device_token = FirebaseInstanceId.getInstance().getToken();
+
+        User utente = new User(displayName,number,"default","default",device_token);
+
+
+        mUsersDBref.setValue(utente).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(!task.isSuccessful()){
-                    //error
+                if (task.isSuccessful()) {
+                    progressDialog.dismiss();
 
-                }else{
+                    Intent mainIntent = new Intent(Autenticazione.this,MainActivity.class);
+                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(mainIntent);
+                    finish();
+                } else {
 
+                    progressDialog.hide();
+                    Toast.makeText(Autenticazione.this,"Credenziali errate",Toast.LENGTH_LONG).show();
                 }
             }
         });

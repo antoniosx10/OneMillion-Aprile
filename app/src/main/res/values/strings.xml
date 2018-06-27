@@ -1,4 +1,13 @@
 <resources>
+    <string name="tutti_gli_tenti">tutti_gli_tenti</string>
+    <string name="crea_nuovo_account">Crea nuovo account</string>
+    <string name="nome">Nome</string>
+    <string name="email">Email</string>
+    <string name="crea_account">crea account</string>
+    <string name="log_out">Log out</string>
+    <string name="tutti_gli_utenti">Tutti gli utenti</string>
+    <string name="impostazioni">Impostazioni</string>
+    <string name="password">Password</string>
     <string name="tag_send">send</string>
     <string name="tag_verify">verify</string>
     <string name="app_name">ProvaCircleMenu</string>

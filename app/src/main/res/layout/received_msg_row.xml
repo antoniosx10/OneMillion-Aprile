@@ -13,12 +13,13 @@
         android:paddingBottom="10dp">
 
         <TextView
+            android:textSize="20sp"
             android:id="@+id/chatMsgTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxWidth="200dp"
             android:padding="10dp"
-            android:textColor="@android:color/holo_red_dark" />
+            android:textColor="@android:color/black" />
 
     </LinearLayout>
 

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,7 +88,7 @@ public class ChatsFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        Query conversationQuery = mConvDatabase.orderByChild("timestamp");
+        Query conversationQuery = mUsersDatabase;
 
         FirebaseRecyclerAdapter<Conv, ConvViewHolder> firebaseConvAdapter = new FirebaseRecyclerAdapter<Conv, ConvViewHolder>(
                 Conv.class,
@@ -98,9 +99,9 @@ public class ChatsFragment extends Fragment {
             @Override
             protected void populateViewHolder(final ConvViewHolder convViewHolder, final Conv conv, int i) {
 
-
-
                 final String list_user_id = getRef(i).getKey();
+
+                Log.d("lista",""+list_user_id);
 
                 Query lastMessageQuery = mMessageDatabase.child(list_user_id).limitToLast(1);
 

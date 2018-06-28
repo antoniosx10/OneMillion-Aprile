@@ -75,6 +75,9 @@ public class MainActivity extends AppCompatActivity{
 
             mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
 
+            Intent serviceIntent = new Intent(getApplicationContext(), ListenerService.class);
+            getApplicationContext().startService(serviceIntent);
+
         }
 
 

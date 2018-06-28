@@ -1,13 +1,10 @@
 package unisa.it.pc1.provacirclemenu.model;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 
 import java.util.ArrayList;
-
-import unisa.it.pc1.provacirclemenu.DbManager;
 
 /**
  * Created by PC1 on 03/06/2018.

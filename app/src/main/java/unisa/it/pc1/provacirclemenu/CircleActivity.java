@@ -38,7 +38,6 @@ public class CircleActivity extends Activity {
 
 
     private String testo;
-    private DbManager dbManager;
     private View mChatHeadView;
     private WindowManager mWindowManager;
     private CircleMenu circleMenu;
@@ -64,8 +63,6 @@ public class CircleActivity extends Activity {
 
         testo = i.getStringExtra("testoCopiato");
 
-
-        dbManager = new DbManager(getApplicationContext());
 
         startTimerHead();
 

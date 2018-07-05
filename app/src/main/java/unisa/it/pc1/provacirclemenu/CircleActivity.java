@@ -77,14 +77,14 @@ public class CircleActivity extends Activity {
 
         circleMenu = (CircleMenu) findViewById(R.id.circle_menu);
 
-        circleMenu.setMainMenu(Color.parseColor("#CCCCCC"), R.drawable.ic_menu_black_24dp, R.drawable.ic_remove_circle_black_24dp)
-                .addSubMenu(Color.parseColor("#1db58c"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#1db58c"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#1db58c"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#1db58c"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#1db58c"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#1db58c"), R.drawable.ic_save_black_24dp)
-                .addSubMenu(Color.parseColor("#1db58c"), R.drawable.ic_add_black_24dp)
+        circleMenu.setMainMenu(Color.parseColor("#d3d1d1"), R.drawable.ic_menu_black_24dp, R.drawable.ic_remove_circle_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_save_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_add_black_24dp)
                 .setOnMenuSelectedListener(new OnMenuSelectedListener() {
                     @Override
                     public void onMenuSelected(int i) {

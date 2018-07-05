@@ -1,242 +1,151 @@
 package unisa.it.pc1.provacirclemenu;
 
-
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Typeface;
-import android.os.Bundle;
+import android.database.Cursor;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
+import android.os.Bundle;
+import android.support.annotation.FloatRange;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
-import de.hdodenhof.circleimageview.CircleImageView;
+import java.net.UnknownServiceException;
+import java.util.ArrayList;
+import java.util.List;
 
+import unisa.it.pc1.provacirclemenu.RecyclerViewAdapter;
+import unisa.it.pc1.provacirclemenu.model.User;
+import unisa.it.pc1.provacirclemenu.model.UtentiModel;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by Antonio on 24/03/2018.
  */
+
 public class ChatsFragment extends Fragment {
+    private UtentiModel utentiModel;
+    private ArrayList<String> listaNumeri;
 
+    View v;
+    private RecyclerView recyclerView;
+    private List<User> listContact;
 
-    private RecyclerView mConvList;
+    private Boolean firstTime = false;
 
-    private DatabaseReference mConvDatabase;
-    private DatabaseReference mMessageDatabase;
-    private DatabaseReference mUsersDatabase;
+    private FirebaseAuth userFirebase;
+    private DatabaseReference mUsersDBRef;
 
-    private FirebaseAuth mAuth;
-
-    private String mCurrent_user_id;
-
-    private View mMainView;
-
+    private ArrayList<User> mUsersList = new ArrayList<>();
 
     public ChatsFragment() {
-        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        userFirebase = FirebaseAuth.getInstance();
+        mUsersDBRef = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        utentiModel = new UtentiModel();
+        //Trovare modo per non far caricare sempre listaNumeri
+        listaNumeri = utentiModel.getContattiTelefono(getContext());
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
+        v = inflater.inflate(R.layout.fragment_chats,container,false);
+        recyclerView = v.findViewById(R.id.conv_list);
+        RecyclerViewAdapterContact recyclerViewAdapter = new RecyclerViewAdapterContact(getContext(),mUsersList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(recyclerViewAdapter);
+
+        return v;
     }
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-        mMainView = inflater.inflate(R.layout.fragment_chats, container, false);
-
-        mConvList = (RecyclerView) mMainView.findViewById(R.id.conv_list);
-        mAuth = FirebaseAuth.getInstance();
-
-        mCurrent_user_id = mAuth.getCurrentUser().getUid();
-
-        mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrent_user_id);
-
-        mConvDatabase.keepSynced(true);
-        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
-        mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrent_user_id);
-        mUsersDatabase.keepSynced(true);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setReverseLayout(true);
-        linearLayoutManager.setStackFromEnd(true);
-
-        mConvList.setHasFixedSize(true);
-        mConvList.setLayoutManager(linearLayoutManager);
+        mUsersList = queryUsersAndAddthemToList();
 
 
-        // Inflate the layout for this fragment
-        return mMainView;
     }
 
+    private ArrayList<User> queryUsersAndAddthemToList(){
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        Query conversationQuery = mUsersDatabase;
-
-        FirebaseRecyclerAdapter<Conv, ConvViewHolder> firebaseConvAdapter = new FirebaseRecyclerAdapter<Conv, ConvViewHolder>(
-                Conv.class,
-                R.layout.users_single_layout,
-                ConvViewHolder.class,
-                conversationQuery
-        ) {
+        final ArrayList<User> lista = new ArrayList<User>();
+        mUsersDBRef.addValueEventListener(new ValueEventListener() {
             @Override
-            protected void populateViewHolder(final ConvViewHolder convViewHolder, final Conv conv, int i) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getChildrenCount() > 0){
+                    for(DataSnapshot snap: dataSnapshot.getChildren()){
+                        User user = snap.getValue(User.class);
+                        user.setNumber(snap.child("number").getValue(String.class));
+                        user.setUserId(snap.getKey());
+                        //if not current user, as we do not want to show ourselves then chat with ourselves lol
+                        try {
+                            if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){
 
-                final String list_user_id = getRef(i).getKey();
+                                Log.d("NUMERO DA FIREBASE", user.getNumber());
 
-                Log.d("lista",""+list_user_id);
+                                for(String s : listaNumeri) {
+                                    Log.d("Num",s);
+                                    if(s.equals(user.getNumber())) {
+                                        Log.d("quante volte",s);
+                                        lista.add(user);
+                                    }
+                                }
 
-                Query lastMessageQuery = mMessageDatabase.child(list_user_id).limitToLast(1);
-
-                lastMessageQuery.addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                        String data = dataSnapshot.child("message").getValue().toString();
-                        convViewHolder.setMessage(data, conv.isSeen());
-
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-
-                mUsersDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        final String userName = dataSnapshot.child("displayName").getValue().toString();
-                        String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
-
-                        if(dataSnapshot.hasChild("online")) {
-
-                            String userOnline = dataSnapshot.child("online").getValue().toString();
-                            convViewHolder.setUserOnline(userOnline);
-
+                                //lista.add(user);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
 
-                        convViewHolder.setName(userName);
-                        convViewHolder.setUserImage(userThumb, getContext());
-
-                        convViewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-
-
-                                Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-                                chatIntent.putExtra("user_id", list_user_id);
-                                chatIntent.putExtra("user_name", userName);
-                                startActivity(chatIntent);
-
-                            }
-                        });
-
-
                     }
+                }
+                if(!firstTime) {
+                    getFragmentManager().beginTransaction().detach(ChatsFragment.this).attach(ChatsFragment.this).commit();
+                    firstTime = true;
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    Log.d("Entrato", "in firsttime");
+                }
+            }
 
-                    }
-                });
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
-        };
 
-        mConvList.setAdapter(firebaseConvAdapter);
+        });
 
+        return lista;
     }
 
-    public static class ConvViewHolder extends RecyclerView.ViewHolder {
-
-        View mView;
-
-        public ConvViewHolder(View itemView) {
-            super(itemView);
-
-            mView = itemView;
-
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            getFragmentManager().beginTransaction().detach(this).attach(this).commit();
         }
-
-        public void setMessage(String message, boolean isSeen){
-
-            TextView userStatusView = (TextView) mView.findViewById(R.id.user_single_status);
-            userStatusView.setText(message);
-
-            if(!isSeen){
-                userStatusView.setTypeface(userStatusView.getTypeface(), Typeface.BOLD);
-            } else {
-                userStatusView.setTypeface(userStatusView.getTypeface(), Typeface.NORMAL);
-            }
-
-        }
-
-        public void setName(String name){
-
-            TextView userNameView = (TextView) mView.findViewById(R.id.user_single_name);
-            userNameView.setText(name);
-
-        }
-
-        public void setUserImage(String thumb_image, Context ctx){
-
-            CircleImageView userImageView = (CircleImageView) mView.findViewById(R.id.user_single_image);
-            Picasso.with(ctx).load(thumb_image).placeholder(R.mipmap.ic_launcher_round).into(userImageView);
-
-        }
-
-        public void setUserOnline(String online_status) {
-
-            ImageView userOnlineView = (ImageView) mView.findViewById(R.id.user_single_online_icon);
-
-            if(online_status.equals("true")){
-
-                userOnlineView.setVisibility(View.VISIBLE);
-
-            } else {
-
-                userOnlineView.setVisibility(View.INVISIBLE);
-
-            }
-
-        }
-
-
     }
+
 
 }

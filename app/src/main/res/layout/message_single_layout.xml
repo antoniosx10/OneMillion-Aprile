@@ -64,7 +64,6 @@
         android:layout_marginLeft="0dp"
         android:layout_toEndOf="@+id/message_profile_layout"
         android:padding="0dp"
-        android:scaleType="centerCrop"
         android:layout_alignParentRight="true"
         android:layout_alignLeft="@+id/message_text_layout"
         android:layout_toRightOf="@+id/message_profile_layout" />

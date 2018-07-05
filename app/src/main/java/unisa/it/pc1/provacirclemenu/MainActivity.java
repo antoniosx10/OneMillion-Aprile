@@ -1,14 +1,24 @@
 package unisa.it.pc1.provacirclemenu;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PersistableBundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -48,12 +58,14 @@ public class MainActivity extends AppCompatActivity{
 
     private Intent serviceIntent;
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mAuth = FirebaseAuth.getInstance();
+        boolean permessi = true;
 
         serviceIntent = new Intent(getApplicationContext(), ListenerService.class);
         startService(serviceIntent);
@@ -65,6 +77,8 @@ public class MainActivity extends AppCompatActivity{
                     Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, 1000);
         }
+
+        mAuth = FirebaseAuth.getInstance();
 
         mToolbar = findViewById(R.id.main_app_bar);
         setSupportActionBar(mToolbar);
@@ -95,10 +109,14 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
+
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
+
+
+
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if(currentUser == null){
@@ -175,6 +193,11 @@ public class MainActivity extends AppCompatActivity{
 
         return true;
     }
+
+
+
+
+
 
 }
 

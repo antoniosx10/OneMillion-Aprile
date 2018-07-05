@@ -95,6 +95,14 @@ public class ChatsFragment extends Fragment {
         mUsersDBRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
+                //diamo il tempo a firstTime di diventare true;
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 if(dataSnapshot.getChildrenCount() > 0){
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
                         User user = snap.getValue(User.class);
@@ -103,22 +111,16 @@ public class ChatsFragment extends Fragment {
                         //if not current user, as we do not want to show ourselves then chat with ourselves lol
                         try {
                             if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){
-
-                                Log.d("NUMERO DA FIREBASE", user.getNumber());
-
                                 for(String s : listaNumeri) {
                                     Log.d("Num",s);
-
                                     if(!s.substring(0,3).equals("+39")) {
                                         s = "+39" + s;
                                     }
-
                                     if(s.equals(user.getNumber())) {
                                         Log.d("quante volte",s);
                                         lista.add(user);
                                     }
                                 }
-
                                 //lista.add(user);
                             }
                         } catch (Exception e) {
@@ -130,8 +132,6 @@ public class ChatsFragment extends Fragment {
                 if(!firstTime) {
                     getFragmentManager().beginTransaction().detach(ChatsFragment.this).attach(ChatsFragment.this).commit();
                     firstTime = true;
-
-                    Log.d("Entrato", "in firsttime");
                 }
             }
 

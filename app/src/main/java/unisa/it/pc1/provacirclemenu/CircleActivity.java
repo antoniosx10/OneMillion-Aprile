@@ -54,8 +54,6 @@ public class CircleActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_circle);
 
-        //PROVA
-        //init Firebase
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Messages");
         mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -90,7 +88,7 @@ public class CircleActivity extends Activity {
                     public void onMenuSelected(int i) {
                         switch (i) {
                             case 0:
-                                //PROVE
+
                                 sendMessageToFirebase(testo, "HoqUAbqQpGNAqfbHon5dA2bDpMt1","E1f84RhKMhOA49X696T1Y0vNvBA3");
 
                             case 5:
@@ -248,7 +246,6 @@ public class CircleActivity extends Activity {
     }
 
 
-    //PROVA
     private void sendMessageToFirebase(String message, String senderId, String receiverId) {
         //mMessagesList.clear();
 

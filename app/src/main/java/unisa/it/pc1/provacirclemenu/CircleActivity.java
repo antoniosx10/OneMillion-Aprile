@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,16 +22,27 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.hitomi.cmlibrary.CircleMenu;
 import com.hitomi.cmlibrary.OnMenuSelectedListener;
 import com.hitomi.cmlibrary.OnMenuStatusChangeListener;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
 import unisa.it.pc1.provacirclemenu.model.ChatMessage;
+import unisa.it.pc1.provacirclemenu.model.User;
 
 public class CircleActivity extends Activity {
     //PROVA
@@ -49,29 +63,53 @@ public class CircleActivity extends Activity {
 
     private Boolean isDettagli = false;
 
+    private FirebaseAuth mAuth;
+
+    private String mCurrent_user_id;
+
+    private DatabaseReference mConvDatabase;
+
+    private ArrayList<User> utenti;
+
+    public static Bitmap getBitmapFromURL(String src) {
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (IOException e) {
+            // Log exception
+            return null;
+        }
+    }
+
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_circle);
 
+        mAuth = FirebaseAuth.getInstance();
+
+        mCurrent_user_id = mAuth.getCurrentUser().getUid();
+
+        mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrent_user_id);
+
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Messages");
         mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        utenti = new ArrayList<User>();
+
+        utenti = uploadChat();
 
         Intent i = getIntent();
 
         testo = i.getStringExtra("testoCopiato");
 
-
         startTimerHead();
-
-        final String arrayName[] = {"Contatto1",
-                "Contatto2",
-                "Contatto3",
-                "Contatto4",
-                "Contatto5",
-                "Salva",
-                "Aggiungi Dettagli"
-        };
 
         circleMenu = (CircleMenu) findViewById(R.id.circle_menu);
 
@@ -265,4 +303,58 @@ public class CircleActivity extends Activity {
         });
     }
 
+    private ArrayList<User> uploadChat(){
+
+
+        Query conversationQuery = mConvDatabase.orderByChild("timestamp").limitToFirst(5);
+
+        final ArrayList<User> finalListaUtenti = new ArrayList<User>();
+        conversationQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(final DataSnapshot convData, String s) {
+
+                mUsersRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot userData) {
+                        User user = new User();
+                        user.setDisplayName(userData.child(convData.getKey()).child("displayName").getValue(String.class));
+                        user.setThumb_image(userData.child(convData.getKey()).child("thumb_image").getValue(String.class));
+                        user.setUserId(userData.child(convData.getKey()).getKey());
+
+                        finalListaUtenti.add(user);
+
+                        Log.d("PROVAUTENTI: ", finalListaUtenti.size() + "");
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        return finalListaUtenti;
+    }
 }

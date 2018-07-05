@@ -110,7 +110,9 @@ public class ChatsFragment extends Fragment {
                         user.setUserId(snap.getKey());
                         //if not current user, as we do not want to show ourselves then chat with ourselves lol
                         try {
+
                             if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){
+
                                 for(String s : listaNumeri) {
                                     Log.d("Num",s);
                                     if(!s.substring(0,3).equals("+39")) {
@@ -121,12 +123,12 @@ public class ChatsFragment extends Fragment {
                                         lista.add(user);
                                     }
                                 }
-                                //lista.add(user);
+
+
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
                     }
                 }
                 if(!firstTime) {

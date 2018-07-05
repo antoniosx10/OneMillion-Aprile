@@ -145,7 +145,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 String online = dataSnapshot.child("online").getValue().toString();
-                final String image = dataSnapshot.child("Immagine").getValue().toString();
+                final String image = dataSnapshot.child("image").getValue().toString();
 
                 if(online.equals("true")) {
 

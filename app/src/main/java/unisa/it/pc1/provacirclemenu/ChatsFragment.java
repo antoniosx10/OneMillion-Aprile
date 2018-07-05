@@ -61,6 +61,7 @@ public class ChatsFragment extends Fragment {
         mUsersDBRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         utentiModel = new UtentiModel();
+
         //Trovare modo per non far caricare sempre listaNumeri
         listaNumeri = utentiModel.getContattiTelefono(getContext());
     }
@@ -107,6 +108,11 @@ public class ChatsFragment extends Fragment {
 
                                 for(String s : listaNumeri) {
                                     Log.d("Num",s);
+
+                                    if(!s.substring(0,3).equals("+39")) {
+                                        s = "+39" + s;
+                                    }
+
                                     if(s.equals(user.getNumber())) {
                                         Log.d("quante volte",s);
                                         lista.add(user);

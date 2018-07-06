@@ -95,13 +95,7 @@ public class ChatsFragment extends Fragment {
         mUsersDBRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-                //diamo il tempo a firstTime di diventare true;
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                mUsersList.clear();
 
                 if(dataSnapshot.getChildrenCount() > 0){
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
@@ -110,7 +104,6 @@ public class ChatsFragment extends Fragment {
                         user.setUserId(snap.getKey());
                         //if not current user, as we do not want to show ourselves then chat with ourselves lol
                         try {
-
                             if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){
 
                                 for(String s : listaNumeri) {
@@ -119,7 +112,6 @@ public class ChatsFragment extends Fragment {
                                         s = "+39" + s;
                                     }
                                     if(s.equals(user.getNumber())) {
-                                        Log.d("quante volte",s);
                                         lista.add(user);
                                     }
                                 }

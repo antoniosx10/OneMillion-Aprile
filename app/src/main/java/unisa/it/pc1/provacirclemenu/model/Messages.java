@@ -6,7 +6,8 @@ package unisa.it.pc1.provacirclemenu.model;
 
 public class Messages {
 
-    private String message, type;
+    private String message;
+    private String type;
     private long  time;
     private boolean seen;
 

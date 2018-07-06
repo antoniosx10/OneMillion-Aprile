@@ -73,13 +73,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         String from_user = c.getFrom();
         String message_type = c.getType();
 
-        if (from_user.equals(curre_user_id)){
-            viewHolder.messageText.setBackgroundColor(Color.WHITE);
-            viewHolder.messageText.setTextColor(Color.BLACK);
-        }else{
-            viewHolder.messageText.setBackgroundColor(R.drawable.message_text_background);
-            viewHolder.messageText.setTextColor(Color.WHITE);
-        }
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(from_user);
 
@@ -102,7 +95,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             }
         });
 
+
         if(message_type.equals("text")) {
+
+            if (from_user.equals(curre_user_id)){
+                viewHolder.messageText.setBackgroundColor(Color.WHITE);
+                viewHolder.messageText.setTextColor(Color.BLACK);
+            }else{
+                viewHolder.messageText.setBackgroundColor(R.drawable.message_text_background);
+                viewHolder.messageText.setTextColor(Color.WHITE);
+            }
 
             viewHolder.messageText.setText(c.getMessage());
             viewHolder.messageImage.setVisibility(View.INVISIBLE);
@@ -111,7 +113,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         } else {
 
             viewHolder.messageText.setVisibility(View.INVISIBLE);
-            Picasso.with(viewHolder.profileImage.getContext()).load(c.getMessage())
+            viewHolder.messageText.setPadding(0,0,0,0);
+            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage())
                     .placeholder(R.drawable.ic_launcher_background).into(viewHolder.messageImage);
 
         }

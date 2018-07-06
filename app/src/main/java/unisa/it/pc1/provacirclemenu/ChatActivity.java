@@ -1,5 +1,6 @@
 package unisa.it.pc1.provacirclemenu;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,7 +18,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,6 +39,8 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,27 +68,17 @@ public class ChatActivity extends AppCompatActivity {
     private EditText mChatMessageView;
 
     private RecyclerView mMessagesList;
-    private SwipeRefreshLayout mRefreshLayout;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
     private MessageAdapter mAdapter;
-
-    private static final int TOTAL_ITEMS_TO_LOAD = 10;
-    private int mCurrentPage = 1;
 
     private static final int GALLERY_PICK = 1;
 
     // Storage Firebase
     private StorageReference mImageStorage;
 
-
-    //New Solution
-    private int itemPos = 0;
-
-    private String mLastKey = "";
-    private String mPrevKey = "";
-
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +105,8 @@ public class ChatActivity extends AppCompatActivity {
 
         actionBar.setCustomView(action_bar_view);
 
+        progressDialog = new ProgressDialog(this);
+
         // ---- Custom Action bar Items ----
 
         mTitleView = (TextView) findViewById(R.id.custom_bar_title);
@@ -122,7 +120,7 @@ public class ChatActivity extends AppCompatActivity {
         mAdapter = new MessageAdapter(messagesList);
 
         mMessagesList =  findViewById(R.id.messages_list);
-        mRefreshLayout =  findViewById(R.id.message_swipe_layout);
+
         mLinearLayout = new LinearLayoutManager(this);
 
         mMessagesList.setHasFixedSize(true);
@@ -240,43 +238,45 @@ public class ChatActivity extends AppCompatActivity {
         mChatAddBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /**
+
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*");
+                startActivityForResult(intent, REQUEST_IMAGE);
+                 **/
 
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 
-                startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
+                startActivityForResult(Intent.createChooser(galleryIntent, "SELEZIONA IMMAGINE"), GALLERY_PICK);
 
             }
         });
 
 
 
-        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
 
-                mCurrentPage++;
-
-                itemPos = 0;
-
-                loadMoreMessages();
-
-
-            }
-        });
 
 
     }
+
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == GALLERY_PICK && resultCode == RESULT_OK){
+        if(requestCode == GALLERY_PICK && resultCode == RESULT_OK && data != null){
+
+            progressDialog.setTitle("Invio immagine in corso");
+            progressDialog.setMessage("Attendi");
+            progressDialog.show();
 
             Uri imageUri = data.getData();
+
+
 
             final String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
             final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
@@ -309,7 +309,6 @@ public class ChatActivity extends AppCompatActivity {
                         messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
                         messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
-                        mChatMessageView.setText("");
 
                         mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                             @Override
@@ -321,9 +320,17 @@ public class ChatActivity extends AppCompatActivity {
 
                                 }
 
+                                mChatMessageView.setText("");
+
+
+                                progressDialog.dismiss();
+
+
+
                             }
                         });
 
+                        progressDialog.dismiss();
 
                     }
 
@@ -334,101 +341,18 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    private void loadMoreMessages() {
-
-        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
-
-        Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
-
-        messageQuery.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-
-                Messages message = dataSnapshot.getValue(Messages.class);
-                String messageKey = dataSnapshot.getKey();
-
-                if(!mPrevKey.equals(messageKey)){
-
-                    messagesList.add(itemPos++, message);
-
-                } else {
-
-                    mPrevKey = mLastKey;
-
-                }
-
-
-                if(itemPos == 1) {
-
-                    mLastKey = messageKey;
-
-                }
-
-
-                Log.d("TOTALKEYS", "Last Key : " + mLastKey + " | Prev Key : " + mPrevKey + " | Message Key : " + messageKey);
-
-                mAdapter.notifyDataSetChanged();
-
-                mRefreshLayout.setRefreshing(false);
-
-                mLinearLayout.scrollToPositionWithOffset(10, 0);
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }
 
     private void loadMessages() {
 
-        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
-
-        Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
-
-
-        messageQuery.addChildEventListener(new ChildEventListener() {
+       mRootRef.child("messages").child(mCurrentUserId).child(mChatUser).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
                 Messages message = dataSnapshot.getValue(Messages.class);
-
-                itemPos++;
-
-                if(itemPos == 1){
-
-                    String messageKey = dataSnapshot.getKey();
-
-                    mLastKey = messageKey;
-                    mPrevKey = messageKey;
-
-                }
 
                 messagesList.add(message);
                 mAdapter.notifyDataSetChanged();
 
-                mMessagesList.scrollToPosition(messagesList.size() - 1);
-
-                mRefreshLayout.setRefreshing(false);
 
             }
 
@@ -481,7 +405,6 @@ public class ChatActivity extends AppCompatActivity {
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
             messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
-            mChatMessageView.setText("");
 
             mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
             mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("timestamp").setValue(ServerValue.TIMESTAMP);
@@ -499,9 +422,14 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
 
+                    mChatMessageView.setText("");
+
+
                 }
             });
 
+        }else{
+            Toast.makeText(getApplicationContext(),"Inserisci il tuo messaggio",Toast.LENGTH_LONG).show();
         }
 
     }

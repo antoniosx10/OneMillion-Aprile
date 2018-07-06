@@ -30,7 +30,6 @@ import unisa.it.pc1.provacirclemenu.model.Messages;
 public class MessageAdapter extends ArrayAdapter<Messages> {
 
 
-    private List<Messages> mMessageList;
     private DatabaseReference mUserDatabase;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 

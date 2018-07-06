@@ -71,7 +71,6 @@ public class ChatActivity extends AppCompatActivity {
     private ListView mMessagesList;
 
     private final List<Messages> messagesList = new ArrayList<>();
-    private LinearLayoutManager mLinearLayout;
     private MessageAdapter mAdapter;
 
     private static final int GALLERY_PICK = 1;
@@ -122,7 +121,6 @@ public class ChatActivity extends AppCompatActivity {
 
         mMessagesList =  findViewById(R.id.messages_list);
 
-        mLinearLayout = new LinearLayoutManager(this);
 
         mMessagesList.setAdapter(mAdapter);
 

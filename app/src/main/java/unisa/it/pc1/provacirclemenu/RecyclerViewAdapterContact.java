@@ -3,6 +3,7 @@ package unisa.it.pc1.provacirclemenu;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +20,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -59,7 +62,43 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         holder.nome.setText(mData.get(position).getDisplayName());
-        Picasso.with(mContext).load(mData.get(position).getThumb_image()).placeholder(R.mipmap.ic_launcher_round).into(holder.foto);
+        Picasso.with(mContext).load(mData.get(position).getThumb_image()).placeholder(R.drawable.ic_account_circle_black_24dp).into(holder.foto);
+
+
+        final String list_user_id = mData.get(position).getUserId();
+
+        Query lastMessageQuery = mMessageDatabase.child(list_user_id).limitToLast(1);
+
+        lastMessageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                String data = dataSnapshot.child("message").getValue().toString();
+                Boolean seen = (Boolean) dataSnapshot.child("seen").getValue();
+                holder.setMessage(data,seen);
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -74,6 +113,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
         private TextView nome;
         private CircleImageView foto;
         private TextView messaggio;
+        private TextView orarioMessaggio;
 
 
         public MyViewHolder(View itemView) {
@@ -81,7 +121,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
 
             nome = itemView.findViewById(R.id.user_single_name);
             foto = itemView.findViewById(R.id.user_single_image);
-            messaggio = itemView.findViewById(R.id.user_single_status);
+
 
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -93,10 +133,23 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
                     mContext.startActivity(chatIntent);
                 }
             });
+
+
+        }
+
+        public void setMessage(String message, boolean isSeen){
+
+            messaggio = itemView.findViewById(R.id.user_single_status);
+            messaggio.setText(message);
+
+            if(!isSeen){
+                messaggio.setTypeface(messaggio.getTypeface(), Typeface.BOLD);
+            } else {
+                messaggio.setTypeface(messaggio.getTypeface(), Typeface.NORMAL);
+            }
+
         }
     }
-
-
 
 
 

@@ -50,6 +50,8 @@ public class ChatsFragment extends Fragment {
 
     private ArrayList<User> mUsersList = new ArrayList<>();
 
+
+
     public ChatsFragment() {
     }
 
@@ -64,6 +66,8 @@ public class ChatsFragment extends Fragment {
 
         //Trovare modo per non far caricare sempre listaNumeri
         listaNumeri = utentiModel.getContattiTelefono(getContext());
+
+
     }
 
     @Nullable
@@ -106,6 +110,7 @@ public class ChatsFragment extends Fragment {
                         try {
                             if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){
 
+                                /**
                                 for(String s : listaNumeri) {
                                     Log.d("Num",s);
                                     if(!s.substring(0,3).equals("+39")) {
@@ -117,6 +122,8 @@ public class ChatsFragment extends Fragment {
                                         notify();
                                     }
                             }
+                                 **/
+                                lista.add(user);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

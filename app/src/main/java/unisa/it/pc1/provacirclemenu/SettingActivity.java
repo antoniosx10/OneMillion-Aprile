@@ -87,7 +87,7 @@ public class SettingActivity extends Activity {
 
 
                     Picasso.with(SettingActivity.this).load(thumb_image).networkPolicy(NetworkPolicy.OFFLINE)
-                            .placeholder(R.mipmap.ic_launcher).into(circleImageView, new Callback() {
+                            .placeholder(R.drawable.ic_account_circle_black_24dp).into(circleImageView, new Callback() {
                         @Override
                         public void onSuccess() {
 
@@ -96,7 +96,7 @@ public class SettingActivity extends Activity {
                         @Override
                         public void onError() {
                             Picasso.with(SettingActivity.this).load(image)
-                                    .placeholder(R.mipmap.ic_launcher).into(circleImageView);
+                                    .placeholder(R.drawable.ic_account_circle_black_24dp).into(circleImageView);
                         }
                     });
 

@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,7 +44,9 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +63,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private TextView mTitleView;
     private TextView mLastSeenView;
+    private TextView orarioMessaggio;
     private CircleImageView mProfileImage;
     private FirebaseAuth mAuth;
     private String mCurrentUserId;
@@ -79,6 +83,7 @@ public class ChatActivity extends AppCompatActivity {
     private StorageReference mImageStorage;
 
     private ProgressDialog progressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +122,8 @@ public class ChatActivity extends AppCompatActivity {
         mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
 
+        orarioMessaggio = findViewById(R.id.time_text_layout);
+
         mAdapter = new MessageAdapter(this,R.layout.message_single_layout,messagesList);
 
         mMessagesList =  findViewById(R.id.messages_list);
@@ -128,6 +135,8 @@ public class ChatActivity extends AppCompatActivity {
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
         mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
+
+
 
         loadMessages();
 
@@ -155,10 +164,12 @@ public class ChatActivity extends AppCompatActivity {
 
                     mLastSeenView.setText(lastSeenTime);
 
+
+
                 }
 
                 Picasso.with(ChatActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE)
-                        .placeholder(R.mipmap.ic_launcher).into(mProfileImage, new Callback() {
+                        .placeholder(R.drawable.ic_account_circle_black_24dp).into(mProfileImage, new Callback() {
                     @Override
                     public void onSuccess() {
 
@@ -167,7 +178,7 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onError() {
                         Picasso.with(ChatActivity.this).load(image)
-                                .placeholder(R.mipmap.ic_launcher).into(mProfileImage);
+                                .placeholder(R.drawable.ic_account_circle_black_24dp).into(mProfileImage);
                     }
                 });
 
@@ -179,6 +190,8 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
+
 
 
         mRootRef.child("Chat").child(mCurrentUserId).addValueEventListener(new ValueEventListener() {

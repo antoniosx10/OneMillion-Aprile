@@ -11,7 +11,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="10dp"
-        android:src="@mipmap/ic_launcher_round"
+        android:src="@drawable/ic_account_circle_black_24dp"
         android:layout_alignParentRight="true" />
 
     <TextView

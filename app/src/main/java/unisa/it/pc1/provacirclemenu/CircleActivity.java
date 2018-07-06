@@ -271,10 +271,10 @@ public class CircleActivity extends Activity {
         }
         circleMenu
                 .addSubMenu(Color.parseColor("#ff9d00"), imgs[0])
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), imgs[1])
+                .addSubMenu(Color.parseColor("#ff9d00"), imgs[2])
+                .addSubMenu(Color.parseColor("#ff9d00"), imgs[3])
+                .addSubMenu(Color.parseColor("#ff9d00"), imgs[4])
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_save_black_24dp)
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_add_black_24dp)
                 .setOnMenuSelectedListener(new OnMenuSelectedListener() {
@@ -311,14 +311,18 @@ public class CircleActivity extends Activity {
                 Bitmap[] imgs = new Bitmap[5];
 
                 for (int i = 0; i < urls[0].size(); i++) {
-                    URL url = new URL(urls[0].get(i).getThumb_image());
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoInput(true);
-                    connection.connect();
-                    InputStream input = connection.getInputStream();
-                    Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                    if(utenti.get(i) != null) {
+                        URL url = new URL(urls[0].get(i).getThumb_image());
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setDoInput(true);
+                        connection.connect();
+                        InputStream input = connection.getInputStream();
+                        Bitmap myBitmap = BitmapFactory.decodeStream(input);
 
-                    imgs[i] = myBitmap;
+                        imgs[i] = myBitmap;
+                    } else {
+                        imgs[i] = BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_black_24dp);
+                    }
                 }
                 return imgs;
             } catch (Exception e) {
@@ -328,8 +332,7 @@ public class CircleActivity extends Activity {
         }
 
         protected void onPostExecute(Bitmap feed) {
-            // TODO: check this.exception
-            // TODO: do something with the feed
+
         }
     }
 

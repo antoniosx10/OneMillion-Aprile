@@ -113,6 +113,8 @@ public class ChatsFragment extends Fragment {
                                     }
                                     if(s.equals(user.getNumber())) {
                                         lista.add(user);
+
+                                        notify();
                                     }
                                 }
 

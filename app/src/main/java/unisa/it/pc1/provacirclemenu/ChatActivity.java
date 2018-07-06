@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,7 +68,7 @@ public class ChatActivity extends AppCompatActivity {
     private ImageButton mChatSendBtn;
     private EditText mChatMessageView;
 
-    private RecyclerView mMessagesList;
+    private ListView mMessagesList;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
@@ -117,14 +118,11 @@ public class ChatActivity extends AppCompatActivity {
         mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
 
-        mAdapter = new MessageAdapter(messagesList);
+        mAdapter = new MessageAdapter(this,R.layout.message_single_layout,messagesList);
 
         mMessagesList =  findViewById(R.id.messages_list);
 
         mLinearLayout = new LinearLayoutManager(this);
-
-        mMessagesList.setHasFixedSize(true);
-        mMessagesList.setLayoutManager(mLinearLayout);
 
         mMessagesList.setAdapter(mAdapter);
 

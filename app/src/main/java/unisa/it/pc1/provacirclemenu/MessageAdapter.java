@@ -1,10 +1,14 @@
 package unisa.it.pc1.provacirclemenu;
 
+import android.app.Notification;
+import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,51 +27,34 @@ import unisa.it.pc1.provacirclemenu.model.Messages;
 
 
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>{
+public class MessageAdapter extends ArrayAdapter<Messages> {
 
 
     private List<Messages> mMessageList;
     private DatabaseReference mUserDatabase;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-    public MessageAdapter(List<Messages> mMessageList) {
+    public MessageAdapter(@NonNull Context context, int resource, @NonNull List<Messages> objects) {
+        super(context, resource, objects);
 
-        this.mMessageList = mMessageList;
 
     }
+
 
     @Override
-    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public View getView(int position, View view, ViewGroup parent) {
+        LayoutInflater inflater = (LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view = inflater.inflate(R.layout.message_single_layout, null);
 
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.message_single_layout ,parent, false);
+        final TextView messageText = (TextView) view.findViewById(R.id.message_text_layout);
+        final CircleImageView profileImage = (CircleImageView) view.findViewById(R.id.message_profile_layout);
+        final TextView displayName = (TextView) view.findViewById(R.id.name_text_layout);
+        final ImageView messageImage = (ImageView) view.findViewById(R.id.message_image_layout);
 
-        return new MessageViewHolder(v);
 
-    }
 
-    public class MessageViewHolder extends RecyclerView.ViewHolder {
-
-        public TextView messageText;
-        public CircleImageView profileImage;
-        public TextView displayName;
-        public ImageView messageImage;
-
-        public MessageViewHolder(View view) {
-            super(view);
-
-            messageText = (TextView) view.findViewById(R.id.message_text_layout);
-            profileImage = (CircleImageView) view.findViewById(R.id.message_profile_layout);
-            displayName = (TextView) view.findViewById(R.id.name_text_layout);
-            messageImage = (ImageView) view.findViewById(R.id.message_image_layout);
-
-        }
-    }
-
-    @Override
-    public void onBindViewHolder(final MessageViewHolder viewHolder, int i) {
-
-        Messages c = mMessageList.get(i);
+        Messages c = getItem(position);
         String curre_user_id = mAuth.getCurrentUser().getUid();
 
         String from_user = c.getFrom();
@@ -83,9 +70,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 String name = dataSnapshot.child("displayName").getValue().toString();
                 String image = dataSnapshot.child("thumb_image").getValue().toString();
 
-                viewHolder.displayName.setText(name);
+                displayName.setText(name);
 
-                Picasso.with(viewHolder.profileImage.getContext()).load(image).into(viewHolder.profileImage);
+                Picasso.with(profileImage.getContext()).load(image).into(profileImage);
 
             }
 
@@ -99,31 +86,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         if(message_type.equals("text")) {
 
             if (from_user.equals(curre_user_id)){
-                viewHolder.messageText.setBackgroundColor(Color.WHITE);
-                viewHolder.messageText.setTextColor(Color.BLACK);
+                messageText.setBackgroundColor(Color.WHITE);
+                messageText.setTextColor(Color.BLACK);
             }else{
-                viewHolder.messageText.setBackgroundColor(R.drawable.message_text_background);
-                viewHolder.messageText.setTextColor(Color.WHITE);
+               messageText.setBackgroundColor(R.drawable.message_text_background);
+               messageText.setTextColor(Color.WHITE);
             }
 
-            viewHolder.messageText.setText(c.getMessage());
-            viewHolder.messageImage.setVisibility(View.INVISIBLE);
+            messageText.setText(c.getMessage());
+            messageImage.setVisibility(View.INVISIBLE);
 
 
         } else {
 
-            viewHolder.messageText.setVisibility(View.INVISIBLE);
-            viewHolder.messageText.setPadding(0,0,0,0);
-            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage())
-                    .placeholder(R.drawable.ic_launcher_background).into(viewHolder.messageImage);
+            messageText.setVisibility(View.INVISIBLE);
+           messageText.setPadding(0,0,0,0);
+            Picasso.with(messageImage.getContext()).load(c.getMessage())
+                    .placeholder(R.drawable.ic_launcher_background).into(messageImage);
 
         }
 
-    }
-
-    @Override
-    public int getItemCount() {
-        return mMessageList.size();
+        return view;
     }
 
 

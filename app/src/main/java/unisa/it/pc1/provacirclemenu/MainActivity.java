@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -30,23 +31,26 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.hitomi.cmlibrary.CircleMenu;
 
 import java.util.ArrayList;
 
 import unisa.it.pc1.provacirclemenu.model.User;
 
 public class MainActivity extends AppCompatActivity{
-    private FirebaseAuth mAuth;
     private Toolbar mToolbar;
 
     private ViewPager mViewPager;
@@ -57,7 +61,28 @@ public class MainActivity extends AppCompatActivity{
     private TabLayout mTabLayout;
 
     private Intent serviceIntent;
+    private ArrayList<User> utenti;
 
+    private DatabaseReference mMessagesDBRef;
+    private DatabaseReference mUsersRef;
+
+    private String testo;
+    private View mChatHeadView;
+    private WindowManager mWindowManager;
+    private CircleMenu circleMenu;
+
+    private Task task;
+
+    private Handler handler;
+    private Runnable runnable;
+
+    private Boolean isDettagli = false;
+
+    private FirebaseAuth mAuth;
+
+    private String mCurrent_user_id;
+
+    private DatabaseReference mConvDatabase;
 
 
 
@@ -67,8 +92,6 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         boolean permessi = true;
 
-        serviceIntent = new Intent(getApplicationContext(), ListenerService.class);
-        startService(serviceIntent);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             //If the draw over permission is not available open the settings screen
@@ -109,13 +132,10 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
-
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-
-
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
 

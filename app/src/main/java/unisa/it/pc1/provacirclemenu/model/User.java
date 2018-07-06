@@ -1,6 +1,8 @@
 package unisa.it.pc1.provacirclemenu.model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     private String userId;
     private String displayName;

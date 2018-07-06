@@ -63,7 +63,7 @@ public class ListenerService extends Service {
             @Override
             public void onScreenShotTaken(ScreenshotData screenshotData) {
 
-                Log.d("PROVA","PROVA");
+
 
                 Intent i = new Intent(getApplicationContext(),CircleActivity.class);
 
@@ -76,6 +76,8 @@ public class ListenerService extends Service {
         mShotWatch = new ShotWatch(getContentResolver(), listener);
 
         mShotWatch.register();
+
+        Log.d("COMAND","BA");
 
         return super.onStartCommand(intent, flags, startId);
     }

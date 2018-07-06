@@ -8,8 +8,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,21 +42,23 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import unisa.it.pc1.provacirclemenu.model.ChatMessage;
 import unisa.it.pc1.provacirclemenu.model.User;
 
 public class CircleActivity extends Activity {
-    //PROVA
+
     private DatabaseReference mMessagesDBRef;
     private DatabaseReference mUsersRef;
-
-
 
     private String testo;
     private View mChatHeadView;
     private WindowManager mWindowManager;
     private CircleMenu circleMenu;
+
+    private Boolean firstTime = true;
 
     private Task task;
 
@@ -71,26 +75,13 @@ public class CircleActivity extends Activity {
 
     private ArrayList<User> utenti;
 
-    public static Bitmap getBitmapFromURL(String src) {
-        try {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return myBitmap;
-        } catch (IOException e) {
-            // Log exception
-            return null;
-        }
-    }
-
+    public WindowManager.LayoutParams params;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_circle);
+
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -101,52 +92,16 @@ public class CircleActivity extends Activity {
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Messages");
         mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
-        utenti = new ArrayList<User>();
-
-        utenti = uploadChat();
-
         Intent i = getIntent();
 
         testo = i.getStringExtra("testoCopiato");
 
+        utenti = new ArrayList<User>();
+
         startTimerHead();
-
         circleMenu = (CircleMenu) findViewById(R.id.circle_menu);
-
-        circleMenu.setMainMenu(Color.parseColor("#d3d1d1"), R.drawable.ic_menu_black_24dp, R.drawable.ic_remove_circle_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_save_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_add_black_24dp)
-                .setOnMenuSelectedListener(new OnMenuSelectedListener() {
-                    @Override
-                    public void onMenuSelected(int i) {
-                        switch (i) {
-                            case 0:
-
-                                sendMessageToFirebase(testo, "HoqUAbqQpGNAqfbHon5dA2bDpMt1","E1f84RhKMhOA49X696T1Y0vNvBA3");
-
-                            case 5:
-
-                                Toast.makeText(getApplicationContext(), "Hai salvato: " + testo, Toast.LENGTH_SHORT).show();
-                                break;
-
-                            case 6:
-                                isDettagli = true;
-                                task = new Task(testo, new Date(), "3");
-                                Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
-                                dettagliIntent.putExtra("task",task);
-                                startActivityForResult(dettagliIntent,15);
-                                break;
-                        }
-                    }
-                });
-        //---Fine CircleMenu
-
-
+        circleMenu.setMainMenu(Color.parseColor("#d3d1d1"), R.drawable.ic_menu_black_24dp, R.drawable.ic_remove_circle_black_24dp);
+        uploadChat();
         circleMenu.setOnMenuStatusChangeListener(new OnMenuStatusChangeListener() {
             @Override
             public void onMenuOpened() {
@@ -155,7 +110,7 @@ public class CircleActivity extends Activity {
 
             @Override
             public void onMenuClosed() {
-                if(!isDettagli) {
+                if (!isDettagli) {
                     startTimerHead();
                 } else {
                     isDettagli = false;
@@ -165,9 +120,10 @@ public class CircleActivity extends Activity {
             }
         });
 
-        final WindowManager.LayoutParams params =  createHead();
+        params = new WindowManager.LayoutParams();
+        params = createHead();
 
-        mChatHeadView.setOnTouchListener(new View.OnTouchListener() {
+        circleMenu.setOnTouchListener(new View.OnTouchListener() {
             private int lastAction;
             private int initialY;
             private int initialX;
@@ -209,22 +165,22 @@ public class CircleActivity extends Activity {
                         params.y = initialY + (int) (event.getRawY() - initialTouchY);
 
                         //Update the layout with new X & Y coordinate
-                        mWindowManager.updateViewLayout(mChatHeadView, params);
+                        mWindowManager.updateViewLayout(circleMenu, params);
                         int differenzaY = 0;
-                        if(params.y > initialY) {
+                        if (params.y > initialY) {
                             differenzaY = params.y - initialY;
                         } else {
                             differenzaY = initialY - params.y;
                         }
 
                         int differenzaX = 0;
-                        if(params.y > initialY) {
+                        if (params.y > initialY) {
                             differenzaX = params.x - initialX;
                         } else {
                             differenzaX = initialX - params.x;
                         }
 
-                        if(differenzaY > 0.3 || differenzaX > 0.3)
+                        if (differenzaY > 0.3 || differenzaX > 0.3)
                             lastAction = event.getAction();
 
                         return true;
@@ -232,47 +188,7 @@ public class CircleActivity extends Activity {
                 return false;
             }
         });
-    }
 
-    private WindowManager.LayoutParams createHead() {
-
-        mChatHeadView = findViewById(R.id.circle_menu);
-
-        ViewGroup p = (ViewGroup )mChatHeadView.getParent();
-        p.removeView(mChatHeadView);
-
-        //Add the view to the window.
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
-
-        //Add the view to the window
-        mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-        mWindowManager.addView(mChatHeadView,params);
-
-        return params;
-    }
-
-    private void startTimerHead(){
-        handler = new Handler();
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (mChatHeadView != null) {
-                    mWindowManager.removeView(mChatHeadView);
-                    mChatHeadView = null;
-                }
-
-            }
-        };
-        handler.postDelayed(runnable,4000);
-    }
-
-    private void stopTimerHead(){
-        handler.removeCallbacks(runnable);
     }
 
     @Override
@@ -283,32 +199,11 @@ public class CircleActivity extends Activity {
             }
     }
 
-
-    private void sendMessageToFirebase(String message, String senderId, String receiverId) {
-        //mMessagesList.clear();
-
-        ChatMessage newMsg = new ChatMessage(message, senderId, receiverId);
-        mMessagesDBRef.push().setValue(newMsg).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
-                if (!task.isSuccessful()) {
-                    //error
-                    // Toast.makeText(ChatMessagesActivity.this, "Error " + task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                } else {
-                    //Toast.makeText(ChatMessagesActivity.this, "Message sent successfully!", Toast.LENGTH_SHORT).show();
-                    //mMessageEditText.setText(null);
-                    //hideSoftKeyboard();
-                }
-            }
-        });
-    }
-
-    private ArrayList<User> uploadChat(){
-
-
+    private void uploadChat(){
         Query conversationQuery = mConvDatabase.orderByChild("timestamp").limitToFirst(5);
 
         final ArrayList<User> finalListaUtenti = new ArrayList<User>();
+
         conversationQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(final DataSnapshot convData, String s) {
@@ -323,7 +218,8 @@ public class CircleActivity extends Activity {
 
                         finalListaUtenti.add(user);
 
-                        Log.d("PROVAUTENTI: ", finalListaUtenti.size() + "");
+                        utenti = finalListaUtenti;
+                        createCircleMenu();
 
                     }
 
@@ -353,8 +249,141 @@ public class CircleActivity extends Activity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
+
+
         });
 
-        return finalListaUtenti;
+        return;
+    }
+
+    public void createCircleMenu() {
+
+        Bitmap[] imgs = new Bitmap[5];
+        for(int i = 0; i<5; i++) {
+            imgs[i] = BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_black_24dp);
+        }
+        try {
+            imgs = new BitmapFromURLTask().execute(utenti).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        circleMenu
+                .addSubMenu(Color.parseColor("#ff9d00"), imgs[0])
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_save_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_add_black_24dp)
+                .setOnMenuSelectedListener(new OnMenuSelectedListener() {
+                    @Override
+                    public void onMenuSelected(int i) {
+                        switch (i) {
+                            case 0:
+
+                                //sendMessageToFirebase(testo, "HoqUAbqQpGNAqfbHon5dA2bDpMt1","E1f84RhKMhOA49X696T1Y0vNvBA3");
+
+                            case 5:
+
+                                Toast.makeText(getApplicationContext(), "Hai salvato: " + testo, Toast.LENGTH_SHORT).show();
+                                break;
+
+                            case 6:
+                                isDettagli = true;
+                                task = new Task(testo, new Date(), "3");
+                                Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
+                                dettagliIntent.putExtra("task", task);
+                                startActivityForResult(dettagliIntent, 15);
+                                break;
+                        }
+                    }
+                });
+    }
+
+    class BitmapFromURLTask extends AsyncTask<ArrayList<User>, Void, Bitmap[]> {
+
+        private Exception exception;
+
+        protected Bitmap[] doInBackground(ArrayList<User>... urls) {
+            try {
+                Bitmap[] imgs = new Bitmap[5];
+
+                for (int i = 0; i < urls[0].size(); i++) {
+                    URL url = new URL(urls[0].get(i).getThumb_image());
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setDoInput(true);
+                    connection.connect();
+                    InputStream input = connection.getInputStream();
+                    Bitmap myBitmap = BitmapFactory.decodeStream(input);
+
+                    imgs[i] = myBitmap;
+                }
+                return imgs;
+            } catch (Exception e) {
+                this.exception = e;
+                return null;
+            }
+        }
+
+        protected void onPostExecute(Bitmap feed) {
+            // TODO: check this.exception
+            // TODO: do something with the feed
+        }
+    }
+
+    private void startTimerHead(){
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (circleMenu != null) {
+                    mWindowManager.removeView(circleMenu);
+                    circleMenu = null;
+                }
+
+            }
+        };
+        handler.postDelayed(runnable,4000);
+    }
+    private void stopTimerHead(){
+        handler.removeCallbacks(runnable);
+    }
+    private WindowManager.LayoutParams createHead() {
+
+        circleMenu = findViewById(R.id.circle_menu);
+
+        ViewGroup p = (ViewGroup)circleMenu.getParent();
+        p.removeView(circleMenu);
+
+        //Add the view to the window.
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
+
+        //Add the view to the window
+        mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        mWindowManager.addView(circleMenu,params);
+
+        return params;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mWindowManager.removeView(circleMenu);
+        stopTimerHead();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
+
+

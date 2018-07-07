@@ -110,6 +110,8 @@ public class ChatsFragment extends Fragment {
                         try {
                             if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){
 
+                                /**
+
                                 for(String s : listaNumeri) {
                                     Log.d("Num",s);
                                     if(!s.substring(0,3).equals("+39")) {
@@ -120,6 +122,9 @@ public class ChatsFragment extends Fragment {
                                         notify();
                                     }
                             }
+                                 **/
+                                lista.add(user);
+
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

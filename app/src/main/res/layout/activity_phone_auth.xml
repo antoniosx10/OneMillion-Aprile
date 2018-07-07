@@ -47,7 +47,8 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Nome"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:singleLine="false" />
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -117,7 +118,8 @@
                             android:layout_gravity="center"
                             android:layout_margin="20dp"
                             android:src="@drawable/ic_send_white_24dp"
-                            android:tag="@string/tag_send" />
+                            android:tag="@string/tag_send"
+                            app:backgroundTint="@color/colorAccent" />
 
                         <TextView
                             android:id="@+id/timertv"

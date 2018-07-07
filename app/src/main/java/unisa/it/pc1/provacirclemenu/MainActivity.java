@@ -206,11 +206,6 @@ public class MainActivity extends AppCompatActivity{
 
         }
 
-        if(item.getItemId() == R.id.main_all_user){
-
-
-        }
-
         return true;
     }
 

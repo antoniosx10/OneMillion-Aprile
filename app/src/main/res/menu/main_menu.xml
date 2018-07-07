@@ -6,9 +6,6 @@
         android:id="@+id/main_setting"
         android:title="@string/impostazioni" />
     <item
-        android:id="@+id/main_all_user"
-        android:title="@string/tutti_gli_tenti" />
-    <item
         android:id="@+id/main_logOut"
         android:title="@string/log_out" />
 

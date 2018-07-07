@@ -8,12 +8,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -31,17 +34,24 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.hitomi.cmlibrary.CircleMenu;
 import com.hitomi.cmlibrary.OnMenuSelectedListener;
 import com.hitomi.cmlibrary.OnMenuStatusChangeListener;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -58,6 +68,7 @@ public class CircleActivity extends Activity {
     private WindowManager mWindowManager;
     private CircleMenu circleMenu;
 
+    private StorageReference mImageStorage;
     private Boolean firstTime = true;
 
     private Task task;
@@ -77,11 +88,19 @@ public class CircleActivity extends Activity {
 
     public WindowManager.LayoutParams params;
 
+    private DatabaseReference mRootRef;
+
+    private String imagePath;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_circle);
 
+        //------- IMAGE STORAGE ---------
+        mImageStorage = FirebaseStorage.getInstance().getReference();
+
+        mRootRef = FirebaseDatabase.getInstance().getReference();
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -95,6 +114,8 @@ public class CircleActivity extends Activity {
         Intent i = getIntent();
 
         testo = i.getStringExtra("testoCopiato");
+
+        imagePath = i.getStringExtra("pathImg");
 
         utenti = new ArrayList<User>();
 
@@ -262,6 +283,7 @@ public class CircleActivity extends Activity {
         for(int i = 0; i<5; i++) {
             imgs[i] = BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_black_24dp);
         }
+
         try {
             imgs = new BitmapFromURLTask().execute(utenti).get();
         } catch (InterruptedException e) {
@@ -269,12 +291,15 @@ public class CircleActivity extends Activity {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+
+        Log.d("IMAGE", "BLABLA");
+
         circleMenu
-                .addSubMenu(Color.parseColor("#ff9d00"), imgs[0])
-                .addSubMenu(Color.parseColor("#ff9d00"), imgs[1])
-                .addSubMenu(Color.parseColor("#ff9d00"), imgs[2])
-                .addSubMenu(Color.parseColor("#ff9d00"), imgs[3])
-                .addSubMenu(Color.parseColor("#ff9d00"), imgs[4])
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_save_black_24dp)
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_add_black_24dp)
                 .setOnMenuSelectedListener(new OnMenuSelectedListener() {
@@ -282,14 +307,44 @@ public class CircleActivity extends Activity {
                     public void onMenuSelected(int i) {
                         switch (i) {
                             case 0:
-
-                                //sendMessageToFirebase(testo, "HoqUAbqQpGNAqfbHon5dA2bDpMt1","E1f84RhKMhOA49X696T1Y0vNvBA3");
-
-                            case 5:
-
-                                Toast.makeText(getApplicationContext(), "Hai salvato: " + testo, Toast.LENGTH_SHORT).show();
+                                if(testo != null) {
+                                    sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                } else {
+                                    sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                    Log.d("Entrato in sendImage", imagePath);
+                                }
                                 break;
-
+                            case 1:
+                                if(testo != null) {
+                                    sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                } else {
+                                    sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                }
+                                break;
+                            case 2:
+                                sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(),testo);
+                                break;
+                            case 3:
+                                if(testo != null) {
+                                    sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                } else {
+                                    sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                }
+                                break;
+                            case 4:
+                                if(testo != null) {
+                                    sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                } else {
+                                    sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                }
+                                break;
+                            case 5:
+                                if(testo != null) {
+                                    sendMessage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),testo);
+                                } else {
+                                    sendImage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(), imagePath);
+                                }
+                                break;
                             case 6:
                                 isDettagli = true;
                                 task = new Task(testo, new Date(), "3");
@@ -378,15 +433,108 @@ public class CircleActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        mWindowManager.removeView(circleMenu);
-        stopTimerHead();
-
+        if(circleMenu != null) {
+            mWindowManager.removeView(circleMenu);
+            stopTimerHead();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
+
+    private void sendMessage(String senderId, String receiverId, String message) {
+
+        if(!TextUtils.isEmpty(message)){
+
+            String current_user_ref = "messages/" + senderId + "/" + receiverId;
+            String chat_user_ref = "messages/" + receiverId + "/" + senderId;
+
+            DatabaseReference user_message_push = mRootRef.child("messages")
+                    .child(senderId).child(receiverId).push();
+
+            String push_id = user_message_push.getKey();
+
+            Map messageMap = new HashMap();
+            messageMap.put("message", message);
+            messageMap.put("seen", false);
+            messageMap.put("type", "text");
+            messageMap.put("time", ServerValue.TIMESTAMP);
+            messageMap.put("from", senderId);
+
+            Map messageUserMap = new HashMap();
+            messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+            messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+
+            mRootRef.child("Chat").child(senderId).child(receiverId).child("seen").setValue(true);
+            mRootRef.child("Chat").child(senderId).child(receiverId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+
+            mRootRef.child("Chat").child(receiverId).child(senderId).child("seen").setValue(false);
+            mRootRef.child("Chat").child(receiverId).child(senderId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+
+            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                    if(databaseError != null){
+
+                        Log.d("CHAT_LOG", databaseError.getMessage().toString());
+
+                    }
+                }
+            });
+
+        }else{
+            Toast.makeText(getApplicationContext(),"Inserisci il tuo messaggio",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void sendImage(final String senderId, String receiverId, String image) {
+
+            Uri imageUri = Uri.fromFile(new File(image));
+
+            final String current_user_ref = "messages/" + senderId + "/" + receiverId;
+            final String chat_user_ref = "messages/" + receiverId + "/" + senderId;
+
+            DatabaseReference user_message_push = mRootRef.child("messages")
+                    .child(senderId).child(receiverId).push();
+
+            final String push_id = user_message_push.getKey();
+            StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".png");
+            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
+                    if(task.isSuccessful()){
+                        String download_url = task.getResult().getDownloadUrl().toString();
+
+                        Map messageMap = new HashMap();
+                        messageMap.put("message", download_url);
+                        messageMap.put("seen", false);
+                        messageMap.put("type", "image");
+                        messageMap.put("time", ServerValue.TIMESTAMP);
+                        messageMap.put("from", senderId);
+
+                        Map messageUserMap = new HashMap();
+                        messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+                        messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+                        mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if(databaseError != null){
+                                    Log.d("CHAT_LOG", databaseError.getMessage().toString());
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+        }
+
 }
+
 
 

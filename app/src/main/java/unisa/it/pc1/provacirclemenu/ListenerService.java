@@ -62,11 +62,8 @@ public class ListenerService extends Service {
         ShotWatch.Listener listener = new ShotWatch.Listener() {
             @Override
             public void onScreenShotTaken(ScreenshotData screenshotData) {
-
-
-
                 Intent i = new Intent(getApplicationContext(),CircleActivity.class);
-
+                i.putExtra("pathImg", screenshotData.getPath());
                 i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 

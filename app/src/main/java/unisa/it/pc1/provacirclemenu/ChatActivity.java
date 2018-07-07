@@ -285,8 +285,6 @@ public class ChatActivity extends AppCompatActivity {
 
             Uri imageUri = data.getData();
 
-
-
             final String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
             final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
 
@@ -294,18 +292,12 @@ public class ChatActivity extends AppCompatActivity {
                     .child(mCurrentUserId).child(mChatUser).push();
 
             final String push_id = user_message_push.getKey();
-
-
             StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".jpg");
-
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-
                     if(task.isSuccessful()){
-
                         String download_url = task.getResult().getDownloadUrl().toString();
-
 
                         Map messageMap = new HashMap();
                         messageMap.put("message", download_url);
@@ -318,31 +310,18 @@ public class ChatActivity extends AppCompatActivity {
                         messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
                         messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
-
                         mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                             @Override
                             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-
                                 if(databaseError != null){
-
                                     Log.d("CHAT_LOG", databaseError.getMessage().toString());
-
                                 }
-
                                 mChatMessageView.setText("");
-
-
                                 progressDialog.dismiss();
-
-
-
                             }
                         });
-
                         progressDialog.dismiss();
-
                     }
-
                 }
             });
 

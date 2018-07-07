@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,6 +51,8 @@ public class ChatsFragment extends Fragment {
 
     private ArrayList<User> mUsersList = new ArrayList<>();
 
+    private ProgressBar progressBar;
+
 
 
     public ChatsFragment() {
@@ -75,6 +78,7 @@ public class ChatsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         v = inflater.inflate(R.layout.fragment_chats,container,false);
+        progressBar = v.findViewById(R.id.progressBar_chat);
         recyclerView = v.findViewById(R.id.conv_list);
         RecyclerViewAdapterContact recyclerViewAdapter = new RecyclerViewAdapterContact(getContext(),mUsersList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -88,7 +92,10 @@ public class ChatsFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+
         mUsersList = queryUsersAndAddthemToList();
+
 
 
     }
@@ -130,6 +137,7 @@ public class ChatsFragment extends Fragment {
                             e.printStackTrace();
                         }
                     }
+                    progressBar.setVisibility(ProgressBar.INVISIBLE);
                 }
                 if(!firstTime) {
                     getFragmentManager().beginTransaction().detach(ChatsFragment.this).attach(ChatsFragment.this).commit();

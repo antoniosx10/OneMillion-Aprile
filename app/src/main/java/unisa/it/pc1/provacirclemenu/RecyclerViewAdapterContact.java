@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -45,6 +46,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     private DatabaseReference mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("messages").child(mAuth.getCurrentUser().getUid());
+    private DatabaseReference userDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
 
     public RecyclerViewAdapterContact(Context mContext, List<User> mData) {
@@ -63,6 +65,24 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         holder.nome.setText(mData.get(position).getDisplayName());
         Picasso.with(mContext).load(mData.get(position).getThumb_image()).placeholder(R.drawable.ic_account_circle_black_24dp).into(holder.foto);
+
+
+        userDatabase.child(mData.get(position).getUserId()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChild("online")){
+                    String online = (String) dataSnapshot.child("online").getValue();
+                    holder.setOnline(online);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
 
 
         final String list_user_id = mData.get(position).getUserId();
@@ -113,7 +133,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
         private TextView nome;
         private CircleImageView foto;
         private TextView messaggio;
-        private TextView orarioMessaggio;
+        private ImageView online_img;
 
 
         public MyViewHolder(View itemView) {
@@ -121,6 +141,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
 
             nome = itemView.findViewById(R.id.user_single_name);
             foto = itemView.findViewById(R.id.user_single_image);
+            online_img = itemView.findViewById(R.id.user_single_online_icon);
 
 
 
@@ -147,6 +168,17 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
             } else {
                 messaggio.setTypeface(messaggio.getTypeface(), Typeface.NORMAL);
             }
+
+        }
+
+        public void setOnline(String online){
+
+           if(online.equalsIgnoreCase("true")){
+               online_img.setVisibility(ImageView.VISIBLE);
+           }else{
+               online_img.setVisibility(ImageView.INVISIBLE);
+
+           }
 
         }
     }

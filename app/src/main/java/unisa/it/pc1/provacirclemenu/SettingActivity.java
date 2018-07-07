@@ -188,7 +188,7 @@ public class SettingActivity extends Activity {
                                     if(thumb_task.isSuccessful()){
 
                                         Map update_HashMapm = new HashMap();
-                                        update_HashMapm.put("Immagine",downloadUrl);
+                                        update_HashMapm.put("image",downloadUrl);
                                         update_HashMapm.put("thumb_image",thumb_downloadUrl);
 
                                         //salva il path nel real-time database

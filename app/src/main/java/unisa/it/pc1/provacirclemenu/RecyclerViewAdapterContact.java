@@ -68,7 +68,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
         holder.nome.setText(mData.get(position).getDisplayName());
         Picasso.with(mContext).load(mData.get(position).getThumb_image()).placeholder(R.drawable.ic_account_circle_black_24dp).into(holder.foto);
 
-
+/**
         userDatabase.child(mData.get(position).getUserId()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -83,6 +83,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
 
             }
         });
+ **/
 
 
 
@@ -135,7 +136,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
         private TextView nome;
         private CircleImageView foto;
         private TextView messaggio;
-        private ImageView online_img;
+        //private ImageView online_img;
 
 
         public MyViewHolder(View itemView) {
@@ -143,7 +144,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
 
             nome = itemView.findViewById(R.id.user_single_name);
             foto = itemView.findViewById(R.id.user_single_image);
-            online_img = itemView.findViewById(R.id.user_single_online_icon);
+            //online_img = itemView.findViewById(R.id.user_single_online_icon);
 
 
 
@@ -172,7 +173,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
             }
 
         }
-
+/**
         public void setOnline(String online){
 
            if(online.equalsIgnoreCase("true")){
@@ -183,6 +184,7 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
            }
 
         }
+ **/
     }
 
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -67,6 +68,7 @@ public class ChatActivity extends AppCompatActivity {
     private CircleImageView mProfileImage;
     private FirebaseAuth mAuth;
     private String mCurrentUserId;
+    private FloatingActionButton btn_scrool;
 
     private ImageButton mChatAddBtn;
     private ImageButton mChatSendBtn;
@@ -122,6 +124,8 @@ public class ChatActivity extends AppCompatActivity {
         mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
 
+        btn_scrool = findViewById(R.id.btn_scrool);
+
         orarioMessaggio = findViewById(R.id.time_text_layout);
 
         mAdapter = new MessageAdapter(this,R.layout.message_single_layout,messagesList);
@@ -139,6 +143,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
         loadMessages();
+
 
 
         mTitleView.setText(userName);
@@ -249,10 +254,10 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 /**
 
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("image/*");
-                startActivityForResult(intent, REQUEST_IMAGE);
+                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                 intent.addCategory(Intent.CATEGORY_OPENABLE);
+                 intent.setType("image/*");
+                 startActivityForResult(intent, REQUEST_IMAGE);
                  **/
 
                 Intent galleryIntent = new Intent();
@@ -307,7 +312,7 @@ public class ChatActivity extends AppCompatActivity {
                         String download_url = task.getResult().getDownloadUrl().toString();
 
 
-                        Map messageMap = new HashMap();
+                        final Map messageMap = new HashMap();
                         messageMap.put("message", download_url);
                         messageMap.put("seen", false);
                         messageMap.put("type", "image");
@@ -334,6 +339,7 @@ public class ChatActivity extends AppCompatActivity {
 
                                 progressDialog.dismiss();
 
+                                mAdapter.notifyDataSetChanged();
 
 
                             }
@@ -353,7 +359,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void loadMessages() {
 
-       mRootRef.child("messages").child(mCurrentUserId).child(mChatUser).addChildEventListener(new ChildEventListener() {
+        mRootRef.child("messages").child(mCurrentUserId).child(mChatUser).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
@@ -385,6 +391,9 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
+
+
 
     }
 
@@ -440,6 +449,12 @@ public class ChatActivity extends AppCompatActivity {
         }else{
             Toast.makeText(getApplicationContext(),"Inserisci il tuo messaggio",Toast.LENGTH_LONG).show();
         }
+
+    }
+
+
+    public void scrool(View v){
+        mMessagesList.smoothScrollToPosition(messagesList.size()-1);
 
     }
 }

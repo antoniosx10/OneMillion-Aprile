@@ -1,6 +1,5 @@
 package unisa.it.pc1.provacirclemenu;
 
-import android.database.Cursor;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -23,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import unisa.it.pc1.provacirclemenu.model.Task;
 import unisa.it.pc1.provacirclemenu.model.UtentiModel;
 
 public class TaskFragment extends Fragment {
@@ -50,7 +50,7 @@ public class TaskFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         userFirebase = FirebaseAuth.getInstance();
-        mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Messages");
+        mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Task").child(userFirebase.getUid());
 
         utentiModel = new UtentiModel();
 
@@ -138,7 +138,6 @@ public class TaskFragment extends Fragment {
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
                         Task task = snap.getValue(Task.class);
                         task.setTaskId(snap.getKey());
-                        task.setContenuto(snap.child("message").getValue(String.class));
                         //if not current user, as we do not want to show ourselves then chat with ourselves lol
                         try {
                             lista.add(task);

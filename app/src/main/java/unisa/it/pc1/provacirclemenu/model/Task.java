@@ -1,4 +1,4 @@
-package unisa.it.pc1.provacirclemenu;
+package unisa.it.pc1.provacirclemenu.model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -10,21 +10,14 @@ import java.util.Date;
 public class Task implements Serializable{
 
     private String taskId;
-
     private String contenuto;
     private Date data;
-    private int foto;
-
     private Date deadline;
     private String descrizione;
     private String categoria;
+    private Boolean stato;
+    private String from;
 
-    public Task(String contenuto, Date data, int foto, String taskId) {
-        this.contenuto = contenuto;
-        this.data = data;
-        this.foto = foto;
-        this.taskId = taskId;
-    }
 
     public Task(String contenuto, Date data,String taskId) {
         this.contenuto = contenuto;
@@ -32,14 +25,15 @@ public class Task implements Serializable{
         this.taskId = taskId;
     }
 
-    public Task(String contenuto, Date data, int foto, Date deadline, String descrizione, String categoria,String taskId) {
+    public Task(String contenuto, Date data, Date deadline, String descrizione, String categoria,String taskId,Boolean stato,String from) {
         this.contenuto = contenuto;
         this.data = data;
-        this.foto = foto;
         this.deadline = deadline;
         this.descrizione = descrizione;
         this.categoria = categoria;
         this.taskId = taskId;
+        this.stato = stato;
+        this.from = from;
     }
 
     public Task(){
@@ -62,13 +56,6 @@ public class Task implements Serializable{
         this.data = data;
     }
 
-    public int getFoto() {
-        return foto;
-    }
-
-    public void setFoto(int foto) {
-        this.foto = foto;
-    }
 
     public Date getDeadline() {
         return deadline;
@@ -100,5 +87,22 @@ public class Task implements Serializable{
 
     public void setTaskId(String id) {
         taskId = id;
+    }
+
+
+    public Boolean getStato() {
+        return stato;
+    }
+
+    public void setStato(Boolean stato) {
+        this.stato = stato;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
     }
 }

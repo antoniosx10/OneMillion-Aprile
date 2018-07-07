@@ -9,9 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+
+import unisa.it.pc1.provacirclemenu.model.Task;
 
 /**
  * Created by Antonio on 25/03/2018.
@@ -39,8 +42,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         holder.contenuto.setText(mData.get(position).getContenuto());
-        holder.data.setText(mData.get(position).getData()+"");
-        holder.foto.setImageResource(mData.get(position).getFoto());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyy");
+        String date=sdf.format(mData.get(position).getData());
+        holder.data.setText(date);
+
+        if(mData.get(position).getCategoria().equalsIgnoreCase("importante")){
+            holder.categoria_img.setVisibility(ImageView.VISIBLE);
+        }
     }
 
     public void deleteItem(int taskDaElim) {
@@ -58,7 +67,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         private LinearLayout item_contact;
         private TextView contenuto;
         private TextView data;
-        private ImageView foto;
+        private ImageView categoria_img;
+
 
         public  MyViewHolder(View itemView) {
             super(itemView);
@@ -66,7 +76,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             item_contact = itemView.findViewById(R.id.task_item);
             contenuto = itemView.findViewById(R.id.name_task);
             data = itemView.findViewById(R.id.data_task);
-            foto = itemView.findViewById(R.id.img_contact);
+            categoria_img = itemView.findViewById(R.id.Categoria_img);
 
 
         }

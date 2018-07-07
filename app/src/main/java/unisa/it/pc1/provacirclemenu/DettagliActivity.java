@@ -2,8 +2,6 @@ package unisa.it.pc1.provacirclemenu;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -12,6 +10,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import unisa.it.pc1.provacirclemenu.model.Task;
 
 
 public class DettagliActivity extends Activity {

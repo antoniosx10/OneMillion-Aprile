@@ -7,21 +7,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +28,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -42,10 +36,7 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,6 +45,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import unisa.it.pc1.provacirclemenu.model.Messages;
+import unisa.it.pc1.provacirclemenu.model.User;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -84,7 +76,10 @@ public class ChatActivity extends AppCompatActivity {
     // Storage Firebase
     private StorageReference mImageStorage;
 
+
     private ProgressDialog progressDialog;
+
+    private User utente;
 
 
     @Override
@@ -104,8 +99,9 @@ public class ChatActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserId = mAuth.getCurrentUser().getUid();
 
+
         mChatUser = getIntent().getStringExtra("user_id");
-        String userName = getIntent().getStringExtra("user_name");
+        final String userName = getIntent().getStringExtra("user_name");
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View action_bar_view = inflater.inflate(R.layout.chat_custom_bar, null);
@@ -142,6 +138,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
 
+
         loadMessages();
 
 
@@ -154,6 +151,9 @@ public class ChatActivity extends AppCompatActivity {
 
                 String online = dataSnapshot.child("online").getValue().toString();
                 final String image = dataSnapshot.child("image").getValue().toString();
+
+                utente = dataSnapshot.getValue(User.class);
+                utente.setUserId(dataSnapshot.getKey());
 
                 if(online.equals("true")) {
 
@@ -184,6 +184,15 @@ public class ChatActivity extends AppCompatActivity {
                     public void onError() {
                         Picasso.with(ChatActivity.this).load(image)
                                 .placeholder(R.drawable.ic_account_circle_black_24dp).into(mProfileImage);
+                    }
+                });
+
+                mProfileImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(getApplicationContext(),Profiloactivity.class);
+                        i.putExtra("utente",utente);
+                        startActivity(i);
                     }
                 });
 
@@ -443,6 +452,25 @@ public class ChatActivity extends AppCompatActivity {
                     mChatMessageView.setText("");
 
 
+                }
+            });
+
+            DatabaseReference task_message_push = mRootRef.child("Task")
+                    .child(mChatUser).push();
+
+            String push_id_task = task_message_push.getKey();
+
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",mChatUser,false,mCurrentUserId);
+
+            mRootRef.child("Task").child(mChatUser).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+
+                    if (task.isSuccessful()) {
+
+                    } else {
+
+                    }
                 }
             });
 

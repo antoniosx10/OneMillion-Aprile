@@ -38,6 +38,7 @@
         android:text="User default Status"
         android:layout_alignLeft="@+id/user_single_name" />
 
+
     <ImageView
         android:id="@+id/user_single_online_icon"
         android:layout_width="23dp"

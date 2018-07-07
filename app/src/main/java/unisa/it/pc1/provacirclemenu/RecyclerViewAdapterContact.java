@@ -43,6 +43,8 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
     static String data;
     static List<User> mData;
 
+
+
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     private DatabaseReference mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("messages").child(mAuth.getCurrentUser().getUid());

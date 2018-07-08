@@ -11,6 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,11 +29,12 @@ import unisa.it.pc1.provacirclemenu.model.Task;
 import unisa.it.pc1.provacirclemenu.model.UtentiModel;
 
 public class TaskFragment extends Fragment {
-    private UtentiModel utentiModel;
-    private ArrayList<String> listaNumeri;
+
 
     View v;
     private RecyclerView recyclerView;
+
+    private Spinner spinner;
 
     private Boolean firstTime = false;
 
@@ -52,7 +56,6 @@ public class TaskFragment extends Fragment {
         userFirebase = FirebaseAuth.getInstance();
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Task").child(userFirebase.getUid());
 
-        utentiModel = new UtentiModel();
 
     }
 
@@ -61,6 +64,15 @@ public class TaskFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         v = inflater.inflate(R.layout.task_fragment,container,false);
+
+        spinner = v.findViewById(R.id.spinner);
+        final ArrayList<String> spinnerText = new ArrayList<>();
+        spinnerText.add("Ordina per data inserimento");
+        spinnerText.add("Ordinamento per deadLine");
+        spinnerText.add("Ordinamento per categoria");
+        SpinnerAdapter adapter = new SpinnerAdapter(spinnerText,getActivity());
+        spinner.setAdapter(adapter);
+
         recyclerView = v.findViewById(R.id.task_recyclerview);
         recyclerView.setHasFixedSize(true);
 

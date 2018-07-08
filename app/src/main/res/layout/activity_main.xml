@@ -15,7 +15,7 @@
             android:id="@+id/main_app_bar"></include>
 
         <android.support.design.widget.TabLayout
-            android:background="@color/colorAccent"
+            android:background="#344955"
             android:id="@+id/main_tabs"
             android:layout_width="match_parent"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"

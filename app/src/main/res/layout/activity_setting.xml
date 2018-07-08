@@ -3,34 +3,113 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:gravity="top|center_horizontal"
     android:orientation="vertical"
-    tools:context=".SettingActivity"
-    android:background="@color/backgroundfragment">
+    tools:context=".SettingActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_weight="2"
         android:id="@+id/immagine_setting"
         android:layout_width="170dp"
         android:layout_height="170dp"
+        android:layout_weight="2"
         android:src="@mipmap/ic_launcher_round" />
 
+    <android.support.v7.widget.CardView
+
+        android:layout_width="303dp"
+        android:layout_height="132dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0.0px"
+        android:elevation="8dp"
+        card_view:cardElevation="10dp"
+        card_view:cardPreventCornerOverlap="false">
+
+
+        <TextView
+            android:id="@+id/text_display_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Display Name"
+            android:textSize="24sp" />
+
+        <LinearLayout
+            android:layout_width="189dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="25dp"
+                android:orientation="horizontal"
+                android:paddingLeft="25dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_phone_black_24dp" />
+
+                <TextView
+
+                    android:id="@+id/numero_setting"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingLeft="20dp"
+                    android:text="+266 225 225"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="194dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="25dp"
+                android:orientation="horizontal"
+                android:paddingLeft="25dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_group_add_black_24dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_horizontal"
+                    android:paddingLeft="20dp"
+                    android:text="Add to group"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
     <TextView
-        android:layout_weight="2"
-        android:id="@+id/text_display_name"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Display Name"
-        android:textSize="24sp" />
+        android:layout_weight="3"
+        android:layout_height="wrap_content" />
+
 
     <Button
-        android:textColor="#ffffff"
         android:id="@+id/cambia_img_btn"
-        android:layout_width="160dp"
+        android:layout_width="201dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="185dp"
-        android:background="@color/colorPrimaryDark"
-        android:text="Cambia immagine" />
+        android:background="@drawable/shadow_button"
+        android:baselineAligned="false"
+        android:text="Cambia immagine"
+        android:textColor="#ffffff" />
 
 
 </LinearLayout>

@@ -48,6 +48,7 @@ public class SettingActivity extends Activity {
 
     private CircleImageView circleImageView;
     private TextView text_nome;
+    private TextView numeroText;
 
     private Button cambiaImmagine;
 
@@ -66,6 +67,8 @@ public class SettingActivity extends Activity {
 
         cambiaImmagine = findViewById(R.id.cambia_img_btn);
 
+        numeroText = findViewById(R.id.numero_setting);
+
         currentUsers = FirebaseAuth.getInstance().getCurrentUser();
 
         String currentUid = currentUsers.getUid();
@@ -80,10 +83,13 @@ public class SettingActivity extends Activity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String nome = dataSnapshot.child("displayName").getValue().toString();
 
+                String number = dataSnapshot.child("number").getValue().toString();
+
                 final String image = dataSnapshot.child("image").getValue().toString();
                 String thumb_image = dataSnapshot.child("thumb_image").getValue().toString();
 
                 text_nome.setText(nome);
+                numeroText.setText(number);
 
 
                     Picasso.with(SettingActivity.this).load(thumb_image).networkPolicy(NetworkPolicy.OFFLINE)
@@ -132,9 +138,12 @@ public class SettingActivity extends Activity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        if (requestCode == GALLERY_PICK && requestCode == RESULT_OK) {
+        if (requestCode == GALLERY_PICK && requestCode == RESULT_OK && data != null) {
             Uri imageUri = data.getData();
-            CropImage .activity(imageUri).setAspectRatio(1,1).start(this);
+            CropImage .activity(imageUri)
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setAspectRatio(1,1)
+                    .start(this);
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {

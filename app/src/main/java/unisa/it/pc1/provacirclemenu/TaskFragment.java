@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -118,7 +119,9 @@ public class TaskFragment extends Fragment {
                 Task t = recyclerViewAdapter.mData.get(viewHolder.getAdapterPosition());
                 recyclerViewAdapter.deleteItem(viewHolder.getAdapterPosition());
 
-                recyclerViewAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                recyclerView.getRecycledViewPool().clear();
+                recyclerViewAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+
 
                 queryDeleteTask(t.getTaskId());
 
@@ -133,9 +136,43 @@ public class TaskFragment extends Fragment {
                 return;
             }
         };
-
         // attaching the touch helper to recycler view
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+
+
+        mMessagesDBRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Task task = dataSnapshot.getValue(Task.class);
+                mMessagesList.add(task);
+                recyclerView.getRecycledViewPool().clear();
+                recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
+
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 
     private ArrayList<Task> queryMessagesAndAddthemToList(){
@@ -178,6 +215,20 @@ public class TaskFragment extends Fragment {
 
         mMessagesDBRef.child(id).removeValue();
 
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+
+            mMessagesList.clear();
+            mMessagesList = queryMessagesAndAddthemToList();
+            recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            recyclerView.setAdapter(recyclerViewAdapter);
+            getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+        }
     }
 
 }

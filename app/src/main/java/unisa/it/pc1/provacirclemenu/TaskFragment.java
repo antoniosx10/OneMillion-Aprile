@@ -133,11 +133,9 @@ public class TaskFragment extends Fragment {
                 return;
             }
         };
+
         // attaching the touch helper to recycler view
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
-
-
-
     }
 
     private ArrayList<Task> queryMessagesAndAddthemToList(){

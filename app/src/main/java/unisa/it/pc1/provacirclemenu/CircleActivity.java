@@ -2,6 +2,7 @@ package unisa.it.pc1.provacirclemenu;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -9,9 +10,11 @@ import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -38,8 +41,10 @@ import com.hitomi.cmlibrary.OnMenuSelectedListener;
 import com.hitomi.cmlibrary.OnMenuStatusChangeListener;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,6 +60,8 @@ public class CircleActivity extends Activity {
     private DatabaseReference mMessagesDBRef;
     private DatabaseReference mUsersRef;
 
+    private Bitmap[] imgs;
+
     private String testo;
     private View mChatHeadView;
     private WindowManager mWindowManager;
@@ -64,6 +71,8 @@ public class CircleActivity extends Activity {
     private Boolean firstTime = true;
 
     private Task task;
+
+    private ArrayList<String> imgsList;
 
     private Handler handler;
     private Runnable runnable;
@@ -84,6 +93,8 @@ public class CircleActivity extends Activity {
 
     private String imagePath;
 
+    private DatabaseReference mNotificationRef;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +102,8 @@ public class CircleActivity extends Activity {
 
         //------- IMAGE STORAGE ---------
         mImageStorage = FirebaseStorage.getInstance().getReference();
+
+        mNotificationRef = FirebaseDatabase.getInstance().getReference().child("Notifications");
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -111,96 +124,35 @@ public class CircleActivity extends Activity {
 
         utenti = new ArrayList<User>();
 
-        startTimerHead();
-        circleMenu = (CircleMenu) findViewById(R.id.circle_menu);
-        circleMenu.setMainMenu(Color.parseColor("#d3d1d1"), R.drawable.ic_menu_black_24dp, R.drawable.ic_remove_circle_black_24dp);
-        uploadChat();
-        circleMenu.setOnMenuStatusChangeListener(new OnMenuStatusChangeListener() {
-            @Override
-            public void onMenuOpened() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
+        imgsList = new ArrayList<String>();
+
+        try {
+            utenti = (ArrayList<User>) ObjectSerializer
+                    .deserialize(prefs.getString("lista_utenti", ObjectSerializer.serialize(new ArrayList<User>())));
+
+            imgsList = (ArrayList<String>) ObjectSerializer
+                    .deserialize(prefs.getString("lista_img", ObjectSerializer.serialize(new ArrayList<String>())));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        imgs = new Bitmap[5];
+
+        int k = 0;
+        for(String encoded :imgsList) {
+            if(!encoded.equals("vuoto")) {
+                byte[] imageAsBytes = Base64.decode(encoded.getBytes(), Base64.DEFAULT);
+                imgs[k] = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
             }
+            k++;
+        }
 
-            @Override
-            public void onMenuClosed() {
-                if (!isDettagli) {
-                    startTimerHead();
-                } else {
-                    isDettagli = false;
-                    circleMenu.setVisibility(View.INVISIBLE);
-
-                }
-            }
-        });
-
-        params = new WindowManager.LayoutParams();
-        params = createHead();
-
-        circleMenu.setOnTouchListener(new View.OnTouchListener() {
-            private int lastAction;
-            private int initialY;
-            private int initialX;
-            private float initialTouchX;
-            private float initialTouchY;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        stopTimerHead();
-                        //remember the initial position.
-                        initialY = params.y;
-                        initialX = params.x;
-
-                        //get the touch location
-                        initialTouchY = event.getRawY();
-                        initialTouchX = event.getRawX();
-
-
-                        lastAction = event.getAction();
-
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        startTimerHead();
-                        //As we implemented on touch listener with ACTION_MOVE,
-                        //we have to check if the previous action was ACTION_DOWN
-                        //to identify if the user clicked the view or not.
-                        if (lastAction == MotionEvent.ACTION_DOWN) {
-                            stopTimerHead();
-                            break;
-                        }
-                        lastAction = event.getAction();
-                        return true;
-                    case MotionEvent.ACTION_MOVE:
-                        stopTimerHead();
-                        //Calculate the X and Y coordinates of the view.
-                        params.x = initialX + (int) (event.getRawX() - initialTouchX);
-                        params.y = initialY + (int) (event.getRawY() - initialTouchY);
-
-                        //Update the layout with new X & Y coordinate
-                        mWindowManager.updateViewLayout(circleMenu, params);
-                        int differenzaY = 0;
-                        if (params.y > initialY) {
-                            differenzaY = params.y - initialY;
-                        } else {
-                            differenzaY = initialY - params.y;
-                        }
-
-                        int differenzaX = 0;
-                        if (params.y > initialY) {
-                            differenzaX = params.x - initialX;
-                        } else {
-                            differenzaX = initialX - params.x;
-                        }
-
-                        if (differenzaY > 0.3 || differenzaX > 0.3)
-                            lastAction = event.getAction();
-
-                        return true;
-                }
-                return false;
-            }
-        });
+        createCircleMenu(imgs);
 
     }
 
@@ -210,177 +162,6 @@ public class CircleActivity extends Activity {
             if(data != null) {
                 task = (Task) data.getSerializableExtra("taskDettagli");
             }
-    }
-
-    private void uploadChat(){
-        Query conversationQuery = mConvDatabase.orderByChild("timestamp").limitToFirst(5);
-
-        final ArrayList<User> finalListaUtenti = new ArrayList<User>();
-
-        conversationQuery.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(final DataSnapshot convData, String s) {
-
-                mUsersRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot userData) {
-                        User user = new User();
-                        user.setDisplayName(userData.child(convData.getKey()).child("displayName").getValue(String.class));
-                        user.setThumb_image(userData.child(convData.getKey()).child("thumb_image").getValue(String.class));
-                        user.setUserId(userData.child(convData.getKey()).getKey());
-
-                        finalListaUtenti.add(user);
-
-                        utenti = finalListaUtenti;
-                        createCircleMenu();
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-
-
-        });
-
-        return;
-    }
-
-    public void createCircleMenu() {
-
-        Bitmap[] imgs = new Bitmap[5];
-        for(int i = 0; i<5; i++) {
-            imgs[i] = BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_black_24dp);
-        }
-
-        try {
-            imgs = new BitmapFromURLTask().execute(utenti).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("IMAGE", "BLABLA");
-
-        circleMenu
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_person_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_save_black_24dp)
-                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_add_black_24dp)
-                .setOnMenuSelectedListener(new OnMenuSelectedListener() {
-                    @Override
-                    public void onMenuSelected(int i) {
-                        switch (i) {
-                            case 0:
-                                if(testo != null) {
-                                    sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
-                                } else {
-                                    sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
-                                    Log.d("Entrato in sendImage", imagePath);
-                                }
-                                break;
-                            case 1:
-                                if(testo != null) {
-                                    sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
-                                } else {
-                                    sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
-                                }
-                                break;
-                            case 2:
-                                sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(),testo);
-                                break;
-                            case 3:
-                                if(testo != null) {
-                                    sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
-                                } else {
-                                    sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
-                                }
-                                break;
-                            case 4:
-                                if(testo != null) {
-                                    sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
-                                } else {
-                                    sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
-                                }
-                                break;
-                            case 5:
-                                if(testo != null) {
-                                    sendMessage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),testo);
-                                } else {
-                                    sendImage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(), imagePath);
-                                }
-                                break;
-                            case 6:
-                                isDettagli = true;
-                                task = new Task(testo, new Date(), "3");
-                                Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
-                                dettagliIntent.putExtra("task", task);
-                                startActivityForResult(dettagliIntent, 15);
-                                break;
-                        }
-                    }
-                });
-    }
-
-    class BitmapFromURLTask extends AsyncTask<ArrayList<User>, Void, Bitmap[]> {
-
-        private Exception exception;
-
-        protected Bitmap[] doInBackground(ArrayList<User>... urls) {
-            try {
-                Bitmap[] imgs = new Bitmap[5];
-
-                for (int i = 0; i < urls[0].size(); i++) {
-                    if(utenti.get(i) != null) {
-                        URL url = new URL(urls[0].get(i).getThumb_image());
-                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                        connection.setDoInput(true);
-                        connection.connect();
-                        InputStream input = connection.getInputStream();
-                        Bitmap myBitmap = BitmapFactory.decodeStream(input);
-
-                        imgs[i] = myBitmap;
-                    } else {
-                        imgs[i] = BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_black_24dp);
-                    }
-                }
-                return imgs;
-            } catch (Exception e) {
-                this.exception = e;
-                return null;
-            }
-        }
-
-        protected void onPostExecute(Bitmap feed) {
-
-        }
     }
 
     private void startTimerHead(){
@@ -477,7 +258,6 @@ public class CircleActivity extends Activity {
                     }
                 }
             });
-
         }else{
             Toast.makeText(getApplicationContext(),"Inserisci il tuo messaggio",Toast.LENGTH_LONG).show();
         }
@@ -500,7 +280,6 @@ public class CircleActivity extends Activity {
                 public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
                     if(task.isSuccessful()){
                         String download_url = task.getResult().getDownloadUrl().toString();
-
                         Map messageMap = new HashMap();
                         messageMap.put("message", download_url);
                         messageMap.put("seen", false);
@@ -523,8 +302,166 @@ public class CircleActivity extends Activity {
                     }
                 }
             });
-
         }
+
+    private void createCircleMenu(Bitmap[] imgs) {
+        startTimerHead();
+        circleMenu = (CircleMenu) findViewById(R.id.circle_menu);
+        circleMenu.setMainMenu(Color.parseColor("#d3d1d1"), R.drawable.ic_menu_black_24dp, R.drawable.ic_remove_circle_black_24dp);
+
+        circleMenu
+                .addSubMenu(Color.parseColor("#ff9d00"), imgs[0])
+                .addSubMenu(Color.parseColor("#ff9d00"), imgs[1])
+                .addSubMenu(Color.parseColor("#ff9d00"), imgs[2])
+                .addSubMenu(Color.parseColor("#ff9d00"), imgs[3])
+                .addSubMenu(Color.parseColor("#ff9d00"), imgs[4])
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_save_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_add_black_24dp)
+                .setOnMenuSelectedListener(new OnMenuSelectedListener() {
+                        @Override
+                        public void onMenuSelected(int i) {
+                            switch (i) {
+                                case 0:
+                                    if(testo != null) {
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                    } else {
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                        Log.d("Entrato in sendImage", imagePath);
+
+                                        Toast.makeText(getApplicationContext(), "Inviato a " + utenti.get(i).getUserId(), Toast.LENGTH_SHORT).show();
+                                    }
+                                    break;
+                                case 1:
+                                    if(testo != null) {
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                    } else {
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                    }
+                                    break;
+                                case 2:
+                                    sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(),testo);
+                                    break;
+                                case 3:
+                                    if(testo != null) {
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                    } else {
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                    }
+                                    break;
+                                case 4:
+                                    if(testo != null) {
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                    } else {
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                    }
+                                    break;
+                                case 5:
+                                    if(testo != null) {
+                                        sendMessage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),testo);
+                                    } else {
+                                        sendImage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(), imagePath);
+                                    }
+                                    break;
+                                case 6:
+                                    isDettagli = true;
+                                    task = new Task(testo, new Date(), "3");
+                                    Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
+                                    dettagliIntent.putExtra("task", task);
+                                    startActivityForResult(dettagliIntent, 15);
+                                    break;
+                            }
+                        }
+                    });
+
+            circleMenu.setOnMenuStatusChangeListener(new OnMenuStatusChangeListener() {
+                @Override
+                public void onMenuOpened() {
+
+                }
+
+                @Override
+                public void onMenuClosed() {
+                    if (!isDettagli) {
+                        startTimerHead();
+                    } else {
+                        isDettagli = false;
+                        circleMenu.setVisibility(View.INVISIBLE);
+
+                    }
+                }
+            });
+
+
+            params = new WindowManager.LayoutParams();
+            params = createHead();
+
+            circleMenu.setOnTouchListener(new View.OnTouchListener() {
+                private int lastAction;
+                private int initialY;
+                private int initialX;
+                private float initialTouchX;
+                private float initialTouchY;
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            stopTimerHead();
+                            //remember the initial position.
+                            initialY = params.y;
+                            initialX = params.x;
+
+                            //get the touch location
+                            initialTouchY = event.getRawY();
+                            initialTouchX = event.getRawX();
+
+
+                            lastAction = event.getAction();
+
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            startTimerHead();
+                            //As we implemented on touch listener with ACTION_MOVE,
+                            //we have to check if the previous action was ACTION_DOWN
+                            //to identify if the user clicked the view or not.
+                            if (lastAction == MotionEvent.ACTION_DOWN) {
+                                stopTimerHead();
+                                break;
+                            }
+                            lastAction = event.getAction();
+                            return true;
+                        case MotionEvent.ACTION_MOVE:
+                            stopTimerHead();
+                            //Calculate the X and Y coordinates of the view.
+                            params.x = initialX + (int) (event.getRawX() - initialTouchX);
+                            params.y = initialY + (int) (event.getRawY() - initialTouchY);
+
+                            //Update the layout with new X & Y coordinate
+                            mWindowManager.updateViewLayout(circleMenu, params);
+                            int differenzaY = 0;
+                            if (params.y > initialY) {
+                                differenzaY = params.y - initialY;
+                            } else {
+                                differenzaY = initialY - params.y;
+                            }
+
+                            int differenzaX = 0;
+                            if (params.y > initialY) {
+                                differenzaX = params.x - initialX;
+                            } else {
+                                differenzaX = initialX - params.x;
+                            }
+
+                            if (differenzaY > 0.3 || differenzaX > 0.3)
+                                lastAction = event.getAction();
+
+                            return true;
+                    }
+                    return false;
+                }
+            });
+        }
+
 
 }
 

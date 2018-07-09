@@ -128,7 +128,7 @@ public class ChatsFragment extends Fragment {
                                         lista.add(user);
                                         notify();
                                     }
-                            }
+                                }
                                  **/
                                 lista.add(user);
 

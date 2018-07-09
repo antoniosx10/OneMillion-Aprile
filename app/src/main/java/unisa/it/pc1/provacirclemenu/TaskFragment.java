@@ -1,6 +1,8 @@
 package unisa.it.pc1.provacirclemenu;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -131,8 +133,28 @@ public class TaskFragment extends Fragment {
             @Override
             public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                                     float dX, float dY, int actionState, boolean isCurrentlyActive) {
+
+                Paint background = new Paint();
+                background.setColor(Color.parseColor("#50C878"));
                 float translationX = Math.min(-dX, viewHolder.itemView.getWidth());
                 viewHolder.itemView.setTranslationX(-translationX);
+
+                Paint paint = new Paint();
+
+                c.drawRect((float) viewHolder.itemView.getRight() + dX, (float) viewHolder.itemView.getTop(),
+                        (float) viewHolder.itemView.getRight(), (float) viewHolder.itemView.getBottom(), background);
+
+                String str = "FATTO";
+
+                Paint mTxtPaint = new Paint();
+                Paint.FontMetrics fm = new Paint.FontMetrics();
+                mTxtPaint.setTextSize(40.0f);
+                mTxtPaint.getFontMetrics(fm);
+                mTxtPaint.setColor(Color.WHITE);
+                mTxtPaint.setStrokeWidth(2);
+
+                c.drawText(str, (float) viewHolder.itemView.getRight() + dX+70, (float) viewHolder.itemView.getTop() + 75, mTxtPaint);
+
                 return;
             }
         };

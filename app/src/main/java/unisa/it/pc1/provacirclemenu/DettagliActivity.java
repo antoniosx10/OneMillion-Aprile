@@ -83,16 +83,20 @@ public class DettagliActivity extends Activity {
 
         Log.d("Dati", "deadline: " + deadline + "descrizione: " + descrizione + "categoria: " + categoria);
 
-        Task task = (Task) getIntent().getSerializableExtra("task");
+        String message = getIntent().getStringExtra("testo");
+        String image = getIntent().getStringExtra("imagePath");
 
-        task.setCategoria(categoria);
-        task.setDeadline(deadline);
-        task.setDescrizione(descrizione);
+        Intent contattiIntent = new Intent(getApplicationContext(),Contatti.class);
 
-        Intent i = new Intent(getApplicationContext(),CircleActivity.class);
-        i.putExtra("taskDettagli",task);
+        contattiIntent.putExtra("testo",message);
+        contattiIntent.putExtra("imagePath",image);
+        contattiIntent.putExtra("categoria",categoria);
+        contattiIntent.putExtra("descrizione",descrizione);
+        contattiIntent.putExtra("deadline",deadline);
 
-        setResult(15, i);
+        contattiIntent.putExtra("flagDettagli","true");
+
+        startActivity(contattiIntent);
         finish();
     }
 }

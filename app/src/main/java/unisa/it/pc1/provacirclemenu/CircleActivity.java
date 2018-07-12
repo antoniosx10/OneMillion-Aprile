@@ -196,6 +196,7 @@ public class CircleActivity extends Activity {
     protected void onPause() {
         super.onPause();
         stopTimerHead();
+        mWindowManager.removeView(circleMenu);
         finish();
     }
 
@@ -353,8 +354,12 @@ public class CircleActivity extends Activity {
                                 case 6:
                                     isDettagli = true;
                                     Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
-                                    dettagliIntent.putExtra("task", task);
-                                    startActivityForResult(dettagliIntent, 15);
+                                    if(testo != null) {
+                                        dettagliIntent.putExtra("testo",testo);
+                                    } else {
+                                        dettagliIntent.putExtra("imagePath",imagePath);
+                                    }
+                                    startActivity(dettagliIntent);
                                     break;
 
                                 case 7:
@@ -365,6 +370,8 @@ public class CircleActivity extends Activity {
                                     } else {
                                         contatti.putExtra("imagePath",imagePath);
                                     }
+                                    contatti.putExtra("flagDettagli","false");
+
                                     startActivity(contatti);
 
                                     break;

@@ -46,6 +46,10 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
     static List<User> mData;
     static String testo;
     static String imagePath;
+    static String descrizione;
+    static String categoria;
+    static Date deadline;
+    static String flagDettagli;
 
     private static FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private static DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
@@ -53,11 +57,15 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
     private DatabaseReference userDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
     private static StorageReference mImageStorage = FirebaseStorage.getInstance().getReference();
 
-    public RecyclerViewAdapterContactSend(Context mContext, List<User> mData,String testo, String imagePath) {
+    public RecyclerViewAdapterContactSend(Context mContext, List<User> mData, String testo, String imagePath, String descrizione, String categoria, Date deadline, String flagDettagli) {
         this.mContext = mContext;
         this.mData = mData;
         this.testo = testo;
         this.imagePath = imagePath;
+        this.descrizione = descrizione;
+        this.categoria = categoria;
+        this.deadline = deadline;
+        this.flagDettagli = flagDettagli;
     }
 
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -137,13 +145,29 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
                 public void onClick(View v) {
 
                     if(testo != null) {
-                        sendMessage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(),testo);
-                        Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
-                        ((Activity)mContext).finish();
+                        if(flagDettagli.equals(true)){
+                            sendMessage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(),testo,descrizione,
+                                    categoria,deadline);
+                            Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
+                            ((Activity)mContext).finish();
+                        }else{
+                            sendMessage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(),testo);
+                            Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
+                            ((Activity)mContext).finish();
+                        }
                     } else {
-                        sendImage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(), imagePath);
-                        Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
-                        ((Activity)mContext).finish();
+                        if(flagDettagli.equals("true")){
+                            sendImage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(), imagePath,
+                                    descrizione,
+                                    categoria,deadline);
+                            Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
+                            ((Activity)mContext).finish();
+                        }else{
+                            sendImage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(), imagePath);
+                            Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
+                            ((Activity)mContext).finish();
+                        }
+
                     }
                 }
             });
@@ -231,6 +255,73 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
         }
     }
 
+
+
+    private static void sendMessage(String senderId, String receiverId, String message,String descrizione,String categoria, Date deadline) {
+
+        if(!TextUtils.isEmpty(message)){
+
+            String current_user_ref = "messages/" + senderId + "/" + receiverId;
+            String chat_user_ref = "messages/" + receiverId + "/" + senderId;
+
+            DatabaseReference user_message_push = mRootRef.child("messages")
+                    .child(senderId).child(receiverId).push();
+
+            String push_id = user_message_push.getKey();
+
+            Map messageMap = new HashMap();
+            messageMap.put("message", message);
+            messageMap.put("seen", false);
+            messageMap.put("type", "text");
+            messageMap.put("time", ServerValue.TIMESTAMP);
+            messageMap.put("from", senderId);
+
+            Map messageUserMap = new HashMap();
+            messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+            messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+
+            mRootRef.child("Chat").child(senderId).child(receiverId).child("seen").setValue(true);
+            mRootRef.child("Chat").child(senderId).child(receiverId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+
+            mRootRef.child("Chat").child(receiverId).child(senderId).child("seen").setValue(false);
+            mRootRef.child("Chat").child(receiverId).child(senderId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+
+            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                    if(databaseError != null){
+
+                        Log.d("CHAT_LOG", databaseError.getMessage().toString());
+
+                    }
+                }
+            });
+
+            DatabaseReference task_message_push = mRootRef.child("Task")
+                    .child(receiverId).push();
+
+            String push_id_task = task_message_push.getKey();
+
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),deadline, descrizione, categoria,receiverId,false,mAuth.getCurrentUser().toString());
+
+            mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+
+                    if (task.isSuccessful()) {
+
+                    } else {
+
+                    }
+                }
+            });
+        }else{
+            Toast.makeText(mContext,"Inserisci il tuo messaggio",Toast.LENGTH_LONG).show();
+        }
+    }
+
     private static void sendImage(final String senderId, String receiverId, String image) {
 
         Uri imageUri = Uri.fromFile(new File(image));
@@ -270,5 +361,88 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
                 }
             }
         });
+
+        DatabaseReference task_message_push = mRootRef.child("Task")
+                .child(receiverId).push();
+
+        String push_id_task = task_message_push.getKey();
+
+        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,receiverId,false,mAuth.getCurrentUser().toString());
+
+        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if (task.isSuccessful()) {
+
+                } else {
+
+                }
+            }
+        });
+    }
+
+
+
+    private static void sendImage(final String senderId, String receiverId, String image,String descrizione,String categoria,Date deadline) {
+
+        Uri imageUri = Uri.fromFile(new File(image));
+
+        final String current_user_ref = "messages/" + senderId + "/" + receiverId;
+        final String chat_user_ref = "messages/" + receiverId + "/" + senderId;
+
+        DatabaseReference user_message_push = mRootRef.child("messages")
+                .child(senderId).child(receiverId).push();
+
+        final String push_id = user_message_push.getKey();
+        StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".png");
+        filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
+                if(task.isSuccessful()){
+                    String download_url = task.getResult().getDownloadUrl().toString();
+                    Map messageMap = new HashMap();
+                    messageMap.put("message", download_url);
+                    messageMap.put("seen", false);
+                    messageMap.put("type", "image");
+                    messageMap.put("time", ServerValue.TIMESTAMP);
+                    messageMap.put("from", senderId);
+
+                    Map messageUserMap = new HashMap();
+                    messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+                    messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+                    mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if(databaseError != null){
+                                Log.d("CHAT_LOG", databaseError.getMessage().toString());
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+
+        DatabaseReference task_message_push = mRootRef.child("Task")
+                .child(receiverId).push();
+
+        String push_id_task = task_message_push.getKey();
+
+        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,receiverId,false,mAuth.getCurrentUser().toString());
+
+        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if (task.isSuccessful()) {
+
+                } else {
+
+                }
+            }
+        });
+
     }
 }

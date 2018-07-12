@@ -47,8 +47,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         String date=sdf.format(mData.get(position).getData());
         holder.data.setText(date);
 
+        SimpleDateFormat deadLineformat = new SimpleDateFormat("dd-MM-yyy");
+        String deadLineDate=deadLineformat.format(mData.get(position).getDeadline());
+
+        holder.deadline.setText(deadLineDate);
+
         if(mData.get(position).getCategoria().equalsIgnoreCase("importante")){
             holder.categoria_img.setVisibility(ImageView.VISIBLE);
+        }else if(mData.get(position).getCategoria().equalsIgnoreCase("normale")){
+
+        }else{
+
         }
     }
 
@@ -68,6 +77,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         private TextView contenuto;
         private TextView data;
         private ImageView categoria_img;
+        private TextView descrizione;
+        private TextView deadline;
 
 
         public  MyViewHolder(View itemView) {
@@ -77,6 +88,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             contenuto = itemView.findViewById(R.id.name_task);
             data = itemView.findViewById(R.id.data_task);
             categoria_img = itemView.findViewById(R.id.Categoria_img);
+            deadline = itemView.findViewById(R.id.deadline_task);
 
 
         }

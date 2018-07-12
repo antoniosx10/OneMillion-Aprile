@@ -17,6 +17,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import unisa.it.pc1.provacirclemenu.model.User;
@@ -55,13 +56,15 @@ public class Contatti extends AppCompatActivity {
         String testo = i.getStringExtra("testo");
         String imagePath = i.getStringExtra("imagePath");
 
+        String descrizione = i.getStringExtra("descrizione");
+        String categoria = i.getStringExtra("categoria");
+        Date deadline = (Date) i.getSerializableExtra("deadline");
+
+        String flagDettagli = i.getStringExtra("flagDettagli");
 
         utentiModel = new UtentiModel();
-
         //Trovare modo per non far caricare sempre listaNumeri
         listaNumeri = utentiModel.getContattiTelefono(this);
-
-
         progressBar = findViewById(R.id.progressBar_chat);
         recyclerView = findViewById(R.id.contatti_list);
 
@@ -69,7 +72,8 @@ public class Contatti extends AppCompatActivity {
 
 
         mUsersList = queryUsersAndAddthemToList();
-        recyclerViewAdapter = new RecyclerViewAdapterContactSend(this,mUsersList,testo,imagePath);
+        recyclerViewAdapter = new RecyclerViewAdapterContactSend(this,mUsersList,testo,imagePath,
+                descrizione,categoria,deadline,flagDettagli);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(recyclerViewAdapter);
 

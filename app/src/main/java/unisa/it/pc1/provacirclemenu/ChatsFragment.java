@@ -147,7 +147,7 @@ public class ChatsFragment extends Fragment {
             }
 
         });
-        progressBar.setVisibility(ProgressBar.INVISIBLE);
+//        progressBar.setVisibility(ProgressBar.INVISIBLE);
         return lista;
     }
 

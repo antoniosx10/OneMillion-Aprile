@@ -26,7 +26,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import unisa.it.pc1.provacirclemenu.model.Task;
 import unisa.it.pc1.provacirclemenu.model.UtentiModel;
@@ -58,8 +61,6 @@ public class TaskFragment extends Fragment {
 
         userFirebase = FirebaseAuth.getInstance();
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Task").child(userFirebase.getUid());
-
-
     }
 
     @Nullable
@@ -70,9 +71,9 @@ public class TaskFragment extends Fragment {
 
         spinner = v.findViewById(R.id.spinner);
         final ArrayList<String> spinnerText = new ArrayList<>();
-        spinnerText.add("Ordina per data inserimento");
-        spinnerText.add("Ordinamento per deadLine");
-        spinnerText.add("Ordinamento per categoria");
+        spinnerText.add("data");
+        spinnerText.add("deadline");
+        spinnerText.add("categoria");
         SpinnerAdapter adapter = new SpinnerAdapter(spinnerText,getActivity());
         spinner.setAdapter(adapter);
 
@@ -158,9 +159,9 @@ public class TaskFragment extends Fragment {
                 return;
             }
         };
+
         // attaching the touch helper to recycler view
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
-
 
         mMessagesDBRef.addChildEventListener(new ChildEventListener() {
             @Override
@@ -194,6 +195,75 @@ public class TaskFragment extends Fragment {
             }
         });
 
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                Log.d("OnITEM",parent.getItemAtPosition(position).toString());
+                /*
+                    Data = 0
+                    Deadline = 1
+                    Categoria = 2
+                 */
+
+                if(parent.getItemAtPosition(position).toString().equals("1")) {
+                    Collections.sort(mMessagesList, new Comparator<Task>() {
+                        @Override
+                        public int compare(Task task1, Task task2) {
+                            if (task1.getDeadline() == null || task2.getDeadline() == null)
+                                return 0;
+                            return task1.getDeadline().compareTo(task2.getDeadline());
+                        }
+                    });
+                    recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    recyclerView.setAdapter(recyclerViewAdapter);
+                } else if(parent.getItemAtPosition(position).toString().equals("0")) {
+                    Collections.sort(mMessagesList, new Comparator<Task>() {
+                        @Override
+                        public int compare(Task task1, Task task2) {
+                            if (task1.getData() == null || task2.getData() == null)
+                                return 0;
+                            return task2.getData().compareTo(task1.getData());
+                        }
+                    });
+                    recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    recyclerView.setAdapter(recyclerViewAdapter);
+                } else if(parent.getItemAtPosition(position).toString().equals("2")) {
+                    Collections.sort(mMessagesList, new Comparator<Task>() {
+                        @Override
+                        public int compare(Task task1, Task task2) {
+                            String cat1 = task1.getCategoria();
+                            String cat2 = task2.getCategoria();
+                            int imp1 = 3;
+                            int imp2 = 3;
+                            if(cat1.equals("da controllare")) {
+                                imp1 = 2;
+                            } else if(cat1.equals("importante")) {
+                                imp1 = 1;
+                            }
+                            if(cat2.equals("da controllare")) {
+                                imp2 = 2;
+                            } else if(cat2.equals("importante")) {
+                                imp2 = 1;
+                            }
+                            return imp1 - imp2;
+                        }
+                    });
+                    recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    recyclerView.setAdapter(recyclerViewAdapter);
+                }
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
     }
 

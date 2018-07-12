@@ -78,8 +78,6 @@ public class DettagliActivity extends Activity {
         int month = dpDeadline.getMonth();
         int year = dpDeadline.getYear();
 
-
-
         deadline = new Date(year-1900,month,day);
 
         Log.d("Year","" + year);

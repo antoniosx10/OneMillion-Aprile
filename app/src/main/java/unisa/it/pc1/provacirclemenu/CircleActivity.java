@@ -100,32 +100,20 @@ public class CircleActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_circle);
 
-        //------- IMAGE STORAGE ---------
         mImageStorage = FirebaseStorage.getInstance().getReference();
-
         mNotificationRef = FirebaseDatabase.getInstance().getReference().child("Notifications");
-
         mRootRef = FirebaseDatabase.getInstance().getReference();
-
         mAuth = FirebaseAuth.getInstance();
-
         mCurrent_user_id = mAuth.getCurrentUser().getUid();
-
         mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrent_user_id);
-
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Messages");
         mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         Intent i = getIntent();
-
         testo = i.getStringExtra("testoCopiato");
-
         imagePath = i.getStringExtra("pathImg");
-
         utenti = new ArrayList<User>();
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
         imgsList = new ArrayList<String>();
 
         try {
@@ -142,7 +130,6 @@ public class CircleActivity extends Activity {
         }
 
         imgs = new Bitmap[5];
-
         int k = 0;
         for(String encoded :imgsList) {
             if(!encoded.equals("vuoto")) {
@@ -178,6 +165,7 @@ public class CircleActivity extends Activity {
         };
         handler.postDelayed(runnable,4000);
     }
+
     private void stopTimerHead(){
         handler.removeCallbacks(runnable);
     }
@@ -364,7 +352,6 @@ public class CircleActivity extends Activity {
                                     break;
                                 case 6:
                                     isDettagli = true;
-                                    task = new Task(testo, new Date(), "3");
                                     Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
                                     dettagliIntent.putExtra("task", task);
                                     startActivityForResult(dettagliIntent, 15);

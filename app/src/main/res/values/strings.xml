@@ -111,4 +111,10 @@
     <string name="data_message">message</string>
     <string name="data_title">title</string>
     <string name="data_message_id">message_id</string>
+
+    <string-array name="categorie_array">
+        <item>normale</item>
+        <item>importante</item>
+        <item>da controllare</item>
+    </string-array>
 </resources>

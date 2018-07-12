@@ -29,7 +29,6 @@ public class DettagliActivity extends Activity {
     private Date deadline;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

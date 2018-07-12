@@ -45,17 +45,10 @@ public class ChatsFragment extends Fragment {
     private List<User> listContact;
 
     private Boolean firstTime = false;
-
     private FirebaseAuth userFirebase;
-    private DatabaseReference mUsersDBRef = FirebaseDatabase.getInstance().getReference().child("Users");
-
+    private DatabaseReference mUsersDBRef;
     private ArrayList<User> mUsersList = new ArrayList<>();
-
     private ProgressBar progressBar;
-
-    private RecyclerViewAdapterContact recyclerViewAdapter;
-
-
 
     public ChatsFragment() {
     }
@@ -63,16 +56,15 @@ public class ChatsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("oncreate","oo");
 
         userFirebase = FirebaseAuth.getInstance();
-
-
+        mUsersDBRef = FirebaseDatabase.getInstance().getReference().child("Users");
         utentiModel = new UtentiModel();
 
         //Trovare modo per non far caricare sempre listaNumeri
         listaNumeri = utentiModel.getContattiTelefono(getContext());
-
-
+        mUsersList = queryUsersAndAddthemToList();
     }
 
     @Nullable
@@ -81,8 +73,10 @@ public class ChatsFragment extends Fragment {
 
         v = inflater.inflate(R.layout.fragment_chats,container,false);
         progressBar = v.findViewById(R.id.progressBar_chat);
+
         recyclerView = v.findViewById(R.id.conv_list);
-        recyclerViewAdapter = new RecyclerViewAdapterContact(getContext(),mUsersList);
+
+        RecyclerViewAdapterContact recyclerViewAdapter = new RecyclerViewAdapterContact(getContext(),mUsersList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
 
@@ -96,12 +90,6 @@ public class ChatsFragment extends Fragment {
 
         progressBar.setVisibility(ProgressBar.VISIBLE);
 
-
-        mUsersList = queryUsersAndAddthemToList();
-
-
-
-
     }
 
     private ArrayList<User> queryUsersAndAddthemToList(){
@@ -110,8 +98,9 @@ public class ChatsFragment extends Fragment {
         mUsersDBRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-                if(dataSnapshot.getChildrenCount() > 0){
+                mUsersList.clear();
+                Log.d("ONDATA","ppp");
+                if(dataSnapshot.getChildrenCount() > 0) {
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
                         User user = snap.getValue(User.class);
                         user.setNumber(snap.child("number").getValue(String.class));
@@ -120,7 +109,7 @@ public class ChatsFragment extends Fragment {
                         try {
                             if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){
 
-
+                                /**
 
                                 for(String s : listaNumeri) {
                                     Log.d("Num",s);
@@ -133,18 +122,23 @@ public class ChatsFragment extends Fragment {
                                     }
                                 }
 
+                                 **/
+                                lista.add(user);
 
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+
                     }
-                    progressBar.setVisibility(ProgressBar.INVISIBLE);
+
                 }
                 if(!firstTime) {
                     getFragmentManager().beginTransaction().detach(ChatsFragment.this).attach(ChatsFragment.this).commit();
+                    Log.d("First","libidine");
                     firstTime = true;
                 }
+
             }
 
             @Override
@@ -153,7 +147,7 @@ public class ChatsFragment extends Fragment {
             }
 
         });
-
+        progressBar.setVisibility(ProgressBar.INVISIBLE);
         return lista;
     }
 
@@ -162,8 +156,25 @@ public class ChatsFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
             getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+
         }
     }
 
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("OnPause", "" + mUsersList.size());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("OnStop", "" + mUsersList.size());
+    }
+
+    public void onStart() {
+        super.onStart();
+        Log.d("OnStart", "" + mUsersList.size());
+    }
 }

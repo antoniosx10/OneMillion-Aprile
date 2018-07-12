@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,8 +44,6 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
     static String data;
     static List<User> mData;
 
-
-
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     private DatabaseReference mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("messages").child(mAuth.getCurrentUser().getUid());
@@ -60,6 +59,9 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
         View v;
         v = LayoutInflater.from(mContext).inflate(R.layout.users_single_layout,parent,false);
         final MyViewHolder myViewHolder = new MyViewHolder(v);
+
+        Log.d("Recycle","volte");
+
         return myViewHolder;
     }
 
@@ -84,9 +86,6 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
             }
         });
  **/
-
-
-
 
         final String list_user_id = mData.get(position).getUserId();
 
@@ -187,7 +186,15 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
  **/
     }
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
 
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
 
 
 }

@@ -74,12 +74,16 @@ public class DettagliActivity extends Activity {
 
         descrizione = etDescrizione.getText().toString();
 
-
         int day = dpDeadline.getDayOfMonth();
         int month = dpDeadline.getMonth();
         int year = dpDeadline.getYear();
 
-        deadline = new Date(year,month,day);
+
+
+        deadline = new Date(year-1900,month,day);
+
+        Log.d("Year","" + year);
+        Log.d("Deadline Year", "" + deadline.getYear());
 
         Log.d("Dati", "deadline: " + deadline + "descrizione: " + descrizione + "categoria: " + categoria);
 

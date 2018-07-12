@@ -48,7 +48,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.data.setText(date);
 
         SimpleDateFormat deadLineformat = new SimpleDateFormat("dd-MM-yyy");
-        String deadLineDate=deadLineformat.format(mData.get(position).getDeadline());
+        String deadLineDate = deadLineformat.format(mData.get(position).getDeadline());
 
         holder.deadline.setText(deadLineDate);
 

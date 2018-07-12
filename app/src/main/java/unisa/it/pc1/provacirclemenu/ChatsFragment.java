@@ -47,11 +47,13 @@ public class ChatsFragment extends Fragment {
     private Boolean firstTime = false;
 
     private FirebaseAuth userFirebase;
-    private DatabaseReference mUsersDBRef;
+    private DatabaseReference mUsersDBRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
     private ArrayList<User> mUsersList = new ArrayList<>();
 
     private ProgressBar progressBar;
+
+    private RecyclerViewAdapterContact recyclerViewAdapter;
 
 
 
@@ -63,7 +65,7 @@ public class ChatsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         userFirebase = FirebaseAuth.getInstance();
-        mUsersDBRef = FirebaseDatabase.getInstance().getReference().child("Users");
+
 
         utentiModel = new UtentiModel();
 
@@ -80,7 +82,7 @@ public class ChatsFragment extends Fragment {
         v = inflater.inflate(R.layout.fragment_chats,container,false);
         progressBar = v.findViewById(R.id.progressBar_chat);
         recyclerView = v.findViewById(R.id.conv_list);
-        RecyclerViewAdapterContact recyclerViewAdapter = new RecyclerViewAdapterContact(getContext(),mUsersList);
+        recyclerViewAdapter = new RecyclerViewAdapterContact(getContext(),mUsersList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
 
@@ -94,7 +96,9 @@ public class ChatsFragment extends Fragment {
 
         progressBar.setVisibility(ProgressBar.VISIBLE);
 
+
         mUsersList = queryUsersAndAddthemToList();
+
 
 
 
@@ -106,7 +110,6 @@ public class ChatsFragment extends Fragment {
         mUsersDBRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                mUsersList.clear();
 
                 if(dataSnapshot.getChildrenCount() > 0){
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
@@ -117,7 +120,7 @@ public class ChatsFragment extends Fragment {
                         try {
                             if(!user.getUserId().equals(userFirebase.getCurrentUser().getUid())){
 
-                                /**
+
 
                                 for(String s : listaNumeri) {
                                     Log.d("Num",s);
@@ -129,8 +132,7 @@ public class ChatsFragment extends Fragment {
                                         notify();
                                     }
                                 }
-                                 **/
-                                lista.add(user);
+
 
                             }
                         } catch (Exception e) {

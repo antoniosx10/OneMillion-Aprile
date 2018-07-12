@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Contatti"
+    android:background="@color/backgroundfragment">
+
+
+    <TextView
+        android:layout_width="310dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Seleziona un contatto a cui inviare il task"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/contatti_list"
+        android:layout_width="match_parent"
+        android:layout_height="529dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"></android.support.v7.widget.RecyclerView>
+
+
+    <ProgressBar
+        android:id="@+id/progressBar_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="239dp"
+        android:visibility="invisible" />
+
+</RelativeLayout>

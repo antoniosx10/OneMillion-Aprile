@@ -143,13 +143,14 @@ public class CircleActivity extends Activity {
 
     }
 
+    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             circleMenu.setVisibility(View.VISIBLE);
             if(data != null) {
                 task = (Task) data.getSerializableExtra("taskDettagli");
             }
-    }
+    }*/
 
     private void startTimerHead(){
         handler = new Handler();
@@ -194,10 +195,8 @@ public class CircleActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        if(circleMenu != null) {
-            mWindowManager.removeView(circleMenu);
-            stopTimerHead();
-        }
+        stopTimerHead();
+        finish();
     }
 
     @Override
@@ -305,6 +304,7 @@ public class CircleActivity extends Activity {
                 .addSubMenu(Color.parseColor("#ff9d00"), imgs[4])
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_save_black_24dp)
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_add_black_24dp)
+                .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_contacts_black_24dp)
                 .setOnMenuSelectedListener(new OnMenuSelectedListener() {
                         @Override
                         public void onMenuSelected(int i) {
@@ -355,6 +355,18 @@ public class CircleActivity extends Activity {
                                     Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
                                     dettagliIntent.putExtra("task", task);
                                     startActivityForResult(dettagliIntent, 15);
+                                    break;
+
+                                case 7:
+                                    isDettagli = true;
+                                    Intent contatti = new Intent(getApplicationContext(),Contatti.class);
+                                    if(testo != null) {
+                                        contatti.putExtra("testo",testo);
+                                    } else {
+                                        contatti.putExtra("imagePath",imagePath);
+                                    }
+                                    startActivity(contatti);
+
                                     break;
                             }
                         }

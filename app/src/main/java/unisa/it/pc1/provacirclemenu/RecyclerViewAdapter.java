@@ -2,6 +2,7 @@ package unisa.it.pc1.provacirclemenu;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +23,8 @@ import unisa.it.pc1.provacirclemenu.model.Task;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
 
-    final Context mContext;
-    List<Task> mData;
+    static Context mContext;
+    static List<Task> mData;
     Dialog myDialog;
 
 
@@ -58,7 +59,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }else if(mData.get(position).getCategoria().equalsIgnoreCase("normale")){
 
         }else{
-
+            holder.categoria_img.setImageResource(R.mipmap.dacontrollare);
+            holder.categoria_img.setVisibility(ImageView.VISIBLE);
         }
     }
 
@@ -91,6 +93,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             categoria_img = itemView.findViewById(R.id.Categoria_img);
             deadline = itemView.findViewById(R.id.deadline_task);
 
+
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(mContext,TaskActivity.class);
+                    i.putExtra("task",mData.get(getPosition()));
+                    mContext.startActivity(i);
+                }
+            });
 
         }
     }

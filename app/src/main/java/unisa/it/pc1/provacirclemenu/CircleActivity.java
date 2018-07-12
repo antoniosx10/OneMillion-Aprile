@@ -206,7 +206,7 @@ public class CircleActivity extends Activity {
         super.onDestroy();
     }
 
-    private void sendMessage(String senderId, String receiverId, String message) {
+    private void sendMessage(String senderId, String receiverId, String message,String nome) {
 
         if(!TextUtils.isEmpty(message)){
 
@@ -252,7 +252,7 @@ public class CircleActivity extends Activity {
 
             String push_id_task = task_message_push.getKey();
 
-            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",senderId,false,receiverId);
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",senderId,false,nome);
 
             mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -272,7 +272,7 @@ public class CircleActivity extends Activity {
         }
     }
 
-    private void sendImage(final String senderId, String receiverId, String image) {
+    private void sendImage(final String senderId, String receiverId, String image,String nome) {
 
             Uri imageUri = Uri.fromFile(new File(image));
 
@@ -311,6 +311,25 @@ public class CircleActivity extends Activity {
                     }
                 }
             });
+
+        DatabaseReference task_message_push = mRootRef.child("Task")
+                .child(receiverId).push();
+
+        String push_id_task = task_message_push.getKey();
+
+        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome);
+
+        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                if (task.isSuccessful()) {
+
+                } else {
+
+                }
+            }
+        });
         }
 
     private void createCircleMenu(Bitmap[] imgs) {
@@ -333,43 +352,41 @@ public class CircleActivity extends Activity {
                             switch (i) {
                                 case 0:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
-                                        Log.d("Entrato in sendImage", imagePath);
-
-                                        Toast.makeText(getApplicationContext(), "Inviato a " + utenti.get(i).getUserId(), Toast.LENGTH_SHORT).show();
-                                    }
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName());
+                                        }
                                     break;
                                 case 1:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName());
                                     }
                                     break;
                                 case 2:
-                                    sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(),testo);
-                                    break;
+                                    if(testo != null) {
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
+                                    } else {
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName());
+                                    }
                                 case 3:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName());
                                     }
-                                    break;
                                 case 4:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo);
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName());
                                     }
-                                    break;
                                 case 5:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),testo);
+                                        sendMessage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),testo,utenti.get(i).getDisplayName());
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(), imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(), imagePath,utenti.get(i).getDisplayName());
                                     }
                                     break;
                                 case 6:

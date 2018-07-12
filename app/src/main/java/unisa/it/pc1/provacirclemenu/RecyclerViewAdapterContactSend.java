@@ -147,11 +147,11 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
                     if(testo != null) {
                         if(flagDettagli.equals(true)){
                             sendMessage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(),testo,descrizione,
-                                    categoria,deadline);
+                                    categoria,deadline,mData.get(getPosition()).getDisplayName());
                             Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
                             ((Activity)mContext).finish();
                         }else{
-                            sendMessage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(),testo);
+                            sendMessage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(),testo,mData.get(getPosition()).getDisplayName());
                             Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
                             ((Activity)mContext).finish();
                         }
@@ -159,11 +159,11 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
                         if(flagDettagli.equals("true")){
                             sendImage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(), imagePath,
                                     descrizione,
-                                    categoria,deadline);
+                                    categoria,deadline,mData.get(getPosition()).getDisplayName());
                             Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
                             ((Activity)mContext).finish();
                         }else{
-                            sendImage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(), imagePath);
+                            sendImage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(), imagePath,mData.get(getPosition()).getDisplayName());
                             Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
                             ((Activity)mContext).finish();
                         }
@@ -190,7 +190,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
     }
 
 
-    private static void sendMessage(String senderId, String receiverId, String message) {
+    private static void sendMessage(String senderId, String receiverId, String message,String nome) {
 
         if(!TextUtils.isEmpty(message)){
 
@@ -237,7 +237,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
             String push_id_task = task_message_push.getKey();
 
-            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",receiverId,false,mAuth.getCurrentUser().toString());
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",senderId,false,mAuth.getCurrentUser().toString());
 
             mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -257,7 +257,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
 
 
-    private static void sendMessage(String senderId, String receiverId, String message,String descrizione,String categoria, Date deadline) {
+    private static void sendMessage(String senderId, String receiverId, String message,String descrizione,String categoria, Date deadline,String nome) {
 
         if(!TextUtils.isEmpty(message)){
 
@@ -304,7 +304,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
             String push_id_task = task_message_push.getKey();
 
-            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),deadline, descrizione, categoria,receiverId,false,mAuth.getCurrentUser().toString());
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),deadline, descrizione, categoria,senderId,false,mAuth.getCurrentUser().toString());
 
             mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -322,7 +322,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
         }
     }
 
-    private static void sendImage(final String senderId, String receiverId, String image) {
+    private static void sendImage(final String senderId, String receiverId, String image,String nome) {
 
         Uri imageUri = Uri.fromFile(new File(image));
 
@@ -367,7 +367,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
         String push_id_task = task_message_push.getKey();
 
-        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,receiverId,false,mAuth.getCurrentUser().toString());
+        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,senderId,false,mAuth.getCurrentUser().toString());
 
         mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -384,7 +384,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
 
 
-    private static void sendImage(final String senderId, String receiverId, String image,String descrizione,String categoria,Date deadline) {
+    private static void sendImage(final String senderId, String receiverId, String image,String descrizione,String categoria,Date deadline,String nome) {
 
         Uri imageUri = Uri.fromFile(new File(image));
 
@@ -430,7 +430,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
         String push_id_task = task_message_push.getKey();
 
-        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,receiverId,false,mAuth.getCurrentUser().toString());
+        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,senderId,false,mAuth.getCurrentUser().toString());
 
         mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

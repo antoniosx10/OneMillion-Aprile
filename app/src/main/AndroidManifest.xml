@@ -60,7 +60,8 @@
         <activity android:name=".ChatActivity" />
         <activity android:name=".Profiloactivity" />
         <activity android:name=".Contatti" />
-        <activity android:name=".ExportCSVActivity"></activity>
+        <activity android:name=".TaskActivity"
+            android:theme="@style/Theme.DialogWithoutTitleBar" ></activity>
     </application>
 
 </manifest>

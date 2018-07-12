@@ -196,7 +196,8 @@ public class CircleActivity extends Activity {
     protected void onPause() {
         super.onPause();
         stopTimerHead();
-        mWindowManager.removeView(circleMenu);
+        if(circleMenu != null )
+            mWindowManager.removeView(circleMenu);
         finish();
     }
 

@@ -167,6 +167,11 @@ public class MainActivity extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
 
+        if(item.getItemId() == R.id.main_export) {
+            Intent settingsIntent = new Intent(MainActivity.this, ExportCSVActivity.class);
+            startActivity(settingsIntent);
+        }
+
         if(item.getItemId() == R.id.main_logOut){
 
             mUserRef.child("online").setValue(ServerValue.TIMESTAMP);

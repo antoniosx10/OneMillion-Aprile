@@ -59,8 +59,8 @@
         <activity android:name=".SettingActivity" />
         <activity android:name=".ChatActivity" />
         <activity android:name=".Profiloactivity" />
-        <activity android:name=".Contatti"
-            ></activity>
+        <activity android:name=".Contatti" />
+        <activity android:name=".ExportCSVActivity"></activity>
     </application>
 
 </manifest>

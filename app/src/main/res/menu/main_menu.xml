@@ -2,6 +2,9 @@
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/main_export"
+        android:title="Export to CSV" />
+    <item
         android:id="@+id/main_setting"
         android:title="@string/impostazioni" />
     <item

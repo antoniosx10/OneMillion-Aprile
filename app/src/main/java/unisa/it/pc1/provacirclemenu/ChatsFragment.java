@@ -64,6 +64,7 @@ public class ChatsFragment extends Fragment {
 
         //Trovare modo per non far caricare sempre listaNumeri
         listaNumeri = utentiModel.getContattiTelefono(getContext());
+
         mUsersList = queryUsersAndAddthemToList();
     }
 
@@ -74,11 +75,16 @@ public class ChatsFragment extends Fragment {
         v = inflater.inflate(R.layout.fragment_chats,container,false);
         progressBar = v.findViewById(R.id.progressBar_chat);
 
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+
         recyclerView = v.findViewById(R.id.conv_list);
 
         RecyclerViewAdapterContact recyclerViewAdapter = new RecyclerViewAdapterContact(getContext(),mUsersList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
+        progressBar.setVisibility(ProgressBar.INVISIBLE);
+
+
 
         return v;
     }
@@ -87,8 +93,6 @@ public class ChatsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        progressBar.setVisibility(ProgressBar.VISIBLE);
 
     }
 
@@ -111,20 +115,19 @@ public class ChatsFragment extends Fragment {
 
                                 /**
 
-                                for(String s : listaNumeri) {
-                                    Log.d("Num",s);
-                                    if(!s.substring(0,3).equals("+39")) {
-                                        s = "+39" + s;
-                                    }
-                                    if(s.equals(user.getNumber())) {
-                                        lista.add(user);
-                                        notify();
-                                    }
-                                }
+                                 for(String s : listaNumeri) {
+                                 Log.d("Num",s);
+                                 if(!s.substring(0,3).equals("+39")) {
+                                 s = "+39" + s;
+                                 }
+                                 if(s.equals(user.getNumber())) {
+                                 lista.add(user);
+                                 notify();
+                                 }
+                                 }
 
                                  **/
                                 lista.add(user);
-
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

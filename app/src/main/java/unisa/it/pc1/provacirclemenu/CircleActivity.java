@@ -246,6 +246,26 @@ public class CircleActivity extends Activity {
                     }
                 }
             });
+            DatabaseReference task_message_push = mRootRef.child("Task")
+                    .child(receiverId).push();
+
+            String push_id_task = task_message_push.getKey();
+
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",senderId,false,receiverId);
+
+            mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                    if (task.isSuccessful()) {
+
+                    } else {
+
+                    }
+                }
+            });
+
+
         }else{
             Toast.makeText(getApplicationContext(),"Inserisci il tuo messaggio",Toast.LENGTH_LONG).show();
         }

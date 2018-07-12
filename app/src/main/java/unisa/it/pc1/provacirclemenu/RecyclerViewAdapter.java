@@ -47,10 +47,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         String date=sdf.format(mData.get(position).getData());
         holder.data.setText(date);
 
-        SimpleDateFormat deadLineformat = new SimpleDateFormat("dd-MM-yyy");
-        String deadLineDate=deadLineformat.format(mData.get(position).getDeadline());
-
-        holder.deadline.setText(deadLineDate);
+        if(mData.get(position).getDeadline() != null){
+            SimpleDateFormat deadLineformat = new SimpleDateFormat("dd-MM-yyy");
+            String deadLineDate=deadLineformat.format(mData.get(position).getDeadline());
+            holder.deadline.setText(deadLineDate);
+        }
 
         if(mData.get(position).getCategoria().equalsIgnoreCase("importante")){
             holder.categoria_img.setVisibility(ImageView.VISIBLE);

@@ -41,7 +41,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="56dp"
         android:layout_marginStart="56dp"
-        android:text="TextView"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/textView"
@@ -76,11 +75,10 @@
     <TextView
         android:id="@+id/detail_messaggio_task"
         android:layout_width="336dp"
-        android:layout_height="164dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_height="209dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:background="#FFFFFF"
-        android:text="TextView"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -98,7 +96,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detail_messaggio_task" />
+        app:layout_constraintTop_toBottomOf="@+id/detail_image_task" />
 
     <TextView
         android:id="@+id/detail_descrizione_task"
@@ -107,7 +105,6 @@
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="TextView"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -117,13 +114,25 @@
         android:id="@+id/detail_categoria_task"
         android:layout_width="123dp"
         android:layout_height="81dp"
-        android:layout_marginLeft="128dp"
-        android:layout_marginStart="128dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginLeft="120dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="44dp"
         android:src="@drawable/ic_error_outline_black_24dp"
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/detail_descrizione_task" />
+
+    <ImageView
+        android:id="@+id/detail_image_task"
+        android:layout_width="214dp"
+        android:layout_height="237dp"
+        android:layout_marginLeft="72dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/smartphone"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
     6dp"
         tools:layout_editor_absoluteY="382dp"
         android:textColor="@andr

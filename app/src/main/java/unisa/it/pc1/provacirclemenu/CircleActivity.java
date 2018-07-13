@@ -252,7 +252,7 @@ public class CircleActivity extends Activity {
 
             String push_id_task = task_message_push.getKey();
 
-            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",senderId,false,nome);
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",senderId,false,nome,"");
 
             mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -272,7 +272,7 @@ public class CircleActivity extends Activity {
         }
     }
 
-    private void sendImage(final String senderId, String receiverId, String image,String nome) {
+    private void sendImage(final String senderId, String receiverId, String image,String nome,String imagePath) {
 
             Uri imageUri = Uri.fromFile(new File(image));
 
@@ -317,7 +317,7 @@ public class CircleActivity extends Activity {
 
         String push_id_task = task_message_push.getKey();
 
-        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome);
+        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,imagePath);
 
         mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -331,6 +331,37 @@ public class CircleActivity extends Activity {
             }
         });
         }
+
+
+
+
+        private void sendTask(final String senderId, String receiverId, String messaggio,String nome,String imagePath){
+            DatabaseReference task_message_push = mRootRef.child("Task")
+                    .child(receiverId).push();
+
+            String push_id_task = task_message_push.getKey();
+
+            if(imagePath != null){
+                unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(messaggio, new Date(),null, "", "normale",senderId,false,nome,imagePath);
+            }else{
+                unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(messaggio, new Date(),null, "", "normale",senderId,false,nome,"");
+            }
+
+
+            mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                    if (task.isSuccessful()) {
+
+                    } else {
+
+                    }
+                }
+            });
+        }
+
+
 
     private void createCircleMenu(Bitmap[] imgs) {
         startTimerHead();
@@ -354,39 +385,39 @@ public class CircleActivity extends Activity {
                                     if(testo != null) {
                                         sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName());
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName(),imagePath);
                                         }
                                     break;
                                 case 1:
                                     if(testo != null) {
                                         sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName());
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName(),imagePath);
                                     }
                                     break;
                                 case 2:
                                     if(testo != null) {
                                         sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName());
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName(),imagePath);
                                     }
                                 case 3:
                                     if(testo != null) {
                                         sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName());
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName(),imagePath);
                                     }
                                 case 4:
                                     if(testo != null) {
                                         sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName());
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName(),imagePath);
                                     }
                                 case 5:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),testo,utenti.get(i).getDisplayName());
+                                        sendTask(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),testo,"Me stesso",null);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(), imagePath,utenti.get(i).getDisplayName());
+                                        sendTask(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),"Immagine","Me stesso",imagePath);
                                     }
                                     break;
                                 case 6:

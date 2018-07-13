@@ -17,6 +17,7 @@ public class Task implements Serializable{
     private String categoria;
     private Boolean stato;
     private String from;
+    private String isImage;
 
     private boolean isSelected = false;
 
@@ -27,7 +28,7 @@ public class Task implements Serializable{
         this.taskId = taskId;
     }
 
-    public Task(String contenuto, Date data, Date deadline, String descrizione, String categoria,String taskId,Boolean stato,String from) {
+    public Task(String contenuto, Date data, Date deadline, String descrizione, String categoria,String taskId,Boolean stato,String from,String isImage) {
         this.contenuto = contenuto;
         this.data = data;
         this.deadline = deadline;
@@ -36,10 +37,19 @@ public class Task implements Serializable{
         this.taskId = taskId;
         this.stato = stato;
         this.from = from;
+        this.isImage = isImage;
     }
 
     public Task(){
 
+    }
+
+    public String getIsImage() {
+        return isImage;
+    }
+
+    public void setIsImage(String isImage) {
+        this.isImage = isImage;
     }
 
     public String getContenuto() {

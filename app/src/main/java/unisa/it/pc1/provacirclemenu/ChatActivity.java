@@ -460,7 +460,7 @@ public class ChatActivity extends AppCompatActivity {
 
             String push_id_task = task_message_push.getKey();
 
-            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",mCurrentUserId,false,utente.getDisplayName());
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",mCurrentUserId,false,utente.getDisplayName(),"");
 
             mRootRef.child("Task").child(mChatUser).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override

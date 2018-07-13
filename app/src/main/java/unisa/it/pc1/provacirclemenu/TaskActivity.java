@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.text.SimpleDateFormat;
 
 import unisa.it.pc1.provacirclemenu.model.Task;
@@ -19,6 +21,7 @@ public class TaskActivity extends Activity {
     private TextView descrizione;
 
     private ImageView categoria;
+    private ImageView immagine;
 
 
     @Override
@@ -36,6 +39,7 @@ public class TaskActivity extends Activity {
         descrizione = findViewById(R.id.detail_descrizione_task);
 
         categoria = findViewById(R.id.detail_categoria_task);
+        immagine = findViewById(R.id.detail_image_task);
 
 
         sender.setText(task.getFrom());
@@ -47,7 +51,14 @@ public class TaskActivity extends Activity {
             deadline.setText(date);
         }
 
-        messaggio.setText(task.getContenuto());
+        if(task.getContenuto().equalsIgnoreCase("immagine")){
+            immagine.setVisibility(View.VISIBLE);
+            Picasso.with(getApplicationContext()).load(task.getIsImage()).placeholder(R.drawable.ic_account_circle_black_24dp).into(immagine);
+
+        }else{
+            messaggio.setText(task.getContenuto());
+
+        }
 
         descrizione.setText(task.getDescrizione());
 

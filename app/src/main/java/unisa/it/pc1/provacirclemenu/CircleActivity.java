@@ -97,6 +97,8 @@ public class CircleActivity extends Activity {
 
     private String nome;
 
+    private String download_url;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -292,7 +294,7 @@ public class CircleActivity extends Activity {
                 @Override
                 public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
                     if(task.isSuccessful()){
-                        String download_url = task.getResult().getDownloadUrl().toString();
+                          download_url = task.getResult().getDownloadUrl().toString();
                         Map messageMap = new HashMap();
                         messageMap.put("message", download_url);
                         messageMap.put("seen", false);
@@ -321,7 +323,7 @@ public class CircleActivity extends Activity {
 
         String push_id_task = task_message_push.getKey();
 
-        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,imagePath);
+        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
 
         mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

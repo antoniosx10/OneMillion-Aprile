@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -53,6 +54,7 @@ public class TaskActivity extends Activity {
 
         if(task.getContenuto().equalsIgnoreCase("immagine")){
             immagine.setVisibility(View.VISIBLE);
+            Toast.makeText(getApplicationContext(),task.getIsImage(),Toast.LENGTH_LONG).show();
             Picasso.with(getApplicationContext()).load(task.getIsImage()).placeholder(R.drawable.ic_account_circle_black_24dp).into(immagine);
 
         }else{

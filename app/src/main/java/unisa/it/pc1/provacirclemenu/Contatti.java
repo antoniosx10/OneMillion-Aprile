@@ -74,8 +74,7 @@ public class Contatti extends AppCompatActivity {
 
 
         mUsersList = queryUsersAndAddthemToList();
-        recyclerViewAdapter = new RecyclerViewAdapterContactSend(this,mUsersList,testo,imagePath,
-                descrizione,categoria,deadline,flagDettagli,nome);
+        recyclerViewAdapter = new RecyclerViewAdapterContactSend(this,mUsersList,testo,imagePath,descrizione,categoria,deadline,flagDettagli,nome);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(recyclerViewAdapter);
 

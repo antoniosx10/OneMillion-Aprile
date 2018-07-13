@@ -58,6 +58,8 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
     private DatabaseReference userDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
     private static StorageReference mImageStorage = FirebaseStorage.getInstance().getReference();
 
+    private static String download_url;
+
     public RecyclerViewAdapterContactSend(Context mContext, List<User> mData, String testo, String imagePath, String descrizione, String categoria, Date deadline, String flagDettagli,String nomeUtente) {
         this.mContext = mContext;
         this.mData = mData;
@@ -337,7 +339,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
                 if(task.isSuccessful()){
-                    String download_url = task.getResult().getDownloadUrl().toString();
+                     download_url = task.getResult().getDownloadUrl().toString();
                     Map messageMap = new HashMap();
                     messageMap.put("message", download_url);
                     messageMap.put("seen", false);
@@ -366,7 +368,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
         String push_id_task = task_message_push.getKey();
 
-        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,senderId,false,nome,image);
+        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,senderId,false,nome,download_url);
 
         mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -399,7 +401,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
                 if(task.isSuccessful()){
-                    String download_url = task.getResult().getDownloadUrl().toString();
+                     download_url = task.getResult().getDownloadUrl().toString();
                     Map messageMap = new HashMap();
                     messageMap.put("message", download_url);
                     messageMap.put("seen", false);
@@ -429,7 +431,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
         String push_id_task = task_message_push.getKey();
 
-        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,senderId,false,nome,image);
+        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,senderId,false,nome,download_url);
 
         mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

@@ -97,8 +97,6 @@ public class CircleActivity extends Activity {
 
     private String nome;
 
-    private String download_url;
-
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -278,7 +276,7 @@ public class CircleActivity extends Activity {
         }
     }
 
-    private void sendImage(final String senderId, String receiverId, String image,String nome,String imagePath) {
+    private void sendImage(final String senderId, final String receiverId, String image, final String nome, String imagePath) {
 
             Uri imageUri = Uri.fromFile(new File(image));
 
@@ -294,7 +292,7 @@ public class CircleActivity extends Activity {
                 @Override
                 public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
                     if(task.isSuccessful()){
-                          download_url = task.getResult().getDownloadUrl().toString();
+                        String download_url = task.getResult().getDownloadUrl().toString();
                         Map messageMap = new HashMap();
                         messageMap.put("message", download_url);
                         messageMap.put("seen", false);
@@ -314,28 +312,29 @@ public class CircleActivity extends Activity {
                                 }
                             }
                         });
+
+                        DatabaseReference task_message_push = mRootRef.child("Task")
+                                .child(receiverId).push();
+
+                        String push_id_task = task_message_push.getKey();
+
+                        unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
+
+                        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                                if (task.isSuccessful()) {
+
+                                } else {
+
+                                }
+                            }
+                        });
                     }
                 }
             });
 
-        DatabaseReference task_message_push = mRootRef.child("Task")
-                .child(receiverId).push();
-
-        String push_id_task = task_message_push.getKey();
-
-        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
-
-        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
-
-                if (task.isSuccessful()) {
-
-                } else {
-
-                }
-            }
-        });
         }
 
 

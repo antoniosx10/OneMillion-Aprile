@@ -276,7 +276,7 @@ public class CircleActivity extends Activity {
         }
     }
 
-    private void sendImage(final String senderId, final String receiverId, String image, final String nome, String imagePath) {
+    private void sendImage(final String senderId, final String receiverId, String image, final String nome) {
 
             Uri imageUri = Uri.fromFile(new File(image));
 
@@ -340,27 +340,40 @@ public class CircleActivity extends Activity {
 
 
 
-        private void sendTask(final String senderId, String receiverId, String messaggio,String nome,String imagePath){
-            DatabaseReference task_message_push = mRootRef.child("Task")
-                    .child(receiverId).push();
-
-            String push_id_task = task_message_push.getKey();
-
-            if(imagePath != null){
-                unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(messaggio, new Date(),null, "", "normale",senderId,false,nome,imagePath);
-            }else{
-                unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(messaggio, new Date(),null, "", "normale",senderId,false,nome,"");
-            }
+        private void sendTask(final String senderId, final String receiverId, String messaggio, final String nome, String imagePath){
 
 
-            mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+            Uri imageUri = Uri.fromFile(new File(imagePath));
+
+            DatabaseReference user_message_push = mRootRef.child("messages")
+                    .child(senderId).child(receiverId).push();
+
+            final String push_id = user_message_push.getKey();
+            StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".png");
+            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
-                public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
+                    if(task.isSuccessful()){
+                        String download_url = task.getResult().getDownloadUrl().toString();
 
-                    if (task.isSuccessful()) {
+                        DatabaseReference task_message_push = mRootRef.child("Task")
+                                .child(receiverId).push();
 
-                    } else {
+                        String push_id_task = task_message_push.getKey();
 
+                        unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
+
+                        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                                if (task.isSuccessful()) {
+
+                                } else {
+
+                                }
+                            }
+                        });
                     }
                 }
             });
@@ -390,33 +403,33 @@ public class CircleActivity extends Activity {
                                     if(testo != null) {
                                         sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome,imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome);
                                         }
                                     break;
                                 case 1:
                                     if(testo != null) {
                                         sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome,imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome);
                                     }
                                     break;
                                 case 2:
                                     if(testo != null) {
                                         sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome,imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome);
                                     }
                                 case 3:
                                     if(testo != null) {
                                         sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome,imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome);
                                     }
                                 case 4:
                                     if(testo != null) {
                                         sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome,imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome);
                                     }
                                 case 5:
                                     if(testo != null) {

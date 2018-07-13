@@ -36,19 +36,13 @@ import unisa.it.pc1.provacirclemenu.model.UtentiModel;
 
 public class TaskFragment extends Fragment {
 
-
     View v;
     private RecyclerView recyclerView;
-
     private Spinner spinner;
-
     private Boolean firstTime = false;
-
     private FirebaseAuth userFirebase;
     private DatabaseReference mMessagesDBRef;
-
     private ArrayList<Task> mMessagesList = new ArrayList<>();
-
     private ItemTouchHelper.Callback itemTouchHelperCallback;
     private RecyclerViewAdapter recyclerViewAdapter;
 
@@ -58,11 +52,45 @@ public class TaskFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         userFirebase = FirebaseAuth.getInstance();
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Task").child(userFirebase.getUid());
-
         mMessagesList = queryMessagesAndAddthemToList();
+
+        mMessagesDBRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                Task task = dataSnapshot.getValue(Task.class);
+                mMessagesList.add(task);
+                //recyclerView.getRecycledViewPool().clear();
+                recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
+
     }
 
     @Nullable
@@ -93,7 +121,6 @@ public class TaskFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
 
         itemTouchHelperCallback = new ItemTouchHelper.Callback() {
             @Override
@@ -164,38 +191,6 @@ public class TaskFragment extends Fragment {
 
         // attaching the touch helper to recycler view
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
-
-        mMessagesDBRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Task task = dataSnapshot.getValue(Task.class);
-                mMessagesList.add(task);
-                recyclerView.getRecycledViewPool().clear();
-                recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
-
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -315,14 +310,10 @@ public class TaskFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-       /* if (isVisibleToUser) {
-            mMessagesList.clear();
-            mMessagesList = queryMessagesAndAddthemToList();
-            recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            recyclerView.setAdapter(recyclerViewAdapter);
+        if (isVisibleToUser) {
             getFragmentManager().beginTransaction().detach(this).attach(this).commit();
-        }*/
+
+        }
     }
 
 }

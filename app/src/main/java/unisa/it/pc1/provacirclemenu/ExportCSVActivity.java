@@ -101,10 +101,12 @@ public class ExportCSVActivity extends AppCompatActivity implements OnItemClick 
         } else {
             try {
                 export(taskDaEsportare);
+                finish();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
     }
 
     private void export(ArrayList<Task> tasks) throws IOException {
@@ -143,6 +145,8 @@ public class ExportCSVActivity extends AppCompatActivity implements OnItemClick 
 
             writer.writeNext(data);
         }
+
+        Toast.makeText(getApplicationContext(),"CSV Salvato",Toast.LENGTH_SHORT).show();
         writer.close();
     }
 }

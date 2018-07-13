@@ -27,11 +27,14 @@ public class DettagliActivity extends Activity {
     private String categoria;
     private String descrizione;
     private Date deadline;
+    private String nome;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        nome = getIntent().getStringExtra("nome");
         setContentView(R.layout.activity_dettagli);
 
         //etDeadline = findViewById(R.id.etDeadline);
@@ -93,6 +96,7 @@ public class DettagliActivity extends Activity {
         contattiIntent.putExtra("categoria",categoria);
         contattiIntent.putExtra("descrizione",descrizione);
         contattiIntent.putExtra("deadline",deadline);
+        contattiIntent.putExtra("nome",nome);
 
         contattiIntent.putExtra("flagDettagli","true");
 

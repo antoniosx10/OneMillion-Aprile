@@ -95,6 +95,8 @@ public class CircleActivity extends Activity {
 
     private DatabaseReference mNotificationRef;
 
+    private String nome;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +114,8 @@ public class CircleActivity extends Activity {
         Intent i = getIntent();
         testo = i.getStringExtra("testoCopiato");
         imagePath = i.getStringExtra("pathImg");
+        nome = i.getStringExtra("nome");
+
         utenti = new ArrayList<User>();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         imgsList = new ArrayList<String>();
@@ -383,35 +387,35 @@ public class CircleActivity extends Activity {
                             switch (i) {
                                 case 0:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName(),imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome,imagePath);
                                         }
                                     break;
                                 case 1:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName(),imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome,imagePath);
                                     }
                                     break;
                                 case 2:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName(),imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome,imagePath);
                                     }
                                 case 3:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName(),imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome,imagePath);
                                     }
                                 case 4:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,utenti.get(i).getDisplayName());
+                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,utenti.get(i).getDisplayName(),imagePath);
+                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome,imagePath);
                                     }
                                 case 5:
                                     if(testo != null) {
@@ -428,6 +432,7 @@ public class CircleActivity extends Activity {
                                     } else {
                                         dettagliIntent.putExtra("imagePath",imagePath);
                                     }
+                                    dettagliIntent.putExtra("nome",nome);
                                     startActivity(dettagliIntent);
                                     break;
 
@@ -440,6 +445,7 @@ public class CircleActivity extends Activity {
                                         contatti.putExtra("imagePath",imagePath);
                                     }
                                     contatti.putExtra("flagDettagli","false");
+                                    contatti.putExtra("nome",nome);
 
                                     startActivity(contatti);
 

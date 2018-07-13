@@ -68,6 +68,8 @@ public class ListenerService extends Service {
 
     private Intent i;
 
+    private User utente;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -84,6 +86,18 @@ public class ListenerService extends Service {
         mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrent_user_id);
 
         mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        mUsersRef.child(mAuth.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot userData) {
+                 utente = userData.getValue(User.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         utenti = new ArrayList<User>();
     }
@@ -107,6 +121,7 @@ public class ListenerService extends Service {
                 i = new Intent(getApplicationContext(),CircleActivity.class);
                 i.putExtra("testoCopiato", text);
                 i.putExtra("dataOdierna", data);
+                i.putExtra("nome",utente.getDisplayName());
                 i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 

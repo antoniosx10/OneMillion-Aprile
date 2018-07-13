@@ -62,6 +62,8 @@ public class Contatti extends AppCompatActivity {
 
         String flagDettagli = i.getStringExtra("flagDettagli");
 
+        String nome = i.getStringExtra("nome");
+
         utentiModel = new UtentiModel();
         //Trovare modo per non far caricare sempre listaNumeri
         listaNumeri = utentiModel.getContattiTelefono(this);
@@ -73,7 +75,7 @@ public class Contatti extends AppCompatActivity {
 
         mUsersList = queryUsersAndAddthemToList();
         recyclerViewAdapter = new RecyclerViewAdapterContactSend(this,mUsersList,testo,imagePath,
-                descrizione,categoria,deadline,flagDettagli);
+                descrizione,categoria,deadline,flagDettagli,nome);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(recyclerViewAdapter);
 

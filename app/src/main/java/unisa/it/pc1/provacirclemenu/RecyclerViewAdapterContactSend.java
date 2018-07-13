@@ -50,6 +50,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
     static String categoria;
     static Date deadline;
     static String flagDettagli;
+    static String nomeUtente;
 
     private static FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private static DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
@@ -57,7 +58,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
     private DatabaseReference userDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
     private static StorageReference mImageStorage = FirebaseStorage.getInstance().getReference();
 
-    public RecyclerViewAdapterContactSend(Context mContext, List<User> mData, String testo, String imagePath, String descrizione, String categoria, Date deadline, String flagDettagli) {
+    public RecyclerViewAdapterContactSend(Context mContext, List<User> mData, String testo, String imagePath, String descrizione, String categoria, Date deadline, String flagDettagli,String nomeUtente) {
         this.mContext = mContext;
         this.mData = mData;
         this.testo = testo;
@@ -66,6 +67,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
         this.categoria = categoria;
         this.deadline = deadline;
         this.flagDettagli = flagDettagli;
+        this.nomeUtente = nomeUtente;
     }
 
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -146,24 +148,21 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
                     if(testo != null) {
                         if(flagDettagli.equals(true)){
-                            sendMessage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(),testo,descrizione,
-                                    categoria,deadline,mData.get(getPosition()).getDisplayName());
+                            sendMessage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(),testo,descrizione,categoria,deadline,nomeUtente);
                             Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
                             ((Activity)mContext).finish();
                         }else{
-                            sendMessage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(),testo,mData.get(getPosition()).getDisplayName());
-                            Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
+                            sendMessage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(),testo,nomeUtente);
+                            Toast.makeText(mContext,mData.get(getPosition()).getDisplayName(),Toast.LENGTH_LONG).show();
                             ((Activity)mContext).finish();
                         }
                     } else {
                         if(flagDettagli.equals("true")){
-                            sendImage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(), imagePath,
-                                    descrizione,
-                                    categoria,deadline,mData.get(getPosition()).getDisplayName());
+                            sendImage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(), imagePath, descrizione, categoria,deadline,nomeUtente);
                             Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
                             ((Activity)mContext).finish();
                         }else{
-                            sendImage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(), imagePath,mData.get(getPosition()).getDisplayName());
+                            sendImage(mAuth.getCurrentUser().getUid(), mData.get(getPosition()).getUserId(), imagePath,nomeUtente);
                             Toast.makeText(mContext,"Task inviato",Toast.LENGTH_LONG).show();
                             ((Activity)mContext).finish();
                         }
@@ -237,7 +236,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
             String push_id_task = task_message_push.getKey();
 
-            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",senderId,false,mAuth.getCurrentUser().toString(),"");
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",senderId,false,nome,"");
 
             mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -304,7 +303,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
 
             String push_id_task = task_message_push.getKey();
 
-            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),deadline, descrizione, categoria,senderId,false,mAuth.getCurrentUser().toString(),"");
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),deadline, descrizione, categoria,senderId,false,nome,"");
 
             mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override

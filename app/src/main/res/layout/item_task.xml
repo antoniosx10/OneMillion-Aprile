@@ -7,7 +7,8 @@
     android:padding="5dp"
     android:layout_marginTop="10dp"
     android:id="@+id/task_item"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:clickable="true" >
 
     <ImageView
         android:layout_width="56dp"

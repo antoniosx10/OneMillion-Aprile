@@ -43,6 +43,8 @@ dependencies {
 
     compile 'com.abangfadli.shotwatch:shotwatch:1.0.4'
     compile 'com.github.Hitomis:CircleMenu:v1.1.0'
+    compile files('libs/opencsv-4.2.jar')
+
 }
 
 apply plugin: 'com.google.gms.google-services'

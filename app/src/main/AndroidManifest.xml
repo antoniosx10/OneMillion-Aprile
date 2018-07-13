@@ -47,8 +47,7 @@
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
         <activity
-            android:name=".DettagliActivity"
-            android:theme="@style/Theme.DialogWithoutTitleBar" />
+            android:name=".DettagliActivity" />
         <activity android:name=".Autenticazione">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

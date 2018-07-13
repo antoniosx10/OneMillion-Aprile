@@ -18,6 +18,8 @@ public class Task implements Serializable{
     private Boolean stato;
     private String from;
 
+    private boolean isSelected = false;
+
 
     public Task(String contenuto, Date data,String taskId) {
         this.contenuto = contenuto;
@@ -104,5 +106,14 @@ public class Task implements Serializable{
 
     public void setFrom(String from) {
         this.from = from;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+
+    public boolean isSelected() {
+        return isSelected;
     }
 }

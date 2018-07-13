@@ -130,5 +130,4 @@ public class Contatti extends AppCompatActivity {
         return lista;
     }
 
-
 }

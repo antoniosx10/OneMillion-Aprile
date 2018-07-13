@@ -63,12 +63,10 @@ public class DettagliActivity extends Activity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
                 categoria = parent.getItemAtPosition(position).toString();
-
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 

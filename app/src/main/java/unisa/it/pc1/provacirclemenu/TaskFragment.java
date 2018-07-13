@@ -61,6 +61,8 @@ public class TaskFragment extends Fragment {
 
         userFirebase = FirebaseAuth.getInstance();
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Task").child(userFirebase.getUid());
+
+        mMessagesList = queryMessagesAndAddthemToList();
     }
 
     @Nullable
@@ -91,7 +93,7 @@ public class TaskFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mMessagesList = queryMessagesAndAddthemToList();
+
 
         itemTouchHelperCallback = new ItemTouchHelper.Callback() {
             @Override
@@ -273,6 +275,7 @@ public class TaskFragment extends Fragment {
         mMessagesDBRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                mMessagesList.clear();
                 if(dataSnapshot.getChildrenCount() > 0){
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
                         Task task = snap.getValue(Task.class);
@@ -312,15 +315,14 @@ public class TaskFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-
+       /* if (isVisibleToUser) {
             mMessagesList.clear();
             mMessagesList = queryMessagesAndAddthemToList();
             recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerView.setAdapter(recyclerViewAdapter);
             getFragmentManager().beginTransaction().detach(this).attach(this).commit();
-        }
+        }*/
     }
 
 }

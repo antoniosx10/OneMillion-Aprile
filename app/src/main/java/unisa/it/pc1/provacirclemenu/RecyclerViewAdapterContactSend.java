@@ -58,7 +58,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
     private DatabaseReference userDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
     private static StorageReference mImageStorage = FirebaseStorage.getInstance().getReference();
 
-    private static String download_url;
+
 
     public RecyclerViewAdapterContactSend(Context mContext, List<User> mData, String testo, String imagePath, String descrizione, String categoria, Date deadline, String flagDettagli,String nomeUtente) {
         this.mContext = mContext;
@@ -323,7 +323,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
         }
     }
 
-    private static void sendImage(final String senderId, String receiverId, String image,String nome) {
+    private static void sendImage(final String senderId, final String receiverId, String image, final String nome) {
 
         Uri imageUri = Uri.fromFile(new File(image));
 
@@ -339,7 +339,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
                 if(task.isSuccessful()){
-                     download_url = task.getResult().getDownloadUrl().toString();
+                     String download_url = task.getResult().getDownloadUrl().toString();
                     Map messageMap = new HashMap();
                     messageMap.put("message", download_url);
                     messageMap.put("seen", false);
@@ -359,33 +359,34 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
                             }
                         }
                     });
+
+                    DatabaseReference task_message_push = mRootRef.child("Task")
+                            .child(receiverId).push();
+
+                    String push_id_task = task_message_push.getKey();
+
+                    unisa.it.pc1.provacirclemenu.model.Task taskUtente = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,senderId,false,nome,download_url);
+
+                    mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskUtente).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+
+                            if (task.isSuccessful()) {
+
+                            } else {
+
+                            }
+                        }
+                    });
                 }
             }
         });
 
-        DatabaseReference task_message_push = mRootRef.child("Task")
-                .child(receiverId).push();
-
-        String push_id_task = task_message_push.getKey();
-
-        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,senderId,false,nome,download_url);
-
-        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-
-                if (task.isSuccessful()) {
-
-                } else {
-
-                }
-            }
-        });
     }
 
 
 
-    private static void sendImage(final String senderId, String receiverId, String image,String descrizione,String categoria,Date deadline,String nome) {
+    private static void sendImage(final String senderId, final String receiverId, String image, final String descrizione, final String categoria, final Date deadline, final String nome) {
 
         Uri imageUri = Uri.fromFile(new File(image));
 
@@ -401,7 +402,7 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
                 if(task.isSuccessful()){
-                     download_url = task.getResult().getDownloadUrl().toString();
+                     String download_url = task.getResult().getDownloadUrl().toString();
                     Map messageMap = new HashMap();
                     messageMap.put("message", download_url);
                     messageMap.put("seen", false);
@@ -421,29 +422,29 @@ public class RecyclerViewAdapterContactSend extends RecyclerView.Adapter<unisa.i
                             }
                         }
                     });
+
+                    DatabaseReference task_message_push = mRootRef.child("Task")
+                            .child(receiverId).push();
+
+                    String push_id_task = task_message_push.getKey();
+
+                    unisa.it.pc1.provacirclemenu.model.Task taskUtente = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,senderId,false,nome,download_url);
+
+                    mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskUtente).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+
+                            if (task.isSuccessful()) {
+
+                            } else {
+
+                            }
+                        }
+                    });
                 }
             }
         });
 
-
-        DatabaseReference task_message_push = mRootRef.child("Task")
-                .child(receiverId).push();
-
-        String push_id_task = task_message_push.getKey();
-
-        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),deadline, descrizione, categoria,senderId,false,nome,download_url);
-
-        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-
-                if (task.isSuccessful()) {
-
-                } else {
-
-                }
-            }
-        });
 
     }
 }

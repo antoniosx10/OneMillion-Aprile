@@ -1,9 +1,11 @@
 package unisa.it.pc1.provacirclemenu;
 
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,6 +48,8 @@ public class TaskFragment extends Fragment {
     private ItemTouchHelper.Callback itemTouchHelperCallback;
     private RecyclerViewAdapter recyclerViewAdapter;
 
+    private int grandezzaLista;
+
     public TaskFragment() {
     }
 
@@ -54,42 +58,38 @@ public class TaskFragment extends Fragment {
         super.onCreate(savedInstanceState);
         userFirebase = FirebaseAuth.getInstance();
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Task").child(userFirebase.getUid());
-        mMessagesList = queryMessagesAndAddthemToList();
+
+        //mMessagesList = queryMessagesAndAddthemToList();
 
         mMessagesDBRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                Task task = dataSnapshot.getValue(Task.class);
-                mMessagesList.add(task);
-                //recyclerView.getRecycledViewPool().clear();
-                recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
-            }
+                    Task task = dataSnapshot.getValue(Task.class);
+                    mMessagesList.add(task);
+                    recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
+                }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-            }
+                }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-            }
+                }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            }
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
-
-
-
-
+                }
+            });
 
     }
 
@@ -315,6 +315,8 @@ public class TaskFragment extends Fragment {
 
         }
     }
+
+
 
 }
 

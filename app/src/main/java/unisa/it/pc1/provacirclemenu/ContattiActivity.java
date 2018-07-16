@@ -75,23 +75,22 @@ public class ContattiActivity extends AppCompatActivity {
 
         String nome = i.getStringExtra("nome");
 
-        // Figure out what to do based on the intent type
-        if (i.getType().indexOf("image/") != -1) {
-            Log.d("Entrato immagine","si");
-            Uri imageUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (Intent.ACTION_SEND.equals(i.getAction())) {
+            // Figure out what to do based on the intent type
+            categoria = "normale";
+            if (i.getType().indexOf("image/") != -1) {
+                Log.d("Entrato immagine", "si");
+                Uri imageUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
+                imagePath = getRealPathFromURI(getApplicationContext(), imageUri);
+                //QUI AGGIUNGERE SALVATAGGIO A FIREBASESTORAGE
 
+                flagDettagli = "false";
 
-            imagePath = getRealPathFromURI(getApplicationContext(),imageUri);
-
-
-            //QUI AGGIUNGERE SALVATAGGIO A FIREBASESTORAGE
-
-            flagDettagli = "false";
-
-        } else if (i.getType().equals("text/plain")) {
-            Log.d("Entrato link/testo","si");
-            testo = i.getStringExtra(Intent.EXTRA_TEXT);
-            flagDettagli = "false";
+            } else if (i.getType().equals("text/plain")) {
+                Log.d("Entrato link/testo", "si");
+                testo = i.getStringExtra(Intent.EXTRA_TEXT);
+                flagDettagli = "false";
+            }
         }
 
         utentiModel = new UtentiModel();

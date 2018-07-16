@@ -59,37 +59,6 @@ public class TaskFragment extends Fragment {
         userFirebase = FirebaseAuth.getInstance();
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Task").child(userFirebase.getUid());
 
-        //mMessagesList = queryMessagesAndAddthemToList();
-
-        mMessagesDBRef.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                    Task task = dataSnapshot.getValue(Task.class);
-                    mMessagesList.add(task);
-                    recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
-                }
-
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
 
     }
 
@@ -121,6 +90,39 @@ public class TaskFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        mMessagesList = queryMessagesAndAddthemToList();
+
+        mMessagesDBRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                Task task = dataSnapshot.getValue(Task.class);
+                mMessagesList.add(task);
+                recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         itemTouchHelperCallback = new ItemTouchHelper.Callback() {
             @Override

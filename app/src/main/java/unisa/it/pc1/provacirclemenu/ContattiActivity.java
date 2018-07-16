@@ -68,20 +68,24 @@ public class ContattiActivity extends AppCompatActivity {
 
         String nome = i.getStringExtra("nome");
 
-        // Figure out what to do based on the intent type
-        if (i.getType().indexOf("image/") != -1) {
-            Log.d("Entrato immagine","si");
-            Uri imageUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
+        if(Intent.ACTION_SEND.equals(i.getAction())) {
+            // Figure out what to do based on the intent type
+            if (i.getType().indexOf("image/") != -1) {
+                Log.d("Entrato immagine","si");
+                Uri imageUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
 
-            //QUI AGGIUNGERE SALVATAGGIO A FIREBASESTORAGE
 
-            flagDettagli = "false";
+                //QUI AGGIUNGERE SALVATAGGIO A FIREBASESTORAGE
 
-        } else if (i.getType().equals("text/plain")) {
-            Log.d("Entrato link/testo","si");
-            testo = i.getStringExtra(Intent.EXTRA_TEXT);
-            flagDettagli = "false";
+                flagDettagli = "false";
+
+            } else if (i.getType().equals("text/plain")) {
+                Log.d("Entrato link/testo","si");
+                testo = i.getStringExtra(Intent.EXTRA_TEXT);
+                flagDettagli = "false";
+            }
         }
+
 
         utentiModel = new UtentiModel();
         //Trovare modo per non far caricare sempre listaNumeri

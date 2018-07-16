@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -54,6 +55,13 @@ public class TaskFragment extends Fragment {
         super.onCreate(savedInstanceState);
         userFirebase = FirebaseAuth.getInstance();
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Task").child(userFirebase.getUid());
+
+        if(savedInstanceState != null) {
+            if(("si").equals(savedInstanceState.getString("girato"))) {
+                mMessagesList.clear();
+            }
+        }
+
         mMessagesList = queryMessagesAndAddthemToList();
 
         mMessagesDBRef.addChildEventListener(new ChildEventListener() {
@@ -62,7 +70,7 @@ public class TaskFragment extends Fragment {
 
                 Task task = dataSnapshot.getValue(Task.class);
                 mMessagesList.add(task);
-                //recyclerView.getRecycledViewPool().clear();
+                recyclerView.getRecycledViewPool().clear();
                 recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
             }
 
@@ -87,8 +95,7 @@ public class TaskFragment extends Fragment {
             }
         });
 
-
-
+        Log.d("Size of lista", "" + mMessagesList.size());
 
 
     }
@@ -316,5 +323,10 @@ public class TaskFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("girato","si");
+    }
 }
 

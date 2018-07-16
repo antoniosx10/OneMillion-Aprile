@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -23,15 +24,29 @@
         android:id="@+id/task_list"
         android:layout_width="match_parent"
         android:layout_height="529dp"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="true">
 
     </android.support.v7.widget.RecyclerView>
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="243dp"
         android:layout_height="70dp"
-        android:layout_alignBottom="@+id/task_list"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="64dp"
+        android:background="@color/colorPrimary"
+        android:onClick="esportaTask"
         android:text="Esporta in CSV"
-        android:onClick="esportaTask" />
+        android:textColor="#FFFFFF" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="99dp"
+        android:layout_height="93dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="148dp"
+        app:srcCompat="@mipmap/csv" />
 
 </RelativeLayout>

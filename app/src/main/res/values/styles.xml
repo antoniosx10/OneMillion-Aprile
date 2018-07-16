@@ -70,4 +70,8 @@
         <item name="android:textSize">36sp</item>
     </style>
 
+    <style name="ThemeWithCorners" parent="android:Theme.Dialog">
+        <item name="android:windowBackground">@drawable/activity_rounded</item>
+    </style>
+
 </resources>

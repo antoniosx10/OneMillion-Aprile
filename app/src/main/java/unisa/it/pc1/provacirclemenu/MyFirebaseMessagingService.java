@@ -99,9 +99,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 );
 
         //add properties to the builder
-        builder.setSmallIcon(R.drawable.ic_android_black_24dp)
+        builder.setSmallIcon(R.drawable.ic_work_black_24dp)
                 .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-                        R.drawable.ic_android_black_24dp))
+                        R.drawable.ic_work_black_24dp))
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentTitle(title)
                 .setColor(getResources().getColor(R.color.colorAccent))

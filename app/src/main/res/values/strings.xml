@@ -10,7 +10,7 @@
     <string name="password">Password</string>
     <string name="tag_send">send</string>
     <string name="tag_verify">verify</string>
-    <string name="app_name">ProvaCircleMenu</string>
+    <string name="app_name">ToDash</string>
     <string name="title_activity_phone_auth">PhoneAuthActivity</string>
 
     <string name="label_google_sign_in">Firebase + Google Sign In</string>

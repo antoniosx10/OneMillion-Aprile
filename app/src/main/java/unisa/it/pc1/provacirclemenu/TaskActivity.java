@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -23,6 +25,8 @@ public class TaskActivity extends Activity {
 
     private ImageView categoria;
     private ImageView immagine;
+
+    private ProgressBar progressBar;
 
 
     @Override
@@ -42,6 +46,8 @@ public class TaskActivity extends Activity {
         categoria = findViewById(R.id.detail_categoria_task);
         immagine = findViewById(R.id.detail_image_task);
 
+        progressBar = findViewById(R.id.detail_progressBar_task);
+
 
         sender.setText(task.getFrom());
 
@@ -53,9 +59,20 @@ public class TaskActivity extends Activity {
         }
 
         if(task.getContenuto().equalsIgnoreCase("immagine")){
+            progressBar.setVisibility(View.VISIBLE);
             immagine.setVisibility(View.VISIBLE);
-            Toast.makeText(getApplicationContext(),task.getIsImage(),Toast.LENGTH_LONG).show();
-            Picasso.with(getApplicationContext()).load(task.getIsImage()).placeholder(R.drawable.ic_account_circle_black_24dp).into(immagine);
+            Picasso.with(getApplicationContext()).load(task.getIsImage()).into(immagine, new Callback() {
+                @Override
+                public void onSuccess() {
+                    progressBar.setVisibility(View.INVISIBLE);
+
+                }
+
+                @Override
+                public void onError() {
+                    Picasso.with(getApplicationContext()).load(R.drawable.ic_work_black_24dp).into(immagine);
+                }
+            });
 
         }else{
             messaggio.setText(task.getContenuto());
@@ -74,11 +91,6 @@ public class TaskActivity extends Activity {
                 categoria.setVisibility(View.VISIBLE);
             }
         }
-
-
-
-
-
 
 
     }

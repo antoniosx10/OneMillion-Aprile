@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -25,14 +24,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -42,15 +37,10 @@ import com.hitomi.cmlibrary.OnMenuStatusChangeListener;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import unisa.it.pc1.provacirclemenu.model.Task;
 import unisa.it.pc1.provacirclemenu.model.User;
@@ -452,7 +442,7 @@ public class CircleActivity extends Activity {
 
                                 case 7:
                                     isDettagli = true;
-                                    Intent contatti = new Intent(getApplicationContext(),Contatti.class);
+                                    Intent contatti = new Intent(getApplicationContext(),ContattiActivity.class);
                                     if(testo != null) {
                                         contatti.putExtra("testo",testo);
                                     } else {

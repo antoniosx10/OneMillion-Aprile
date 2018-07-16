@@ -1,11 +1,13 @@
 package unisa.it.pc1.provacirclemenu;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -23,7 +25,7 @@ import java.util.List;
 import unisa.it.pc1.provacirclemenu.model.User;
 import unisa.it.pc1.provacirclemenu.model.UtentiModel;
 
-public class Contatti extends AppCompatActivity {
+public class ContattiActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private FirebaseAuth mAuth;
     private ArrayList<String> listaNumeri;
@@ -53,6 +55,8 @@ public class Contatti extends AppCompatActivity {
 
         Intent i = getIntent();
 
+        Uri data = i.getData();
+
         String testo = i.getStringExtra("testo");
         String imagePath = i.getStringExtra("imagePath");
 
@@ -63,6 +67,21 @@ public class Contatti extends AppCompatActivity {
         String flagDettagli = i.getStringExtra("flagDettagli");
 
         String nome = i.getStringExtra("nome");
+
+        // Figure out what to do based on the intent type
+        if (i.getType().indexOf("image/") != -1) {
+            Log.d("Entrato immagine","si");
+            Uri imageUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
+
+            //QUI AGGIUNGERE SALVATAGGIO A FIREBASESTORAGE
+
+            flagDettagli = "false";
+
+        } else if (i.getType().equals("text/plain")) {
+            Log.d("Entrato link/testo","si");
+            testo = i.getStringExtra(Intent.EXTRA_TEXT);
+            flagDettagli = "false";
+        }
 
         utentiModel = new UtentiModel();
         //Trovare modo per non far caricare sempre listaNumeri
@@ -79,7 +98,6 @@ public class Contatti extends AppCompatActivity {
         recyclerView.setAdapter(recyclerViewAdapter);
 
     }
-
 
     private ArrayList<User> queryUsersAndAddthemToList(){
 

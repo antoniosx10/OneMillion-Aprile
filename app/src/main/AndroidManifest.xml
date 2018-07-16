@@ -58,7 +58,14 @@
         <activity android:name=".SettingActivity" />
         <activity android:name=".ChatActivity" />
         <activity android:name=".Profiloactivity" />
-        <activity android:name=".Contatti" />
+        <activity android:name=".ContattiActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="image/*"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+        </activity>
         <activity android:name=".TaskActivity"
             android:theme="@style/ThemeWithCorners" ></activity>
         <activity android:name=".ExportCSVActivity"></activity>

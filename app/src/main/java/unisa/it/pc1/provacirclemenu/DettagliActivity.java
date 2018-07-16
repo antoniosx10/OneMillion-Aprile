@@ -11,12 +11,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import unisa.it.pc1.provacirclemenu.model.Task;
 
 
 public class DettagliActivity extends Activity {
@@ -89,7 +84,7 @@ public class DettagliActivity extends Activity {
         String message = getIntent().getStringExtra("testo");
         String image = getIntent().getStringExtra("imagePath");
 
-        Intent contattiIntent = new Intent(getApplicationContext(),Contatti.class);
+        Intent contattiIntent = new Intent(getApplicationContext(),ContattiActivity.class);
 
         contattiIntent.putExtra("testo",message);
         contattiIntent.putExtra("imagePath",image);

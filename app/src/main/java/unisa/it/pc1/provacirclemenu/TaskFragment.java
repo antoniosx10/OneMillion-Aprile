@@ -1,5 +1,6 @@
 package unisa.it.pc1.provacirclemenu;
 
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -47,6 +48,8 @@ public class TaskFragment extends Fragment {
     private ItemTouchHelper.Callback itemTouchHelperCallback;
     private RecyclerViewAdapter recyclerViewAdapter;
 
+    private int grandezzaLista;
+
     public TaskFragment() {
     }
 
@@ -56,47 +59,37 @@ public class TaskFragment extends Fragment {
         userFirebase = FirebaseAuth.getInstance();
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Task").child(userFirebase.getUid());
 
-        if(savedInstanceState != null) {
-            if(("si").equals(savedInstanceState.getString("girato"))) {
-                mMessagesList.clear();
-            }
-        }
-
-        mMessagesList = queryMessagesAndAddthemToList();
+        //mMessagesList = queryMessagesAndAddthemToList();
 
         mMessagesDBRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                Task task = dataSnapshot.getValue(Task.class);
-                mMessagesList.add(task);
-                recyclerView.getRecycledViewPool().clear();
-                recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
-            }
+                    Task task = dataSnapshot.getValue(Task.class);
+                    mMessagesList.add(task);
+                    recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
+                }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-            }
+                }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-            }
+                }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            }
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
-
-        Log.d("Size of lista", "" + mMessagesList.size());
-
+                }
+            });
 
     }
 
@@ -323,10 +316,7 @@ public class TaskFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("girato","si");
-    }
+
+
 }
 

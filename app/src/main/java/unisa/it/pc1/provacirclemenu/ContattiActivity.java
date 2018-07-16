@@ -74,7 +74,6 @@ public class ContattiActivity extends AppCompatActivity {
                 Log.d("Entrato immagine","si");
                 Uri imageUri = (Uri) i.getParcelableExtra(Intent.EXTRA_STREAM);
 
-
                 //QUI AGGIUNGERE SALVATAGGIO A FIREBASESTORAGE
 
                 flagDettagli = "false";

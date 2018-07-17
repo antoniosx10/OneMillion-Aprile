@@ -3,17 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatsFragment"
     android:background="@color/backgroundfragment">
 
     <!-- TODO: Update blank fragment layout -->
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/conv_list"
+        android:id="@+id/group_list_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"></android.support.v7.widget.RecyclerView>
+        android:layout_alignParentLeft="true">
+
+    </android.support.v7.widget.RecyclerView>
 
 
     <ProgressBar
@@ -24,16 +25,5 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="239dp"
         android:visibility="invisible" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/crea_gruppo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="15dp"
-        android:clickable="true"
-        android:src="@drawable/ic_add_black_24dp" />
 
 </RelativeLayout>

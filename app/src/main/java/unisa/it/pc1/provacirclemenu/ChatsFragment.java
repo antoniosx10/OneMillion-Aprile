@@ -1,7 +1,9 @@
 package unisa.it.pc1.provacirclemenu;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.provider.ContactsContract;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.FloatRange;
@@ -50,6 +52,8 @@ public class ChatsFragment extends Fragment {
     private ArrayList<User> mUsersList = new ArrayList<>();
     private ProgressBar progressBar;
 
+    private FloatingActionButton creaGruppo;
+
     public ChatsFragment() {
     }
 
@@ -76,6 +80,16 @@ public class ChatsFragment extends Fragment {
         progressBar = v.findViewById(R.id.progressBar_chat);
 
         progressBar.setVisibility(ProgressBar.VISIBLE);
+
+        creaGruppo = v.findViewById(R.id.crea_gruppo);
+
+        creaGruppo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getContext(),CreazioneGroupActivity.class);
+                startActivity(i);
+            }
+        });
 
         recyclerView = v.findViewById(R.id.conv_list);
 

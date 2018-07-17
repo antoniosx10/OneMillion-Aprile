@@ -21,8 +21,11 @@ public class SectionsPageAdapter extends FragmentPagerAdapter {
             case 0:
                 ChatsFragment chatsFragment = new ChatsFragment();
                 return chatsFragment;
-
             case 1:
+                GroupFragment groupFragment = new GroupFragment();
+                return groupFragment;
+
+            case 2:
                 TaskFragment taskFragment = new TaskFragment();
                 return taskFragment;
 
@@ -34,7 +37,7 @@ public class SectionsPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Nullable
@@ -46,6 +49,11 @@ public class SectionsPageAdapter extends FragmentPagerAdapter {
                 return "Chats";
 
             case 1:
+
+                return "Gruppi";
+
+
+            case 2:
 
                 return "Task";
 

@@ -11,6 +11,8 @@ public class User implements Serializable {
     private String thumb_image;
     private String deviceToken;
 
+    private boolean isSelected = false;
+
     public User() {
     }
 
@@ -68,5 +70,14 @@ public class User implements Serializable {
 
     public void setDeviceToken(String deviceToken) {
         this.deviceToken = deviceToken;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+
+    public boolean isSelected() {
+        return isSelected;
     }
 }

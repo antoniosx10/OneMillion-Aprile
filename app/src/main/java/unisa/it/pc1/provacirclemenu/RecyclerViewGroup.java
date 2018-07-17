@@ -1,8 +1,10 @@
 package unisa.it.pc1.provacirclemenu;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,11 +40,14 @@ public class RecyclerViewGroup extends RecyclerView.Adapter<RecyclerViewGroup.My
         View v;
         v = LayoutInflater.from(mContext).inflate(R.layout.group_single_layout,parent,false);
         final RecyclerViewGroup.MyViewHolder myViewHolder = new RecyclerViewGroup.MyViewHolder(v);
+
+
+
         return myViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         holder.nome.setText(mData.get(position).getNome());
         Picasso.with(mContext).load(mData.get(position).getImmagine()).placeholder(R.drawable.ic_group_add_black_24dp).into(holder.foto);
         holder.messaggio.setText("");
@@ -50,8 +55,10 @@ public class RecyclerViewGroup extends RecyclerView.Adapter<RecyclerViewGroup.My
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mData.size();
     }
+
+
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -65,6 +72,17 @@ public class RecyclerViewGroup extends RecyclerView.Adapter<RecyclerViewGroup.My
             nome = itemView.findViewById(R.id.group_single_name);
             foto = itemView.findViewById(R.id.group_single_image);
             messaggio = itemView.findViewById(R.id.group_single_status);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent groupIntent = new Intent(mContext, GroupActivity.class);
+                    groupIntent.putExtra("group_id", mData.get(getPosition()).getGroup_id());
+                    groupIntent.putExtra("group_name", nome.getText().toString());
+                    mContext.startActivity(groupIntent);
+                }
+            });
+
         }
     }
 }

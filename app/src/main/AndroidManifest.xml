@@ -71,6 +71,7 @@
             android:theme="@style/ThemeWithCorners" />
         <activity android:name=".ExportCSVActivity" />
         <activity android:name=".CreazioneGroupActivity"></activity>
+        <activity android:name=".GroupActivity"></activity>
     </application>
 
 </manifest>

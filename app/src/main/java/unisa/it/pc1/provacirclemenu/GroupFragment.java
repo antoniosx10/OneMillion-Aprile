@@ -51,6 +51,7 @@ public class GroupFragment extends android.support.v4.app.Fragment {
 
         mGroupsDBRef = FirebaseDatabase.getInstance().getReference().child("Group");
         mGroupList = new ArrayList<Group>();
+
         mUserKeyGroupList = queryUserKeyGroupAndAddThemeToList();
 
         mGroupList = queryGroupsAndAddThemToList();

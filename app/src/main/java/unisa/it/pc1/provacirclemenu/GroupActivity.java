@@ -108,6 +108,8 @@ public class GroupActivity extends AppCompatActivity {
 
         progressDialog = new ProgressDialog(this);
 
+        loadMessages();
+
         // ---- Custom Action bar Items ----
 
         mTitleView = (TextView) findViewById(R.id.custom_bar_title);
@@ -131,7 +133,7 @@ public class GroupActivity extends AppCompatActivity {
         //------- IMAGE STORAGE ---------
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
-        loadMessages();
+
 
         mTitleView.setText(groupName);
 
@@ -145,11 +147,14 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     private void loadMessages() {
-        mRootRef.child("group_messages").child(mChatGroup).child("messages")
+        DatabaseReference user_message_push = mRootRef.child("Group")
+                .child(mChatGroup).child("messages");
+
+        user_message_push
                 .addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
+                Log.d("OnChildLettura","" + dataSnapshot.getValue(Messages.class).getMessage());
                 Messages message = dataSnapshot.getValue(Messages.class);
 
                 messagesList.add(message);
@@ -187,7 +192,7 @@ public class GroupActivity extends AppCompatActivity {
             String current_user_ref = "group_messages/" + mChatGroup + "/" + mChatUser;
             String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;*/
 
-            DatabaseReference user_message_push = mRootRef.child("group_messages")
+            DatabaseReference user_message_push = mRootRef.child("Group")
                     .child(mChatGroup).child("messages").push();
 
             String push_id = user_message_push.getKey();
@@ -205,7 +210,7 @@ public class GroupActivity extends AppCompatActivity {
             mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("seen").setValue(false);
             mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("timestamp").setValue(ServerValue.TIMESTAMP);*/
 
-            mRootRef.updateChildren(messageMap, new DatabaseReference.CompletionListener() {
+            user_message_push.updateChildren(messageMap, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                     if(databaseError != null){

@@ -1,11 +1,9 @@
 package unisa.it.pc1.provacirclemenu;
 
-import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,13 +25,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 import unisa.it.pc1.provacirclemenu.model.Task;
-import unisa.it.pc1.provacirclemenu.model.UtentiModel;
 
 public class TaskFragment extends Fragment {
 
@@ -46,7 +41,7 @@ public class TaskFragment extends Fragment {
     private DatabaseReference mMessagesDBRef;
     private ArrayList<Task> mMessagesList = new ArrayList<>();
     private ItemTouchHelper.Callback itemTouchHelperCallback;
-    private RecyclerViewAdapter recyclerViewAdapter;
+    private RecyclerViewAdapterTask recyclerViewAdapter;
 
     private int grandezzaLista;
 
@@ -79,7 +74,7 @@ public class TaskFragment extends Fragment {
         recyclerView = v.findViewById(R.id.task_recyclerview);
         recyclerView.setHasFixedSize(true);
 
-        recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
+        recyclerViewAdapter = new RecyclerViewAdapterTask(getContext(),mMessagesList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
 
@@ -214,7 +209,7 @@ public class TaskFragment extends Fragment {
                             return task1.getDeadline().compareTo(task2.getDeadline());
                         }
                     });
-                    recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
+                    recyclerViewAdapter = new RecyclerViewAdapterTask(getContext(),mMessagesList);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                     recyclerView.setAdapter(recyclerViewAdapter);
                 } else if(parent.getItemAtPosition(position).toString().equals("0")) {
@@ -226,7 +221,7 @@ public class TaskFragment extends Fragment {
                             return task2.getData().compareTo(task1.getData());
                         }
                     });
-                    recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
+                    recyclerViewAdapter = new RecyclerViewAdapterTask(getContext(),mMessagesList);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                     recyclerView.setAdapter(recyclerViewAdapter);
                 } else if(parent.getItemAtPosition(position).toString().equals("2")) {
@@ -250,7 +245,7 @@ public class TaskFragment extends Fragment {
                             return imp1 - imp2;
                         }
                     });
-                    recyclerViewAdapter = new RecyclerViewAdapter(getContext(),mMessagesList);
+                    recyclerViewAdapter = new RecyclerViewAdapterTask(getContext(),mMessagesList);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                     recyclerView.setAdapter(recyclerViewAdapter);
                 }

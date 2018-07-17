@@ -8,12 +8,8 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,7 +30,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -212,6 +207,7 @@ public class Autenticazione extends AppCompatActivity {
                     }
                 });
     }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -276,7 +272,6 @@ public class Autenticazione extends AppCompatActivity {
                 mCallbacks,         // OnVerificationStateChangedCallbacks
                 token);             // ForceResendingToken from callbacks
     }
-
 
     private void createUserInDb(String userId, String displayName, String number){
         String uid = mAuth.getUid();

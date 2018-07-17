@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import unisa.it.pc1.provacirclemenu.model.Task;
@@ -21,14 +20,14 @@ import unisa.it.pc1.provacirclemenu.model.Task;
  * Created by Antonio on 25/03/2018.
  */
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
+public class RecyclerViewAdapterTask extends RecyclerView.Adapter<RecyclerViewAdapterTask.MyViewHolder> {
 
     static Context mContext;
     static List<Task> mData;
     Dialog myDialog;
 
 
-    public RecyclerViewAdapter(Context mContext, List<Task> mData) {
+    public RecyclerViewAdapterTask(Context mContext, List<Task> mData) {
         this.mContext = mContext;
         this.mData = mData;
     }
@@ -45,7 +44,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.contenuto.setText(mData.get(position).getContenuto());
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyy");
-        String date=sdf.format(mData.get(position).getData());
+        String date = sdf.format(mData.get(position).getData());
         holder.data.setText(date);
 
         if(mData.get(position).getDeadline() != null){

@@ -30,7 +30,7 @@ import java.net.UnknownServiceException;
 import java.util.ArrayList;
 import java.util.List;
 
-import unisa.it.pc1.provacirclemenu.RecyclerViewAdapter;
+import unisa.it.pc1.provacirclemenu.RecyclerViewAdapterContact;
 import unisa.it.pc1.provacirclemenu.model.User;
 import unisa.it.pc1.provacirclemenu.model.UtentiModel;
 
@@ -60,7 +60,6 @@ public class ChatsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("oncreate","oo");
 
         userFirebase = FirebaseAuth.getInstance();
         mUsersDBRef = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -70,6 +69,7 @@ public class ChatsFragment extends Fragment {
         listaNumeri = utentiModel.getContattiTelefono(getContext());
 
         mUsersList = queryUsersAndAddthemToList();
+
     }
 
     @Nullable
@@ -97,8 +97,6 @@ public class ChatsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
         progressBar.setVisibility(ProgressBar.INVISIBLE);
-
-
 
         return v;
     }

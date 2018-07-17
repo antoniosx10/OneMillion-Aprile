@@ -8,21 +8,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -41,9 +34,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.hitomi.cmlibrary.CircleMenu;
 
 import unisa.it.pc1.provacirclemenu.model.User;
 
@@ -105,46 +95,52 @@ public class ListenerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.d("Servizio","prova");
+        //Login
+        if(mAuth.getCurrentUser() != null) {
+            Log.d("Login", "Sei loggato");
 
-        final ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        clipboard.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener() {
-            @Override
-            public void onPrimaryClipChanged() {
-                uploadChat();
+            final ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener() {
+                @Override
+                public void onPrimaryClipChanged() {
+                    uploadChat();
 
-                ClipData clipText = clipboard.getPrimaryClip();
-                ClipData.Item clipItem = clipText.getItemAt(0);
-                final String text = clipItem.getText().toString();
-                final Date data = new Date();
+                    ClipData clipText = clipboard.getPrimaryClip();
+                    ClipData.Item clipItem = clipText.getItemAt(0);
+                    final String text = clipItem.getText().toString();
+                    final Date data = new Date();
 
-                i = new Intent(getApplicationContext(),CircleActivity.class);
-                i.putExtra("testoCopiato", text);
-                i.putExtra("dataOdierna", data);
-                i.putExtra("nome",utente.getDisplayName());
-                i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    i = new Intent(getApplicationContext(), CircleActivity.class);
+                    i.putExtra("testoCopiato", text);
+                    i.putExtra("dataOdierna", data);
+                    i.putExtra("nome", utente.getDisplayName());
+                    i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                startActivity(i);
+                    startActivity(i);
 
-            }
-        });
+                }
+            });
 
-        ShotWatch.Listener listener = new ShotWatch.Listener() {
-            @Override
-            public void onScreenShotTaken(ScreenshotData screenshotData) {
-                uploadChat();
+            ShotWatch.Listener listener = new ShotWatch.Listener() {
+                @Override
+                public void onScreenShotTaken(ScreenshotData screenshotData) {
+                    uploadChat();
 
-                i = new Intent(getApplicationContext(),CircleActivity.class);
-                i.putExtra("pathImg", screenshotData.getPath());
-                i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
-            }
-        };
-        mShotWatch = new ShotWatch(getContentResolver(), listener);
+                    i = new Intent(getApplicationContext(), CircleActivity.class);
+                    i.putExtra("pathImg", screenshotData.getPath());
+                    i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                }
+            };
+            mShotWatch = new ShotWatch(getContentResolver(), listener);
 
-        mShotWatch.register();
+            mShotWatch.register();
+        } else {
+            Log.d("Login","Non sei loggato");
+            startActivity(new Intent(getApplicationContext(),Autenticazione.class));
+        }
 
         return super.onStartCommand(intent, flags, startId);
     }

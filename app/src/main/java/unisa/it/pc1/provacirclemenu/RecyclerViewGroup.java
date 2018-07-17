@@ -38,7 +38,8 @@ public class RecyclerViewGroup extends RecyclerView.Adapter<RecyclerViewGroup.My
         View v;
         v = LayoutInflater.from(mContext).inflate(R.layout.group_single_layout,parent,false);
         final RecyclerViewGroup.MyViewHolder myViewHolder = new RecyclerViewGroup.MyViewHolder(v);
-        return myViewHolder;    }
+        return myViewHolder;
+    }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
@@ -64,8 +65,6 @@ public class RecyclerViewGroup extends RecyclerView.Adapter<RecyclerViewGroup.My
             nome = itemView.findViewById(R.id.group_single_name);
             foto = itemView.findViewById(R.id.group_single_image);
             messaggio = itemView.findViewById(R.id.group_single_status);
-
-
         }
     }
 }

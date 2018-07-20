@@ -154,7 +154,7 @@ public class GroupFragment extends android.support.v4.app.Fragment {
                 if(dataSnapshot.getChildrenCount() > 0) {
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
 
-                        String groupKey = snap.getValue(String.class);
+                        String groupKey = snap.child("group_id").getValue(String.class);
                         Log.d("Scrivo group", "" + groupKey);
                         lista.add(groupKey);
                     }

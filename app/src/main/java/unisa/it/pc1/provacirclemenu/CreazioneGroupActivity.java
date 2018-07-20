@@ -122,7 +122,7 @@ public class CreazioneGroupActivity extends AppCompatActivity implements OnItemC
 
                     group.setNome(nomeGruppo.getText().toString());
 
-                    mUsersDBRef.child(mAuth.getUid()).child("groups").child("group_id").setValue(push_id_group).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    mUsersDBRef.child(mAuth.getUid()).child("groups").child(push_id_group).child("group_id").setValue(push_id_group).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
 
@@ -135,7 +135,7 @@ public class CreazioneGroupActivity extends AppCompatActivity implements OnItemC
                     });
 
                     for(User temp: utenti){
-                        mUsersDBRef.child(temp.getUserId()).child("groups").child("group_id").setValue(push_id_group).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        mUsersDBRef.child(temp.getUserId()).child("groups").child(push_id_group).child("group_id").setValue(push_id_group).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
 

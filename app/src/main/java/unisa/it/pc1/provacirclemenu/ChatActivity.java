@@ -400,6 +400,10 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        mMessagesList.smoothScrollToPosition(messagesList.size()-1);
+        mMessagesList.setScrollingCacheEnabled(true);
+
+
 
 
 
@@ -476,6 +480,8 @@ public class ChatActivity extends AppCompatActivity {
         }else{
             Toast.makeText(getApplicationContext(),"Inserisci il tuo messaggio",Toast.LENGTH_LONG).show();
         }
+
+        mMessagesList.deferNotifyDataSetChanged();
 
     }
 

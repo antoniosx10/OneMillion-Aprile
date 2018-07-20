@@ -36,38 +36,13 @@ public class MainActivity extends AppCompatActivity{
     private DatabaseReference mUserRef;
 
     private TabLayout mTabLayout;
-
-    private Intent serviceIntent;
-    private ArrayList<User> utenti;
-
-    private DatabaseReference mMessagesDBRef;
-    private DatabaseReference mUsersRef;
-
-    private String testo;
-    private View mChatHeadView;
-    private WindowManager mWindowManager;
-    private CircleMenu circleMenu;
-
-    private Task task;
-
-    private Handler handler;
-    private Runnable runnable;
-
-    private Boolean isDettagli = false;
-
     private FirebaseAuth mAuth;
-
-    private String mCurrent_user_id;
-
-    private DatabaseReference mConvDatabase;
-
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        boolean permessi = true;
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {

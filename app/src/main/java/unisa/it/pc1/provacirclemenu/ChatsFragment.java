@@ -66,7 +66,7 @@ public class ChatsFragment extends Fragment {
         utentiModel = new UtentiModel();
 
         //Trovare modo per non far caricare sempre listaNumeri
-        listaNumeri = utentiModel.getContattiTelefono(getContext());
+        //listaNumeri = utentiModel.getContattiTelefono(getContext());
 
         mUsersList = queryUsersAndAddthemToList();
 

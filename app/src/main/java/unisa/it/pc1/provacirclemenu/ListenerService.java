@@ -99,11 +99,13 @@ public class ListenerService extends Service {
         if(mAuth.getCurrentUser() != null) {
             Log.d("Login", "Sei loggato");
 
+            uploadChat();
+
             final ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             clipboard.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener() {
                 @Override
                 public void onPrimaryClipChanged() {
-                    uploadChat();
+                    //uploadChat();
 
                     ClipData clipText = clipboard.getPrimaryClip();
                     ClipData.Item clipItem = clipText.getItemAt(0);
@@ -125,7 +127,7 @@ public class ListenerService extends Service {
             ShotWatch.Listener listener = new ShotWatch.Listener() {
                 @Override
                 public void onScreenShotTaken(ScreenshotData screenshotData) {
-                    uploadChat();
+                    //uploadChat();
 
                     i = new Intent(getApplicationContext(), CircleActivity.class);
                     i.putExtra("pathImg", screenshotData.getPath());
@@ -166,17 +168,6 @@ public class ListenerService extends Service {
                         finalListaUtenti.add(user);
 
                         utenti = finalListaUtenti;
-
-                        /*
-                        try {
-                            sendUtenti();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        }*/
 
                         try {
                             Bitmap[] imgs = new BitmapFromURLTask().execute(utenti).get();

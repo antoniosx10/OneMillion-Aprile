@@ -116,7 +116,7 @@ public class CreazioneGroupActivity extends AppCompatActivity implements OnItemC
 
                     DatabaseReference group_push =  mUsersDBRef.child(mAuth.getUid()).child("groups").push();
 
-                    String push_id_group= group_push.getKey();
+                    String push_id_group = group_push.getKey();
 
                     group.setGroup_id(push_id_group);
 

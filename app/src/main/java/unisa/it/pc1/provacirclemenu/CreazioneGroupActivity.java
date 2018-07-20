@@ -22,10 +22,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -116,7 +120,7 @@ public class CreazioneGroupActivity extends AppCompatActivity implements OnItemC
 
                     DatabaseReference group_push =  mUsersDBRef.child(mAuth.getUid()).child("groups").push();
 
-                    String push_id_group= group_push.getKey();
+                    final String push_id_group= group_push.getKey();
 
                     group.setGroup_id(push_id_group);
 
@@ -128,18 +132,23 @@ public class CreazioneGroupActivity extends AppCompatActivity implements OnItemC
 
                             if (task.isSuccessful()) {
 
+                                databaseReference.child("Chat").child(mAuth.getUid()).child(push_id_group).child("seen").setValue(true);
+                                databaseReference.child("Chat").child(mAuth.getUid()).child(push_id_group).child("timestamp").setValue(ServerValue.TIMESTAMP);
+
                             } else {
 
                             }
                         }
                     });
 
-                    for(User temp: utenti){
+                    for(final User temp: utenti){
                         mUsersDBRef.child(temp.getUserId()).child("groups").child(push_id_group).child("group_id").setValue(push_id_group).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
 
                                 if (task.isSuccessful()) {
+                                    databaseReference.child("Chat").child(temp.getUserId()).child(push_id_group).child("seen").setValue(true);
+                                    databaseReference.child("Chat").child(temp.getUserId()).child(push_id_group).child("timestamp").setValue(ServerValue.TIMESTAMP);
 
                                 } else {
 
@@ -242,6 +251,21 @@ public class CreazioneGroupActivity extends AppCompatActivity implements OnItemC
                                         group.setImmagine(downloadUrl);
                                         progressDialog.dismiss();
                                     }
+                                }
+                            });
+
+
+                            Picasso.with(CreazioneGroupActivity.this).load(downloadUrl).networkPolicy(NetworkPolicy.OFFLINE)
+                                    .placeholder(R.drawable.ic_group_black_24dp).into(immagineGruppo, new Callback() {
+                                @Override
+                                public void onSuccess() {
+
+                                }
+
+                                @Override
+                                public void onError() {
+                                    Picasso.with(CreazioneGroupActivity.this).load(downloadUrl)
+                                            .placeholder(R.drawable.ic_group_black_24dp).into(immagineGruppo);
                                 }
                             });
 

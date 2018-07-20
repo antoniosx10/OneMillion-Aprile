@@ -55,6 +55,9 @@ public class ListenerService extends Service {
 
     private ArrayList<User> utenti;
 
+    private SharedPreferences sharedPref;
+    private SharedPreferences.Editor editor;
+
 
     private Intent i;
 
@@ -90,16 +93,23 @@ public class ListenerService extends Service {
         });
 
         utenti = new ArrayList<User>();
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = sharedPref.edit();
+        editor.clear();
     }
+
+
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+
+
         //Login
         if(mAuth.getCurrentUser() != null) {
             Log.d("Login", "Sei loggato");
-
-
 
             final ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             clipboard.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener() {
@@ -148,6 +158,7 @@ public class ListenerService extends Service {
     }
 
     private void uploadChat(){
+
         utenti.clear();
         Query conversationQuery = mConvDatabase.orderByChild("timestamp").limitToFirst(5);
 
@@ -212,16 +223,14 @@ public class ListenerService extends Service {
     }
 
     public void sendUtenti(Bitmap[] imgs) throws IOException, ExecutionException, InterruptedException {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPref.edit();
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = sharedPref.edit();
 
         editor.putString("lista_utenti", ObjectSerializer.serialize(utenti));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         ArrayList<String> encodedList = new ArrayList<String>();
-
-
 
         for(int i=0; i<imgs.length; i++) {
             if(imgs[i] != null) {

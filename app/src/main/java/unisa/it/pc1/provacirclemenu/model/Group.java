@@ -1,8 +1,9 @@
 package unisa.it.pc1.provacirclemenu.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Group {
+public class Group implements Serializable {
 
     private String group_id;
     private String nome;

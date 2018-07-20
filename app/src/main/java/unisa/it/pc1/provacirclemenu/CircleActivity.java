@@ -137,15 +137,6 @@ public class CircleActivity extends Activity {
 
     }
 
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            circleMenu.setVisibility(View.VISIBLE);
-            if(data != null) {
-                task = (Task) data.getSerializableExtra("taskDettagli");
-            }
-    }*/
-
     private void startTimerHead(){
         handler = new Handler();
         runnable = new Runnable() {

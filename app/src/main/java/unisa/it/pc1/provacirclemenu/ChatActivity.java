@@ -28,6 +28,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -81,6 +82,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private User utente;
 
+    private int itemPos = 0;
+
+    private String mLastKey = "";
+    private String mPrevKey = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +134,10 @@ public class ChatActivity extends AppCompatActivity {
 
         mMessagesList =  findViewById(R.id.messages_list);
 
+        View header = getLayoutInflater().inflate(R.layout.header_view, mMessagesList, false);
+
+        mMessagesList.addHeaderView(header,null,true);
+
 
         mMessagesList.setAdapter(mAdapter);
 
@@ -135,6 +145,7 @@ public class ChatActivity extends AppCompatActivity {
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
         mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
+
 
 
 
@@ -373,6 +384,18 @@ public class ChatActivity extends AppCompatActivity {
 
                 Messages message = dataSnapshot.getValue(Messages.class);
 
+                itemPos++;
+
+                if(itemPos == 1){
+
+                    String messageKey = dataSnapshot.getKey();
+
+                    mLastKey = messageKey;
+                    mPrevKey = messageKey;
+
+                }
+
+
                 messagesList.add(message);
                 mAdapter.notifyDataSetChanged();
 
@@ -489,5 +512,62 @@ public class ChatActivity extends AppCompatActivity {
     public void scrool(View v){
         mMessagesList.smoothScrollToPosition(messagesList.size()-1);
 
+    }
+
+    public void loadAllMessage(View v){
+        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
+
+        Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
+
+        messageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+
+                Messages message = dataSnapshot.getValue(Messages.class);
+                String messageKey = dataSnapshot.getKey();
+
+                if(!mPrevKey.equals(messageKey)){
+
+                    messagesList.add(itemPos++, message);
+
+                } else {
+
+                    mPrevKey = mLastKey;
+
+                }
+
+
+                if(itemPos == 1) {
+
+                    mLastKey = messageKey;
+
+                }
+
+
+                mAdapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

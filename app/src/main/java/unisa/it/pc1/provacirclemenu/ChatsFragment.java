@@ -52,7 +52,6 @@ public class ChatsFragment extends Fragment {
     private ArrayList<User> mUsersList = new ArrayList<>();
     private ProgressBar progressBar;
 
-    private FloatingActionButton creaGruppo;
 
     public ChatsFragment() {
     }
@@ -81,15 +80,7 @@ public class ChatsFragment extends Fragment {
 
         progressBar.setVisibility(ProgressBar.VISIBLE);
 
-        creaGruppo = v.findViewById(R.id.crea_gruppo);
 
-        creaGruppo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getContext(),CreazioneGroupActivity.class);
-                startActivity(i);
-            }
-        });
 
         recyclerView = v.findViewById(R.id.conv_list);
 

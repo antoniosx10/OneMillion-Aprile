@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -37,6 +38,9 @@ public class GroupFragment extends android.support.v4.app.Fragment {
     private ArrayList<Group> mGroupList;
     private ArrayList<String> mUserKeyGroupList;
 
+    private FloatingActionButton creaGruppo;
+
+
     public GroupFragment() {
     }
 
@@ -64,6 +68,16 @@ public class GroupFragment extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         v = inflater.inflate(R.layout.group_fragment,container,false);
+
+        creaGruppo = v.findViewById(R.id.crea_gruppo);
+
+        creaGruppo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getContext(),CreazioneGroupActivity.class);
+                startActivity(i);
+            }
+        });
         recyclerView = v.findViewById(R.id.group_list_fragment);
         RecyclerViewGroup recyclerViewAdapter = new RecyclerViewGroup(getContext(),mGroupList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

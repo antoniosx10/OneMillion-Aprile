@@ -26,8 +26,12 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.Timer;
@@ -52,6 +56,9 @@ public class Autenticazione extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private TextView nome;
+
+    private String image;
+    private String thumb_image;
 
 
     private DatabaseReference mUsersDBref;
@@ -79,7 +86,6 @@ public class Autenticazione extends AppCompatActivity {
 
             @Override
             public void onVerificationCompleted(PhoneAuthCredential credential) {
-
 
                 signInWithPhoneAuthCredential(credential);
             }
@@ -175,13 +181,9 @@ public class Autenticazione extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
 
-
-
-
                             FirebaseUser user = task.getResult().getUser();
 
                             createUserInDb(user.getUid(), nome.getText().toString(), user.getPhoneNumber());
-
 
                             mVerified = true;
                             timer.cancel();

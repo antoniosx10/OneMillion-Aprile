@@ -24,10 +24,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -42,6 +44,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import unisa.it.pc1.provacirclemenu.model.Chatter;
+import unisa.it.pc1.provacirclemenu.model.Group;
 import unisa.it.pc1.provacirclemenu.model.Task;
 import unisa.it.pc1.provacirclemenu.model.User;
 
@@ -75,7 +79,7 @@ public class CircleActivity extends Activity {
 
     private DatabaseReference mConvDatabase;
 
-    private ArrayList<User> utenti;
+    private ArrayList<Chatter> utenti;
 
     public WindowManager.LayoutParams params;
 
@@ -86,6 +90,9 @@ public class CircleActivity extends Activity {
     private DatabaseReference mNotificationRef;
 
     private String nome;
+
+    private SharedPreferences sharedPref;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -106,13 +113,16 @@ public class CircleActivity extends Activity {
         imagePath = i.getStringExtra("pathImg");
         nome = i.getStringExtra("nome");
 
-        utenti = new ArrayList<User>();
+        utenti = new ArrayList<Chatter>();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         imgsList = new ArrayList<String>();
 
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = sharedPref.edit();
+
         try {
-            utenti = (ArrayList<User>) ObjectSerializer
-                    .deserialize(prefs.getString("lista_utenti", ObjectSerializer.serialize(new ArrayList<User>())));
+            utenti = (ArrayList<Chatter>) ObjectSerializer
+                    .deserialize(prefs.getString("lista_utenti", ObjectSerializer.serialize(new ArrayList<Chatter>())));
 
             imgsList = (ArrayList<String>) ObjectSerializer
                     .deserialize(prefs.getString("lista_img", ObjectSerializer.serialize(new ArrayList<String>())));
@@ -189,8 +199,71 @@ public class CircleActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        editor.clear();
+        editor.commit();
     }
 
+
+    private void sendImage(final String senderId, final String receiverId, String image, final String nome) {
+
+        Uri imageUri = Uri.fromFile(new File(image));
+
+        final String current_user_ref = "messages/" + senderId + "/" + receiverId;
+        final String chat_user_ref = "messages/" + receiverId + "/" + senderId;
+
+        DatabaseReference user_message_push = mRootRef.child("messages")
+                .child(senderId).child(receiverId).push();
+
+        final String push_id = user_message_push.getKey();
+        StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".png");
+        filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
+                if(task.isSuccessful()){
+                    String download_url = task.getResult().getDownloadUrl().toString();
+                    Map messageMap = new HashMap();
+                    messageMap.put("message", download_url);
+                    messageMap.put("seen", false);
+                    messageMap.put("type", "image");
+                    messageMap.put("time", ServerValue.TIMESTAMP);
+                    messageMap.put("from", senderId);
+
+                    Map messageUserMap = new HashMap();
+                    messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+                    messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+                    mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if(databaseError != null){
+                                Log.d("CHAT_LOG", databaseError.getMessage().toString());
+                            }
+                        }
+                    });
+
+                    DatabaseReference task_message_push = mRootRef.child("Task")
+                            .child(receiverId).push();
+
+                    String push_id_task = task_message_push.getKey();
+
+                    unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
+
+                    mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                            if (task.isSuccessful()) {
+
+                            } else {
+
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+    }
     private void sendMessage(String senderId, String receiverId, String message,String nome) {
 
         if(!TextUtils.isEmpty(message)){
@@ -256,111 +329,44 @@ public class CircleActivity extends Activity {
             Toast.makeText(getApplicationContext(),"Inserisci il tuo messaggio",Toast.LENGTH_LONG).show();
         }
     }
+    private void sendTask(final String senderId, final String receiverId, String messaggio, final String nome, String imagePath){
 
-    private void sendImage(final String senderId, final String receiverId, String image, final String nome) {
 
-            Uri imageUri = Uri.fromFile(new File(image));
+        Uri imageUri = Uri.fromFile(new File(imagePath));
 
-            final String current_user_ref = "messages/" + senderId + "/" + receiverId;
-            final String chat_user_ref = "messages/" + receiverId + "/" + senderId;
+        DatabaseReference user_message_push = mRootRef.child("messages")
+                .child(senderId).child(receiverId).push();
 
-            DatabaseReference user_message_push = mRootRef.child("messages")
-                    .child(senderId).child(receiverId).push();
+        final String push_id = user_message_push.getKey();
+        StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".png");
+        filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
+                if(task.isSuccessful()){
+                    String download_url = task.getResult().getDownloadUrl().toString();
 
-            final String push_id = user_message_push.getKey();
-            StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".png");
-            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
-                    if(task.isSuccessful()){
-                        String download_url = task.getResult().getDownloadUrl().toString();
-                        Map messageMap = new HashMap();
-                        messageMap.put("message", download_url);
-                        messageMap.put("seen", false);
-                        messageMap.put("type", "image");
-                        messageMap.put("time", ServerValue.TIMESTAMP);
-                        messageMap.put("from", senderId);
+                    DatabaseReference task_message_push = mRootRef.child("Task")
+                            .child(receiverId).push();
 
-                        Map messageUserMap = new HashMap();
-                        messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-                        messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+                    String push_id_task = task_message_push.getKey();
 
-                        mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                if(databaseError != null){
-                                    Log.d("CHAT_LOG", databaseError.getMessage().toString());
-                                }
+                    unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
+
+                    mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                            if (task.isSuccessful()) {
+
+                            } else {
+
                             }
-                        });
-
-                        DatabaseReference task_message_push = mRootRef.child("Task")
-                                .child(receiverId).push();
-
-                        String push_id_task = task_message_push.getKey();
-
-                        unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
-
-                        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
-
-                                if (task.isSuccessful()) {
-
-                                } else {
-
-                                }
-                            }
-                        });
-                    }
+                        }
+                    });
                 }
-            });
-
-        }
-
-
-
-
-        private void sendTask(final String senderId, final String receiverId, String messaggio, final String nome, String imagePath){
-
-
-            Uri imageUri = Uri.fromFile(new File(imagePath));
-
-            DatabaseReference user_message_push = mRootRef.child("messages")
-                    .child(senderId).child(receiverId).push();
-
-            final String push_id = user_message_push.getKey();
-            StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".png");
-            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
-                    if(task.isSuccessful()){
-                        String download_url = task.getResult().getDownloadUrl().toString();
-
-                        DatabaseReference task_message_push = mRootRef.child("Task")
-                                .child(receiverId).push();
-
-                        String push_id_task = task_message_push.getKey();
-
-                        unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
-
-                        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
-
-                                if (task.isSuccessful()) {
-
-                                } else {
-
-                                }
-                            }
-                        });
-                    }
-                }
-            });
-        }
-
-
+            }
+        });
+    }
 
     private void createCircleMenu(Bitmap[] imgs) {
         startTimerHead();
@@ -382,36 +388,99 @@ public class CircleActivity extends Activity {
                             switch (i) {
                                 case 0:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
-                                    } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome);
+                                        if(utenti.get(i) instanceof User) {
+                                            User user = (User) utenti.get(i);
+                                            sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
+                                        } else {
+                                            Group group = (Group) utenti.get(i);
+                                            sendMessageToGroup(group.getGroup_id(),testo);
                                         }
+                                    } else {
+                                        if (utenti.get(i) instanceof User) {
+                                            User user = (User) utenti.get(i);
+                                            sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
+                                        } else {
+                                            Group group = (Group) utenti.get(i);
+                                            sendImageToGroup(group.getGroup_id(), imagePath);
+                                        }
+                                    }
                                     break;
                                 case 1:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
+                                        if(utenti.get(i) instanceof User) {
+                                            User user = (User) utenti.get(i);
+                                            sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
+                                        } else {
+                                            Group group = (Group) utenti.get(i);
+                                            sendMessageToGroup(group.getGroup_id(),testo);
+                                        }
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome);
+                                        if (utenti.get(i) instanceof User) {
+                                            User user = (User) utenti.get(i);
+                                            sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
+                                        } else {
+                                            Group group = (Group) utenti.get(i);
+                                            sendImageToGroup(group.getGroup_id(), imagePath);
+                                        }
                                     }
                                     break;
                                 case 2:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
+                                        if(utenti.get(i) instanceof User) {
+                                            User user = (User) utenti.get(i);
+                                            sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
+                                        } else {
+                                            Group group = (Group) utenti.get(i);
+                                            sendMessageToGroup(group.getGroup_id(),testo);
+                                        }
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome);
+                                        if (utenti.get(i) instanceof User) {
+                                            User user = (User) utenti.get(i);
+                                            sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
+                                        } else {
+                                            Group group = (Group) utenti.get(i);
+                                            sendImageToGroup(group.getGroup_id(), imagePath);
+                                        }
                                     }
+                                    break;
                                 case 3:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
+                                        if(utenti.get(i) instanceof User) {
+                                            User user = (User) utenti.get(i);
+                                            sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
+                                        } else {
+                                            Group group = (Group) utenti.get(i);
+                                            sendMessageToGroup(group.getGroup_id(),testo);
+                                        }
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome);
+                                        if (utenti.get(i) instanceof User) {
+                                            User user = (User) utenti.get(i);
+                                            sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
+                                        } else {
+                                            Group group = (Group) utenti.get(i);
+                                            sendImageToGroup(group.getGroup_id(), imagePath);
+                                        }
                                     }
+                                    break;
                                 case 4:
                                     if(testo != null) {
-                                        sendMessage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), testo,nome);
+                                        if(utenti.get(i) instanceof User) {
+                                            User user = (User) utenti.get(i);
+                                            sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
+                                        } else {
+                                            Group group = (Group) utenti.get(i);
+                                            sendMessageToGroup(group.getGroup_id(),testo);
+                                        }
                                     } else {
-                                        sendImage(mAuth.getCurrentUser().getUid(), utenti.get(i).getUserId(), imagePath,nome);
+                                        if (utenti.get(i) instanceof User) {
+                                            User user = (User) utenti.get(i);
+                                            sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
+                                        } else {
+                                            Group group = (Group) utenti.get(i);
+                                            sendImageToGroup(group.getGroup_id(), imagePath);
+                                        }
                                     }
+                                    break;
                                 case 5:
                                     if(testo != null) {
                                         sendTask(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),testo,"Me stesso",null);
@@ -537,6 +606,137 @@ public class CircleActivity extends Activity {
                 }
             });
         }
+
+
+
+    private void sendImageToGroup(final String groupId, String image) {
+
+        Uri imageUri = Uri.fromFile(new File(image));
+
+        DatabaseReference group_message_push = mRootRef.child("Group")
+                .child(groupId).child("messages").push();
+
+        final String push_id = group_message_push.getKey();
+        StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".png");
+        filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
+                if(task.isSuccessful()){
+                    String download_url = task.getResult().getDownloadUrl().toString();
+                    Map messageMap = new HashMap();
+                    messageMap.put("message", download_url);
+                    messageMap.put("seen", false);
+                    messageMap.put("type", "image");
+                    messageMap.put("time", ServerValue.TIMESTAMP);
+                    messageMap.put("from", mAuth.getCurrentUser().getUid());
+
+                    Map messageUserMap = new HashMap();
+                    messageUserMap.put(groupId + "/" + "messages" + "/" + push_id , messageMap);
+
+                    mRootRef.child("Group").updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if(databaseError != null){
+                                Log.d("CHAT_LOG", databaseError.getMessage().toString());
+                            }
+                        }
+                    });
+
+                    /*DatabaseReference task_message_push = mRootRef.child("Task")
+                            .child(receiverId).push();
+
+                    String push_id_task = task_message_push.getKey();
+
+                    unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
+
+                    mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                            if (task.isSuccessful()) {
+
+                            } else {
+
+                            }
+                        }
+                    });*/
+                }
+            }
+        });
+
+    }
+
+    private void sendMessageToGroup(final String groupId, String message) {
+
+        if(!TextUtils.isEmpty(message)){
+
+            DatabaseReference user_message_push = mRootRef.child("Group")
+                    .child(groupId).child("messages").push();
+
+            String push_id = user_message_push.getKey();
+
+            Map messageMap = new HashMap();
+            messageMap.put("message", message);
+            messageMap.put("seen", false);
+            messageMap.put("type", "text");
+            messageMap.put("time", ServerValue.TIMESTAMP);
+            messageMap.put("from", mAuth.getCurrentUser().getUid());
+
+            mRootRef.child("Chat").child(mAuth.getCurrentUser().getUid()).child(groupId).child("seen").setValue(true);
+            mRootRef.child("Chat").child(mAuth.getCurrentUser().getUid()).child(groupId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+
+            mRootRef.child("Chat").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(!mAuth.getCurrentUser().getUid().equals(dataSnapshot.getKey())) {
+                        dataSnapshot.child(groupId).child("seen").getValue();
+                        dataSnapshot.child(groupId).child("timestamp").getValue();
+
+                        Log.d("Scorrimento", "" + dataSnapshot.child(groupId).child("timestamp").getValue() );
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+            user_message_push.updateChildren(messageMap, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if(databaseError != null){
+
+                        Log.d("CHAT_LOG", databaseError.getMessage().toString());
+
+                    }
+                }
+            });
+
+            /*
+            DatabaseReference task_message_push = mRootRef.child("Task")
+                    .child(mChatUser).push();
+
+            String push_id_task = task_message_push.getKey();
+
+            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",mCurrentUserId,false,utente.getDisplayName(),"");
+
+            mRootRef.child("Task").child(mChatUser).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+
+                    if (task.isSuccessful()) {
+
+                    } else {
+
+                    }
+                }
+            });*/
+
+        }
+
+    }
 
 
 }

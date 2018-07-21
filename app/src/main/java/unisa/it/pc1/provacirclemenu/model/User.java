@@ -2,7 +2,7 @@ package unisa.it.pc1.provacirclemenu.model;
 
 import java.io.Serializable;
 
-public class User implements Serializable {
+public class User extends Chatter implements Serializable {
 
     private String userId;
     private String displayName;

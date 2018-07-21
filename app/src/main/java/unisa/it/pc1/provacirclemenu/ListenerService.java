@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.util.Log;
@@ -35,6 +36,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import unisa.it.pc1.provacirclemenu.model.Chatter;
+import unisa.it.pc1.provacirclemenu.model.Group;
 import unisa.it.pc1.provacirclemenu.model.User;
 
 /**
@@ -46,6 +49,7 @@ public class ListenerService extends Service {
     private ShotWatch mShotWatch;
 
     private DatabaseReference mUsersRef;
+    private DatabaseReference mGroupsRef;
 
     private FirebaseAuth mAuth;
 
@@ -53,7 +57,7 @@ public class ListenerService extends Service {
 
     private DatabaseReference mConvDatabase;
 
-    private ArrayList<User> utenti;
+    private ArrayList<Chatter> utenti;
 
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor editor;
@@ -79,11 +83,13 @@ public class ListenerService extends Service {
         mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrent_user_id);
 
         mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        mGroupsRef = FirebaseDatabase.getInstance().getReference().child("Group");
 
         mUsersRef.child(mAuth.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot userData) {
                  utente = userData.getValue(User.class);
+                 utente.setDisplayName(userData.child("displayName").getValue(String.class));
             }
 
             @Override
@@ -92,20 +98,14 @@ public class ListenerService extends Service {
             }
         });
 
-        utenti = new ArrayList<User>();
+        utenti = new ArrayList<Chatter>();
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sharedPref.edit();
-        editor.clear();
     }
-
-
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-
 
         //Login
         if(mAuth.getCurrentUser() != null) {
@@ -115,6 +115,7 @@ public class ListenerService extends Service {
             clipboard.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener() {
                 @Override
                 public void onPrimaryClipChanged() {
+
                     uploadChat();
 
                     ClipData clipText = clipboard.getPrimaryClip();
@@ -137,6 +138,7 @@ public class ListenerService extends Service {
             ShotWatch.Listener listener = new ShotWatch.Listener() {
                 @Override
                 public void onScreenShotTaken(ScreenshotData screenshotData) {
+
                     uploadChat();
 
                     i = new Intent(getApplicationContext(), CircleActivity.class);
@@ -162,38 +164,68 @@ public class ListenerService extends Service {
         utenti.clear();
         Query conversationQuery = mConvDatabase.orderByChild("timestamp").limitToFirst(5);
 
-        final ArrayList<User> finalListaUtenti = new ArrayList<User>();
+        final ArrayList<Chatter> finalListaUtenti = new ArrayList<Chatter>();
 
         conversationQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(final DataSnapshot convData, String s) {
 
-                mUsersRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot userData) {
-                        User user = new User();
-                        user.setDisplayName(userData.child(convData.getKey()).child("displayName").getValue(String.class));
-                        user.setThumb_image(userData.child(convData.getKey()).child("thumb_image").getValue(String.class));
-                        user.setUserId(userData.child(convData.getKey()).getKey());
+                if(convData.getKey().charAt(0) != '-') {
+                    mUsersRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot userData) {
+                            User user = new User();
+                            user.setDisplayName(userData.child(convData.getKey()).child("displayName").getValue(String.class));
+                            user.setThumb_image(userData.child(convData.getKey()).child("thumb_image").getValue(String.class));
+                            user.setUserId(userData.child(convData.getKey()).getKey());
 
-                        finalListaUtenti.add(user);
+                            finalListaUtenti.add(user);
 
-                        utenti = finalListaUtenti;
+                            utenti = finalListaUtenti;
 
-                        try {
-                            Bitmap[] imgs = new BitmapFromURLTask().execute(utenti).get();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
+                            try {
+                                Bitmap[] imgs = new BitmapFromURLTask().execute(utenti).get();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+                        }
+                    });
+                } else {
+                    Log.d("Diverso","clacla");
+                    mGroupsRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot groupData) {
+                            Group group = new Group();
+                            group.setNome(groupData.child(convData.getKey()).child("nome").getValue(String.class));
+                            group.setThumb_image(groupData.child(convData.getKey()).child("thumb_image").getValue(String.class));
+                            group.setGroup_id(groupData.child(convData.getKey()).getKey());
+
+                            finalListaUtenti.add(group);
+
+                            utenti = finalListaUtenti;
+
+                            try {
+                                Bitmap[] imgs = new BitmapFromURLTask().execute(utenti).get();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
             }
 
             @Override
@@ -248,17 +280,25 @@ public class ListenerService extends Service {
 
         editor.commit();
 
+
+
     }
 
-    class BitmapFromURLTask extends AsyncTask<ArrayList<User>, Void, Bitmap[]> {
+    class BitmapFromURLTask extends AsyncTask<ArrayList<Chatter>, Void, Bitmap[]> {
 
-        protected Bitmap[] doInBackground(ArrayList<User>... urls) {
+        protected Bitmap[] doInBackground(ArrayList<Chatter>... urls) {
             Bitmap[] imgs = new Bitmap[5];
             for (int j = 0; j < urls[0].size(); j++) {
                 if (utenti.get(j) != null) {
                     try {
                         URL url = null;
-                        url = new URL(urls[0].get(j).getThumb_image());
+                        if(utenti.get(j) instanceof User) {
+                            User userUrl = (User) urls[0].get(j);
+                            url = new URL(userUrl.getThumb_image());
+                        } else {
+                            Group groupUrl = (Group) urls[0].get(j);
+                            url = new URL(groupUrl.getThumb_image());
+                        }
                         HttpURLConnection connection = null;
                         connection = (HttpURLConnection) url.openConnection();
                         connection.setDoInput(true);

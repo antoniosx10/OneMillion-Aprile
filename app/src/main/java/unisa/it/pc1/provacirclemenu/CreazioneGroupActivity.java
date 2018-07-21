@@ -77,6 +77,8 @@ public class CreazioneGroupActivity extends AppCompatActivity implements OnItemC
 
     private StorageReference imageStorage;
 
+    private  String push_id_group;
+
 
 
 
@@ -118,11 +120,6 @@ public class CreazioneGroupActivity extends AppCompatActivity implements OnItemC
             public void onClick(View v) {
                 if((!nomeGruppo.getText().toString().equalsIgnoreCase(""))&&(utenti.size()>0)){
 
-                    DatabaseReference group_push =  mUsersDBRef.child(mAuth.getUid()).child("groups").push();
-
-                    final String push_id_group= group_push.getKey();
-
-                    group.setGroup_id(push_id_group);
 
                     group.setNome(nomeGruppo.getText().toString());
 
@@ -231,6 +228,13 @@ public class CreazioneGroupActivity extends AppCompatActivity implements OnItemC
                 thumb_bitMap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 final byte[] thumb_byte = baos.toByteArray();
 
+                final DatabaseReference group_push =  mUsersDBRef.child(mAuth.getUid()).child("groups").push();
+
+                push_id_group= group_push.getKey();
+
+                group.setGroup_id(push_id_group);
+
+
 
                 StorageReference filePath = imageStorage.child("immagini_gruppi").child(group.getGroup_id()+" .jpg");
                 final StorageReference thumb_filepath = imageStorage.child("immagini_gruppi").child("thumb").child(group.getGroup_id()+" .jpg");
@@ -249,6 +253,7 @@ public class CreazioneGroupActivity extends AppCompatActivity implements OnItemC
                                     String thumb_downloadUrl = thumb_task.getResult().getDownloadUrl().toString();
                                     if(thumb_task.isSuccessful()){
                                         group.setImmagine(downloadUrl);
+                                        group.setThumb_image(thumb_downloadUrl);
                                         progressDialog.dismiss();
                                     }
                                 }

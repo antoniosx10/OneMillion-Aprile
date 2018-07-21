@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +27,6 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,6 +34,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -56,9 +57,6 @@ public class Autenticazione extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private TextView nome;
-
-    private String image;
-    private String thumb_image;
 
 
     private DatabaseReference mUsersDBref;
@@ -86,6 +84,7 @@ public class Autenticazione extends AppCompatActivity {
 
             @Override
             public void onVerificationCompleted(PhoneAuthCredential credential) {
+
 
                 signInWithPhoneAuthCredential(credential);
             }
@@ -141,6 +140,7 @@ public class Autenticazione extends AppCompatActivity {
                                 .make((CoordinatorLayout) findViewById(R.id.parentlayout), "Please wait...", Snackbar.LENGTH_LONG);
 
                         snackbar.show();
+
                         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, codeed.getText().toString().trim());
                         signInWithPhoneAuthCredential(credential);
                     }
@@ -181,9 +181,13 @@ public class Autenticazione extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
 
+
+
+
                             FirebaseUser user = task.getResult().getUser();
 
                             createUserInDb(user.getUid(), nome.getText().toString(), user.getPhoneNumber());
+
 
                             mVerified = true;
                             timer.cancel();
@@ -278,16 +282,13 @@ public class Autenticazione extends AppCompatActivity {
     private void createUserInDb(String userId, String displayName, String number){
         String uid = mAuth.getUid();
 
-        mUsersDBref = FirebaseDatabase.getInstance().getReference().child("Users")
-                .child(uid);
-
 
         String device_token = FirebaseInstanceId.getInstance().getToken();
 
         User utente = new User(displayName,number,"default","default",device_token);
 
 
-        mUsersDBref.setValue(utente).addOnCompleteListener(new OnCompleteListener<Void>() {
+        mUsersDBref.child(uid).setValue(utente).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {

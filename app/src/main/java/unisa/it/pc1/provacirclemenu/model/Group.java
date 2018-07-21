@@ -29,10 +29,11 @@ public class Group extends Chatter implements Serializable  {
         this.utenti = utenti;
     }
 
-    public Group(String group_id, String nome, String immagine) {
+    public Group(String group_id, String nome, String immagine,String thumb_image) {
         this.group_id = group_id;
         this.nome = nome;
         this.immagine = immagine;
+        this.thumb_image = thumb_image;
     }
 
     public String getGroup_id() {

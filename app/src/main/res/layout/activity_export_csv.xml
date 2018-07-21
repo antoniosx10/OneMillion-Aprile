@@ -16,37 +16,46 @@
         android:text="Seleziona Task Da Esportare"
         android:textColor="@android:color/black"
         android:textAlignment="center"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:id="@+id/textView6" />
 
-    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/textView6">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/task_list"
         android:layout_width="match_parent"
-        android:layout_height="529dp"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true">
+        android:layout_height="350dp"
+        android:layout_gravity="center_horizontal"
+        >
 
     </android.support.v7.widget.RecyclerView>
 
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_above="@+id/button2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            app:srcCompat="@mipmap/csv"
+            android:layout_gravity="center_horizontal"/>
     <Button
         android:layout_width="243dp"
         android:layout_height="70dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="64dp"
+        android:layout_alignBottom="@+id/task_list"
+        android:layout_gravity="center_horizontal"
         android:background="@color/colorPrimary"
         android:onClick="esportaTask"
         android:text="Esporta in CSV"
-        android:textColor="#FFFFFF" />
+        android:textColor="#FFFFFF"
+        android:id="@+id/button2" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="99dp"
-        android:layout_height="93dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="148dp"
-        app:srcCompat="@mipmap/csv" />
+
+    </LinearLayout>
 
 </RelativeLayout>

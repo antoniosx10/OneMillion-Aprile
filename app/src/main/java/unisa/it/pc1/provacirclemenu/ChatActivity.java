@@ -423,12 +423,8 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        mMessagesList.smoothScrollToPosition(messagesList.size()-1);
-        mMessagesList.setScrollingCacheEnabled(true);
-
-
-
-
+            mMessagesList.smoothScrollToPosition(messagesList.size()-1);
+            mMessagesList.setScrollingCacheEnabled(true);
 
     }
 
@@ -515,6 +511,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void loadAllMessage(View v){
+        itemPos = 0;
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
 
         Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
@@ -529,8 +526,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 if(!mPrevKey.equals(messageKey)){
 
-                    messagesList.add(itemPos++, message);
-
+                    messagesList.add(itemPos++,message);
                 } else {
 
                     mPrevKey = mLastKey;
@@ -569,5 +565,12 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
+        mMessagesList.smoothScrollToPosition(0);
+        mMessagesList.setScrollingCacheEnabled(true);
+
+
+
+
     }
 }

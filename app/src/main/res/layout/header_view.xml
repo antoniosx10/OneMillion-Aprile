@@ -4,8 +4,10 @@
     android:orientation="vertical"
     android:gravity="center" >
     <Button
+        android:background="@color/backgroundfragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/orange_500"
         android:text="Carica altri messaggi"
         android:onClick="loadAllMessage" />
 </LinearLayout>

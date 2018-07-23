@@ -64,7 +64,7 @@ public class CircleActivity extends Activity {
     private StorageReference mImageStorage;
     private Boolean firstTime = true;
 
-    private Task task;
+    private unisa.it.pc1.provacirclemenu.model.Task task;
 
     private ArrayList<String> imgsList;
 
@@ -393,7 +393,7 @@ public class CircleActivity extends Activity {
                                             sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
                                         } else {
                                             Group group = (Group) utenti.get(i);
-                                            sendMessageToGroup(group.getGroup_id(),testo);
+                                            sendMessageToGroup(group.getGroup_id(),testo,nome);
                                         }
                                     } else {
                                         if (utenti.get(i) instanceof User) {
@@ -401,7 +401,7 @@ public class CircleActivity extends Activity {
                                             sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
                                         } else {
                                             Group group = (Group) utenti.get(i);
-                                            sendImageToGroup(group.getGroup_id(), imagePath);
+                                            sendImageToGroup(group.getGroup_id(), imagePath,nome);
                                         }
                                     }
                                     break;
@@ -412,7 +412,7 @@ public class CircleActivity extends Activity {
                                             sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
                                         } else {
                                             Group group = (Group) utenti.get(i);
-                                            sendMessageToGroup(group.getGroup_id(),testo);
+                                            sendMessageToGroup(group.getGroup_id(),testo,nome);
                                         }
                                     } else {
                                         if (utenti.get(i) instanceof User) {
@@ -420,7 +420,7 @@ public class CircleActivity extends Activity {
                                             sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
                                         } else {
                                             Group group = (Group) utenti.get(i);
-                                            sendImageToGroup(group.getGroup_id(), imagePath);
+                                            sendImageToGroup(group.getGroup_id(), imagePath,nome);
                                         }
                                     }
                                     break;
@@ -431,7 +431,7 @@ public class CircleActivity extends Activity {
                                             sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
                                         } else {
                                             Group group = (Group) utenti.get(i);
-                                            sendMessageToGroup(group.getGroup_id(),testo);
+                                            sendMessageToGroup(group.getGroup_id(),testo,nome);
                                         }
                                     } else {
                                         if (utenti.get(i) instanceof User) {
@@ -439,7 +439,7 @@ public class CircleActivity extends Activity {
                                             sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
                                         } else {
                                             Group group = (Group) utenti.get(i);
-                                            sendImageToGroup(group.getGroup_id(), imagePath);
+                                            sendImageToGroup(group.getGroup_id(), imagePath,nome);
                                         }
                                     }
                                     break;
@@ -450,7 +450,7 @@ public class CircleActivity extends Activity {
                                             sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
                                         } else {
                                             Group group = (Group) utenti.get(i);
-                                            sendMessageToGroup(group.getGroup_id(),testo);
+                                            sendMessageToGroup(group.getGroup_id(),testo,nome);
                                         }
                                     } else {
                                         if (utenti.get(i) instanceof User) {
@@ -458,7 +458,7 @@ public class CircleActivity extends Activity {
                                             sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
                                         } else {
                                             Group group = (Group) utenti.get(i);
-                                            sendImageToGroup(group.getGroup_id(), imagePath);
+                                            sendImageToGroup(group.getGroup_id(), imagePath,nome);
                                         }
                                     }
                                     break;
@@ -469,7 +469,7 @@ public class CircleActivity extends Activity {
                                             sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
                                         } else {
                                             Group group = (Group) utenti.get(i);
-                                            sendMessageToGroup(group.getGroup_id(),testo);
+                                            sendMessageToGroup(group.getGroup_id(),testo,nome);
                                         }
                                     } else {
                                         if (utenti.get(i) instanceof User) {
@@ -477,7 +477,7 @@ public class CircleActivity extends Activity {
                                             sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
                                         } else {
                                             Group group = (Group) utenti.get(i);
-                                            sendImageToGroup(group.getGroup_id(), imagePath);
+                                            sendImageToGroup(group.getGroup_id(), imagePath,nome);
                                         }
                                     }
                                     break;
@@ -607,13 +607,11 @@ public class CircleActivity extends Activity {
             });
         }
 
-
-
-    private void sendImageToGroup(final String groupId, String image) {
+    private void sendImageToGroup(final String groupId, final String image, final String nome) {
 
         Uri imageUri = Uri.fromFile(new File(image));
 
-        DatabaseReference group_message_push = mRootRef.child("Group")
+        final DatabaseReference group_message_push = mRootRef.child("Group")
                 .child(groupId).child("messages").push();
 
         final String push_id = group_message_push.getKey();
@@ -642,33 +640,74 @@ public class CircleActivity extends Activity {
                         }
                     });
 
-                    /*DatabaseReference task_message_push = mRootRef.child("Task")
-                            .child(receiverId).push();
+                    mRootRef.child("Chat").child(mAuth.getCurrentUser().getUid()).child(groupId).child("seen").setValue(true);
+                    mRootRef.child("Chat").child(mAuth.getCurrentUser().getUid()).child(groupId).child("timestamp").setValue(ServerValue.TIMESTAMP);
 
-                    String push_id_task = task_message_push.getKey();
-
-                    unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
-
-                    mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    mRootRef.child("Chat").addValueEventListener(new ValueEventListener() {
                         @Override
-                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Iterable<DataSnapshot> iter = dataSnapshot.getChildren();
 
-                            if (task.isSuccessful()) {
+                            for(DataSnapshot d : iter) {
+                                Log.d("DERP"," " + d.getKey());
+                                if(!d.getKey().equals(mAuth.getCurrentUser().getUid())) {
 
-                            } else {
+                                    mRootRef.child("Chat").child(d.getKey()).child(groupId).child("seen").setValue(true);
+                                    mRootRef.child("Chat").child(d.getKey()).child(groupId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+
+
+                                    DatabaseReference task_message_push = mRootRef.child("Task")
+                                            .child(dataSnapshot.getKey()).push();
+
+                                    String push_id_task = task_message_push.getKey();
+
+                                    unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(image, new Date(), null, "", "normale", mAuth.getCurrentUser().getUid(), false, nome, "");
+
+
+
+                                    mRootRef.child("Task").child(d.getKey()).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                                        @Override
+                                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                                            if (task.isSuccessful()) {
+
+                                            } else {
+
+                                            }
+                                        }
+                                    });
+                                }
 
                             }
                         }
-                    });*/
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    group_message_push.updateChildren(messageMap, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if(databaseError != null){
+
+                                Log.d("CHAT_LOG", databaseError.getMessage().toString());
+
+                            }
+                        }
+                    });
+
                 }
+
             }
         });
 
     }
 
-    private void sendMessageToGroup(final String groupId, String message) {
-
-        if(!TextUtils.isEmpty(message)){
+    private void sendMessageToGroup(final String groupId, final String message, final String nome) {
+        if(!TextUtils.isEmpty(message)) {
 
             DatabaseReference user_message_push = mRootRef.child("Group")
                     .child(groupId).child("messages").push();
@@ -688,19 +727,48 @@ public class CircleActivity extends Activity {
             mRootRef.child("Chat").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(!mAuth.getCurrentUser().getUid().equals(dataSnapshot.getKey())) {
-                        dataSnapshot.child(groupId).child("seen").getValue();
-                        dataSnapshot.child(groupId).child("timestamp").getValue();
+                    Iterable<DataSnapshot> iter = dataSnapshot.getChildren();
 
-                        Log.d("Scorrimento", "" + dataSnapshot.child(groupId).child("timestamp").getValue() );
+                    for(DataSnapshot d : iter) {
+                        Log.d("DERP"," " + d.getKey());
+                        if(!d.getKey().equals(mAuth.getCurrentUser().getUid())) {
+
+                            mRootRef.child("Chat").child(d.getKey()).child(groupId).child("seen").setValue(true);
+                            mRootRef.child("Chat").child(d.getKey()).child(groupId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+
+
+                        DatabaseReference task_message_push = mRootRef.child("Task")
+                                .child(dataSnapshot.getKey()).push();
+
+                        String push_id_task = task_message_push.getKey();
+
+                        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(), null, "", "normale", mAuth.getCurrentUser().getUid(), false, nome, "");
+
+
+
+                                mRootRef.child("Task").child(d.getKey()).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                                    @Override
+                                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                                        if (task.isSuccessful()) {
+
+                                        } else {
+
+                                        }
+                                    }
+                                });
+                        }
+
                     }
-                }
+                    }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
+                    }
+                });
+
 
 
             user_message_push.updateChildren(messageMap, new DatabaseReference.CompletionListener() {
@@ -714,30 +782,8 @@ public class CircleActivity extends Activity {
                 }
             });
 
-            /*
-            DatabaseReference task_message_push = mRootRef.child("Task")
-                    .child(mChatUser).push();
-
-            String push_id_task = task_message_push.getKey();
-
-            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(),null, "", "normale",mCurrentUserId,false,utente.getDisplayName(),"");
-
-            mRootRef.child("Task").child(mChatUser).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-
-                    if (task.isSuccessful()) {
-
-                    } else {
-
-                    }
-                }
-            });*/
-
-        }
-
+            }
     }
-
 
 }
 

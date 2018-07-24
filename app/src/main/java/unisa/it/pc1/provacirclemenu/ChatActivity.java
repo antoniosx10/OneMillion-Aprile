@@ -566,8 +566,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        mMessagesList.smoothScrollToPosition(0);
-        mMessagesList.setScrollingCacheEnabled(true);
 
 
 

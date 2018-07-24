@@ -28,6 +28,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -80,6 +81,10 @@ public class GroupActivity extends AppCompatActivity {
 
     private User utente;
 
+    private int itemPos = 0;
+
+    private String mLastKey = "";
+    private String mPrevKey = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,6 +133,10 @@ public class GroupActivity extends AppCompatActivity {
 
         mMessagesList =  findViewById(R.id.messages_list);
 
+        View header = getLayoutInflater().inflate(R.layout.header_view, mMessagesList, false);
+
+        mMessagesList.addHeaderView(header,null,true);
+
         mMessagesList.setAdapter(mAdapter);
 
         //------- IMAGE STORAGE ---------
@@ -150,12 +159,23 @@ public class GroupActivity extends AppCompatActivity {
         DatabaseReference user_message_push = mRootRef.child("Group")
                 .child(mChatGroup).child("messages");
 
-        user_message_push
+        user_message_push.limitToLast(10)
                 .addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.d("OnChildLettura","" + dataSnapshot.getValue(Messages.class).getMessage());
                 Messages message = dataSnapshot.getValue(Messages.class);
+
+                itemPos++;
+
+                if(itemPos == 1){
+
+                    String messageKey = dataSnapshot.getKey();
+
+                    mLastKey = messageKey;
+                    mPrevKey = messageKey;
+
+                }
 
                 messagesList.add(message);
                 mAdapter.notifyDataSetChanged();
@@ -250,6 +270,70 @@ public class GroupActivity extends AppCompatActivity {
 
     public void scrool(View v){
         mMessagesList.smoothScrollToPosition(messagesList.size()-1);
+
+    }
+
+
+    public void loadAllMessage(View v){
+        itemPos = 0;
+        DatabaseReference messageRef = mRootRef.child("Group")
+                .child(mChatGroup).child("messages");
+
+        Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
+
+        messageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+
+                Messages message = dataSnapshot.getValue(Messages.class);
+                String messageKey = dataSnapshot.getKey();
+
+                if(!mPrevKey.equals(messageKey)){
+
+                    messagesList.add(itemPos++,message);
+                } else {
+
+                    mPrevKey = mLastKey;
+
+                }
+
+
+                if(itemPos == 1) {
+
+                    mLastKey = messageKey;
+
+                }
+
+
+                mAdapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
 
     }
 }

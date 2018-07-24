@@ -2,6 +2,7 @@ package unisa.it.pc1.provacirclemenu;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,6 +14,8 @@ import android.widget.TextView;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.squareup.picasso.Picasso;
 
@@ -27,6 +30,8 @@ public class RecyclerViewGroup extends RecyclerView.Adapter<RecyclerViewGroup.My
 
     static Context mContext;
     static List<Group> mData;
+    private DatabaseReference mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("Group");
+
 
     public RecyclerViewGroup(Context mContext, List<Group> mData) {
         this.mContext = mContext;
@@ -47,10 +52,44 @@ public class RecyclerViewGroup extends RecyclerView.Adapter<RecyclerViewGroup.My
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         holder.nome.setText(mData.get(position).getNome());
         Picasso.with(mContext).load(mData.get(position).getImmagine()).placeholder(R.drawable.ic_group_add_black_24dp).into(holder.foto);
-        holder.messaggio.setText("");
+
+        final String list_user_id = mData.get(position).getGroup_id();
+
+        Query lastMessageQuery = mMessageDatabase.child(list_user_id).child("messages").limitToLast(1);
+
+        lastMessageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                String data = dataSnapshot.child("message").getValue().toString();
+                Boolean seen = (Boolean) dataSnapshot.child("seen").getValue();
+                holder.setMessage(data,seen);
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -82,6 +121,17 @@ public class RecyclerViewGroup extends RecyclerView.Adapter<RecyclerViewGroup.My
                     mContext.startActivity(groupIntent);
                 }
             });
+
+        }
+
+        public void setMessage(String message, boolean isSeen){
+            messaggio.setText(message);
+
+            if(!isSeen){
+                messaggio.setTypeface(messaggio.getTypeface(), Typeface.BOLD);
+            } else {
+                messaggio.setTypeface(messaggio.getTypeface(), Typeface.NORMAL);
+            }
 
         }
     }

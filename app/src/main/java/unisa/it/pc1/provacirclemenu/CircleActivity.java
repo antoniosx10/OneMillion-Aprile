@@ -124,8 +124,8 @@ public class CircleActivity extends Activity {
             utenti = (ArrayList<Chatter>) ObjectSerializer
                     .deserialize(prefs.getString("lista_utenti", ObjectSerializer.serialize(new ArrayList<Chatter>())));
 
-            imgsList = (ArrayList<String>) ObjectSerializer
-                    .deserialize(prefs.getString("lista_img", ObjectSerializer.serialize(new ArrayList<String>())));
+            /*imgsList = (ArrayList<String>) ObjectSerializer
+                    .deserialize(prefs.getString("lista_img", ObjectSerializer.serialize(new ArrayList<String>())));*/
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -700,7 +700,6 @@ public class CircleActivity extends Activity {
                     });
 
                 }
-
             }
         });
 

@@ -183,6 +183,18 @@ public class ListenerService extends Service {
 
                             utenti = finalListaUtenti;
 
+                            //SEND UTENTI SENZA IMG
+                            try {
+                                sendUtenti();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            /*
                             try {
                                 Bitmap[] imgs = new BitmapFromURLTask().execute(utenti).get();
                             } catch (InterruptedException e) {
@@ -190,6 +202,7 @@ public class ListenerService extends Service {
                             } catch (ExecutionException e) {
                                 e.printStackTrace();
                             }
+                            */
                         }
 
                         @Override
@@ -211,6 +224,18 @@ public class ListenerService extends Service {
 
                             utenti = finalListaUtenti;
 
+                            //SEND UTENTI SENZA IMG
+                            try {
+                                sendUtenti();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            /*
                             try {
                                 Bitmap[] imgs = new BitmapFromURLTask().execute(utenti).get();
                             } catch (InterruptedException e) {
@@ -218,6 +243,7 @@ public class ListenerService extends Service {
                             } catch (ExecutionException e) {
                                 e.printStackTrace();
                             }
+                            */
                         }
 
                         @Override
@@ -254,12 +280,13 @@ public class ListenerService extends Service {
         return;
     }
 
-    public void sendUtenti(Bitmap[] imgs) throws IOException, ExecutionException, InterruptedException {
+    public void sendUtenti() throws IOException, ExecutionException, InterruptedException {
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sharedPref.edit();
 
         editor.putString("lista_utenti", ObjectSerializer.serialize(utenti));
 
+        /*
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         ArrayList<String> encodedList = new ArrayList<String>();
@@ -277,12 +304,13 @@ public class ListenerService extends Service {
         }
 
         editor.putString("lista_img", ObjectSerializer.serialize(encodedList));
+        */
 
         editor.commit();
 
-
-
     }
+
+    /**
 
     class BitmapFromURLTask extends AsyncTask<ArrayList<Chatter>, Void, Bitmap[]> {
 
@@ -332,5 +360,5 @@ public class ListenerService extends Service {
                 e.printStackTrace();
             }
         }
-    }
+    } **/
 }

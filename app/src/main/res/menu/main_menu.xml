@@ -6,7 +6,7 @@
         android:title="Export to CSV" />
     <item
         android:id="@+id/main_setting"
-        android:title="@string/impostazioni" />
+        android:title="Settings" />
     <item
         android:id="@+id/main_logOut"
         android:title="@string/log_out" />

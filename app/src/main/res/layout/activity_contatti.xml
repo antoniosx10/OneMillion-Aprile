@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:fontFamily="sans-serif-smallcaps"
-        android:text="Seleziona un contatto a cui inviare il task"
+        android:text="Select A Contact"
         android:textColor="@android:color/black"
         android:textStyle="bold" />
 

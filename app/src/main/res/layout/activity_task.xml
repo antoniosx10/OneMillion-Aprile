@@ -66,7 +66,7 @@
         android:layout_marginLeft="28dp"
         android:layout_marginStart="28dp"
         android:layout_marginTop="72dp"
-        android:text="MESSAGGIO:"
+        android:text="MESSAGE:"
         android:textColor="@android:color/background_dark"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -83,7 +83,7 @@
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />/>
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
     <TextView
         android:id="@+id/textView7"
@@ -93,7 +93,7 @@
         android:layout_marginStart="28dp"
         android:layout_marginTop="8dp"
         android:background="@color/backgroundfragment"
-        android:text="DESCRIZIONE:"
+        android:text="DESCRIPTION:"
         android:textColor="@android:color/background_dark"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -104,30 +104,33 @@
         android:id="@+id/detail_descrizione_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginStart="28dp"
         android:layout_marginTop="16dp"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
-
-    <ImageView
-        android:id="@+id/detail_categoria_task"
-        android:layout_width="78dp"
-        android:layout_height="75dp"
-        android:layout_marginLeft="168dp"
-        android:layout_marginStart="168dp"
-        android:layout_marginTop="84dp"
-        android:src="@drawable/ic_error_outline_black_24dp"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+        app:layout_constraintTop_toBottomOf="@+id/textView7"
+        android:paddingBottom="20dp"/>
 
     <ImageView
         android:id="@+id/detail_image_task"
         android:layout_width="310dp"
         android:layout_height="230dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/smartphone"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+    <ImageView
+        android:id="@+id/detail_categoria_task"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"

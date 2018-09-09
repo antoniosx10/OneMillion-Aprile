@@ -50,12 +50,12 @@ public class SectionsPageAdapter extends FragmentPagerAdapter {
 
             case 1:
 
-                return "Gruppi";
+                return "Groups";
 
 
             case 2:
 
-                return "Task";
+                return "Tasks";
 
             default:
                 return null;

@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -22,6 +23,8 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -175,8 +178,8 @@ public class CircleActivity extends Activity {
 
         //Add the view to the window.
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                500,
+               500,
                 WindowManager.LayoutParams.TYPE_PHONE,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
@@ -397,12 +400,37 @@ public class CircleActivity extends Activity {
         circleMenu = (CircleMenu) findViewById(R.id.circle_menu);
         circleMenu.setMainMenu(Color.parseColor("#d3d1d1"), R.drawable.ic_menu_black_24dp, R.drawable.ic_remove_circle_black_24dp);
 
+        ArrayList<Drawable> imgsDrawable = new ArrayList<>();
+        ColorGenerator generator = ColorGenerator.MATERIAL;
+
+        String tempNome;
+        for(int j = 0; j < 5; j++){
+            imgsDrawable.add(getResources().getDrawable(R.drawable.ic_account_circle_black_24dp));
+        }
+        for(int i= 0; i < utenti.size(); i++){
+                if(utenti.get(i) instanceof User) {
+                    User user = (User) utenti.get(i);
+
+                    tempNome = user.getDisplayName();
+
+                } else {
+                    Group group = (Group) utenti.get(i);
+                    tempNome = group.getNome();
+                }
+
+                Log.d("NOME",""+tempNome);
+                TextDrawable drawable = TextDrawable.builder()
+                        .buildRound(tempNome.substring(0,1), generator.getRandomColor());
+
+                imgsDrawable.add(i,drawable);
+        }
+
         circleMenu
-                .addSubMenu(Color.parseColor("#ff9d00"), imgs[0])
-                .addSubMenu(Color.parseColor("#ff9d00"), imgs[1])
-                .addSubMenu(Color.parseColor("#ff9d00"), imgs[2])
-                .addSubMenu(Color.parseColor("#ff9d00"), imgs[3])
-                .addSubMenu(Color.parseColor("#ff9d00"), imgs[4])
+                .addSubMenu(Color.parseColor("#ff9d00"), imgsDrawable.get(0))
+                .addSubMenu(Color.parseColor("#ff9d00"), imgsDrawable.get(1))
+                .addSubMenu(Color.parseColor("#ff9d00"), imgsDrawable.get(2))
+                .addSubMenu(Color.parseColor("#ff9d00"), imgsDrawable.get(3))
+                .addSubMenu(Color.parseColor("#ff9d00"), imgsDrawable.get(4))
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_save_black_24dp)
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_add_black_24dp)
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_contacts_black_24dp)

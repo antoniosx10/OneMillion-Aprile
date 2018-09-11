@@ -46,6 +46,7 @@ import java.util.Map;
 
 import unisa.it.pc1.provacirclemenu.model.Chatter;
 import unisa.it.pc1.provacirclemenu.model.Group;
+import unisa.it.pc1.provacirclemenu.model.Messages;
 import unisa.it.pc1.provacirclemenu.model.Task;
 import unisa.it.pc1.provacirclemenu.model.User;
 
@@ -331,41 +332,64 @@ public class CircleActivity extends Activity {
     }
     private void sendTask(final String senderId, final String receiverId, String messaggio, final String nome, String imagePath){
 
+        if(messaggio.equalsIgnoreCase("Immagine")){
 
-        Uri imageUri = Uri.fromFile(new File(imagePath));
+            Uri imageUri = Uri.fromFile(new File(imagePath));
 
-        DatabaseReference user_message_push = mRootRef.child("messages")
-                .child(senderId).child(receiverId).push();
+            DatabaseReference user_message_push = mRootRef.child("messages")
+                    .child(senderId).child(receiverId).push();
 
-        final String push_id = user_message_push.getKey();
-        StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".png");
-        filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
-                if(task.isSuccessful()){
-                    String download_url = task.getResult().getDownloadUrl().toString();
+            final String push_id = user_message_push.getKey();
+            StorageReference filepath = mImageStorage.child("message_images").child( push_id + ".png");
+            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull com.google.android.gms.tasks.Task<UploadTask.TaskSnapshot> task) {
+                    if(task.isSuccessful()){
+                        String download_url = task.getResult().getDownloadUrl().toString();
 
-                    DatabaseReference task_message_push = mRootRef.child("Task")
-                            .child(receiverId).push();
+                        DatabaseReference task_message_push = mRootRef.child("Task")
+                                .child(receiverId).push();
 
-                    String push_id_task = task_message_push.getKey();
+                        String push_id_task = task_message_push.getKey();
 
-                    unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
+                        unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task("Immagine", new Date(),null, "", "normale",senderId,false,nome,download_url);
 
-                    mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                        mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
 
-                            if (task.isSuccessful()) {
+                                if (task.isSuccessful()) {
 
-                            } else {
+                                } else {
 
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }else{
+            DatabaseReference task_message_push = mRootRef.child("Task")
+                    .child(receiverId).push();
+
+            String push_id_task = task_message_push.getKey();
+
+            unisa.it.pc1.provacirclemenu.model.Task taskInivato = new unisa.it.pc1.provacirclemenu.model.Task(messaggio, new Date(),null, "", "normale",senderId,false,nome,"");
+
+            mRootRef.child("Task").child(receiverId).child(push_id_task).setValue(taskInivato).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                    if (task.isSuccessful()) {
+
+                    } else {
+
+                    }
+                }
+            });
+        }
+
+
     }
 
     private void createCircleMenu(Bitmap[] imgs) {
@@ -383,229 +407,229 @@ public class CircleActivity extends Activity {
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_add_black_24dp)
                 .addSubMenu(Color.parseColor("#ff9d00"), R.drawable.ic_contacts_black_24dp)
                 .setOnMenuSelectedListener(new OnMenuSelectedListener() {
-                        @Override
-                        public void onMenuSelected(int i) {
-                            switch (i) {
-                                case 0:
-                                    if(testo != null) {
-                                        if(utenti.get(i) instanceof User) {
-                                            User user = (User) utenti.get(i);
-                                            sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
-                                        } else {
-                                            Group group = (Group) utenti.get(i);
-                                            sendMessageToGroup(group.getGroup_id(),testo,nome);
-                                        }
+                    @Override
+                    public void onMenuSelected(int i) {
+                        switch (i) {
+                            case 0:
+                                if(testo != null) {
+                                    if(utenti.get(i) instanceof User) {
+                                        User user = (User) utenti.get(i);
+                                        sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
                                     } else {
-                                        if (utenti.get(i) instanceof User) {
-                                            User user = (User) utenti.get(i);
-                                            sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
-                                        } else {
-                                            Group group = (Group) utenti.get(i);
-                                            sendImageToGroup(group.getGroup_id(), imagePath,nome);
-                                        }
+                                        Group group = (Group) utenti.get(i);
+                                        sendMessageToGroup(group.getGroup_id(),testo,nome);
                                     }
-                                    break;
-                                case 1:
-                                    if(testo != null) {
-                                        if(utenti.get(i) instanceof User) {
-                                            User user = (User) utenti.get(i);
-                                            sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
-                                        } else {
-                                            Group group = (Group) utenti.get(i);
-                                            sendMessageToGroup(group.getGroup_id(),testo,nome);
-                                        }
+                                } else {
+                                    if (utenti.get(i) instanceof User) {
+                                        User user = (User) utenti.get(i);
+                                        sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
                                     } else {
-                                        if (utenti.get(i) instanceof User) {
-                                            User user = (User) utenti.get(i);
-                                            sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
-                                        } else {
-                                            Group group = (Group) utenti.get(i);
-                                            sendImageToGroup(group.getGroup_id(), imagePath,nome);
-                                        }
+                                        Group group = (Group) utenti.get(i);
+                                        sendImageToGroup(group.getGroup_id(), imagePath,nome);
                                     }
-                                    break;
-                                case 2:
-                                    if(testo != null) {
-                                        if(utenti.get(i) instanceof User) {
-                                            User user = (User) utenti.get(i);
-                                            sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
-                                        } else {
-                                            Group group = (Group) utenti.get(i);
-                                            sendMessageToGroup(group.getGroup_id(),testo,nome);
-                                        }
-                                    } else {
-                                        if (utenti.get(i) instanceof User) {
-                                            User user = (User) utenti.get(i);
-                                            sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
-                                        } else {
-                                            Group group = (Group) utenti.get(i);
-                                            sendImageToGroup(group.getGroup_id(), imagePath,nome);
-                                        }
-                                    }
-                                    break;
-                                case 3:
-                                    if(testo != null) {
-                                        if(utenti.get(i) instanceof User) {
-                                            User user = (User) utenti.get(i);
-                                            sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
-                                        } else {
-                                            Group group = (Group) utenti.get(i);
-                                            sendMessageToGroup(group.getGroup_id(),testo,nome);
-                                        }
-                                    } else {
-                                        if (utenti.get(i) instanceof User) {
-                                            User user = (User) utenti.get(i);
-                                            sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
-                                        } else {
-                                            Group group = (Group) utenti.get(i);
-                                            sendImageToGroup(group.getGroup_id(), imagePath,nome);
-                                        }
-                                    }
-                                    break;
-                                case 4:
-                                    if(testo != null) {
-                                        if(utenti.get(i) instanceof User) {
-                                            User user = (User) utenti.get(i);
-                                            sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
-                                        } else {
-                                            Group group = (Group) utenti.get(i);
-                                            sendMessageToGroup(group.getGroup_id(),testo,nome);
-                                        }
-                                    } else {
-                                        if (utenti.get(i) instanceof User) {
-                                            User user = (User) utenti.get(i);
-                                            sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
-                                        } else {
-                                            Group group = (Group) utenti.get(i);
-                                            sendImageToGroup(group.getGroup_id(), imagePath,nome);
-                                        }
-                                    }
-                                    break;
-                                case 5:
-                                    if(testo != null) {
-                                        sendTask(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),testo,"Me stesso",null);
-                                    } else {
-                                        sendTask(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),"Immagine","Me stesso",imagePath);
-                                    }
-                                    break;
-                                case 6:
-                                    isDettagli = true;
-                                    Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
-                                    if(testo != null) {
-                                        dettagliIntent.putExtra("testo",testo);
-                                    } else {
-                                        dettagliIntent.putExtra("imagePath",imagePath);
-                                    }
-                                    dettagliIntent.putExtra("nome",nome);
-                                    startActivity(dettagliIntent);
-                                    break;
-
-                                case 7:
-                                    isDettagli = true;
-                                    Intent contatti = new Intent(getApplicationContext(),ContattiActivity.class);
-                                    if(testo != null) {
-                                        contatti.putExtra("testo",testo);
-                                    } else {
-                                        contatti.putExtra("imagePath",imagePath);
-                                    }
-                                    contatti.putExtra("flagDettagli","false");
-                                    contatti.putExtra("nome",nome);
-
-                                    startActivity(contatti);
-
-                                    break;
-                            }
-                        }
-                    });
-
-            circleMenu.setOnMenuStatusChangeListener(new OnMenuStatusChangeListener() {
-                @Override
-                public void onMenuOpened() {
-
-                }
-
-                @Override
-                public void onMenuClosed() {
-                    if (!isDettagli) {
-                        startTimerHead();
-                    } else {
-                        isDettagli = false;
-                        circleMenu.setVisibility(View.INVISIBLE);
-
-                    }
-                }
-            });
-
-
-            params = new WindowManager.LayoutParams();
-            params = createHead();
-
-            circleMenu.setOnTouchListener(new View.OnTouchListener() {
-                private int lastAction;
-                private int initialY;
-                private int initialX;
-                private float initialTouchX;
-                private float initialTouchY;
-
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            stopTimerHead();
-                            //remember the initial position.
-                            initialY = params.y;
-                            initialX = params.x;
-
-                            //get the touch location
-                            initialTouchY = event.getRawY();
-                            initialTouchX = event.getRawX();
-
-
-                            lastAction = event.getAction();
-
-                            return true;
-                        case MotionEvent.ACTION_UP:
-                            startTimerHead();
-                            //As we implemented on touch listener with ACTION_MOVE,
-                            //we have to check if the previous action was ACTION_DOWN
-                            //to identify if the user clicked the view or not.
-                            if (lastAction == MotionEvent.ACTION_DOWN) {
-                                stopTimerHead();
+                                }
                                 break;
-                            }
-                            lastAction = event.getAction();
-                            return true;
-                        case MotionEvent.ACTION_MOVE:
-                            stopTimerHead();
-                            //Calculate the X and Y coordinates of the view.
-                            params.x = initialX + (int) (event.getRawX() - initialTouchX);
-                            params.y = initialY + (int) (event.getRawY() - initialTouchY);
+                            case 1:
+                                if(testo != null) {
+                                    if(utenti.get(i) instanceof User) {
+                                        User user = (User) utenti.get(i);
+                                        sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
+                                    } else {
+                                        Group group = (Group) utenti.get(i);
+                                        sendMessageToGroup(group.getGroup_id(),testo,nome);
+                                    }
+                                } else {
+                                    if (utenti.get(i) instanceof User) {
+                                        User user = (User) utenti.get(i);
+                                        sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
+                                    } else {
+                                        Group group = (Group) utenti.get(i);
+                                        sendImageToGroup(group.getGroup_id(), imagePath,nome);
+                                    }
+                                }
+                                break;
+                            case 2:
+                                if(testo != null) {
+                                    if(utenti.get(i) instanceof User) {
+                                        User user = (User) utenti.get(i);
+                                        sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
+                                    } else {
+                                        Group group = (Group) utenti.get(i);
+                                        sendMessageToGroup(group.getGroup_id(),testo,nome);
+                                    }
+                                } else {
+                                    if (utenti.get(i) instanceof User) {
+                                        User user = (User) utenti.get(i);
+                                        sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
+                                    } else {
+                                        Group group = (Group) utenti.get(i);
+                                        sendImageToGroup(group.getGroup_id(), imagePath,nome);
+                                    }
+                                }
+                                break;
+                            case 3:
+                                if(testo != null) {
+                                    if(utenti.get(i) instanceof User) {
+                                        User user = (User) utenti.get(i);
+                                        sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
+                                    } else {
+                                        Group group = (Group) utenti.get(i);
+                                        sendMessageToGroup(group.getGroup_id(),testo,nome);
+                                    }
+                                } else {
+                                    if (utenti.get(i) instanceof User) {
+                                        User user = (User) utenti.get(i);
+                                        sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
+                                    } else {
+                                        Group group = (Group) utenti.get(i);
+                                        sendImageToGroup(group.getGroup_id(), imagePath,nome);
+                                    }
+                                }
+                                break;
+                            case 4:
+                                if(testo != null) {
+                                    if(utenti.get(i) instanceof User) {
+                                        User user = (User) utenti.get(i);
+                                        sendMessage(mAuth.getCurrentUser().getUid(), user.getUserId(), testo, nome);
+                                    } else {
+                                        Group group = (Group) utenti.get(i);
+                                        sendMessageToGroup(group.getGroup_id(),testo,nome);
+                                    }
+                                } else {
+                                    if (utenti.get(i) instanceof User) {
+                                        User user = (User) utenti.get(i);
+                                        sendImage(mAuth.getCurrentUser().getUid(), user.getUserId(), imagePath, nome);
+                                    } else {
+                                        Group group = (Group) utenti.get(i);
+                                        sendImageToGroup(group.getGroup_id(), imagePath,nome);
+                                    }
+                                }
+                                break;
+                            case 5:
+                                if(testo != null) {
+                                    sendTask(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),testo,"Me stesso",null);
+                                } else {
+                                    sendTask(mAuth.getCurrentUser().getUid(), mAuth.getCurrentUser().getUid(),"Immagine","Me stesso",imagePath);
+                                }
+                                break;
+                            case 6:
+                                isDettagli = true;
+                                Intent dettagliIntent = new Intent(getApplicationContext(), DettagliActivity.class);
+                                if(testo != null) {
+                                    dettagliIntent.putExtra("testo",testo);
+                                } else {
+                                    dettagliIntent.putExtra("imagePath",imagePath);
+                                }
+                                dettagliIntent.putExtra("nome",nome);
+                                startActivity(dettagliIntent);
+                                break;
 
-                            //Update the layout with new X & Y coordinate
-                            mWindowManager.updateViewLayout(circleMenu, params);
-                            int differenzaY = 0;
-                            if (params.y > initialY) {
-                                differenzaY = params.y - initialY;
-                            } else {
-                                differenzaY = initialY - params.y;
-                            }
+                            case 7:
+                                isDettagli = true;
+                                Intent contatti = new Intent(getApplicationContext(),ContattiActivity.class);
+                                if(testo != null) {
+                                    contatti.putExtra("testo",testo);
+                                } else {
+                                    contatti.putExtra("imagePath",imagePath);
+                                }
+                                contatti.putExtra("flagDettagli","false");
+                                contatti.putExtra("nome",nome);
 
-                            int differenzaX = 0;
-                            if (params.y > initialY) {
-                                differenzaX = params.x - initialX;
-                            } else {
-                                differenzaX = initialX - params.x;
-                            }
+                                startActivity(contatti);
 
-                            if (differenzaY > 0.3 || differenzaX > 0.3)
-                                lastAction = event.getAction();
-
-                            return true;
+                                break;
+                        }
                     }
-                    return false;
+                });
+
+        circleMenu.setOnMenuStatusChangeListener(new OnMenuStatusChangeListener() {
+            @Override
+            public void onMenuOpened() {
+
+            }
+
+            @Override
+            public void onMenuClosed() {
+                if (!isDettagli) {
+                    startTimerHead();
+                } else {
+                    isDettagli = false;
+                    circleMenu.setVisibility(View.INVISIBLE);
+
                 }
-            });
-        }
+            }
+        });
+
+
+        params = new WindowManager.LayoutParams();
+        params = createHead();
+
+        circleMenu.setOnTouchListener(new View.OnTouchListener() {
+            private int lastAction;
+            private int initialY;
+            private int initialX;
+            private float initialTouchX;
+            private float initialTouchY;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        stopTimerHead();
+                        //remember the initial position.
+                        initialY = params.y;
+                        initialX = params.x;
+
+                        //get the touch location
+                        initialTouchY = event.getRawY();
+                        initialTouchX = event.getRawX();
+
+
+                        lastAction = event.getAction();
+
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        startTimerHead();
+                        //As we implemented on touch listener with ACTION_MOVE,
+                        //we have to check if the previous action was ACTION_DOWN
+                        //to identify if the user clicked the view or not.
+                        if (lastAction == MotionEvent.ACTION_DOWN) {
+                            stopTimerHead();
+                            break;
+                        }
+                        lastAction = event.getAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        stopTimerHead();
+                        //Calculate the X and Y coordinates of the view.
+                        params.x = initialX + (int) (event.getRawX() - initialTouchX);
+                        params.y = initialY + (int) (event.getRawY() - initialTouchY);
+
+                        //Update the layout with new X & Y coordinate
+                        mWindowManager.updateViewLayout(circleMenu, params);
+                        int differenzaY = 0;
+                        if (params.y > initialY) {
+                            differenzaY = params.y - initialY;
+                        } else {
+                            differenzaY = initialY - params.y;
+                        }
+
+                        int differenzaX = 0;
+                        if (params.y > initialY) {
+                            differenzaX = params.x - initialX;
+                        } else {
+                            differenzaX = initialX - params.x;
+                        }
+
+                        if (differenzaY > 0.3 || differenzaX > 0.3)
+                            lastAction = event.getAction();
+
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
 
     private void sendImageToGroup(final String groupId, final String image, final String nome) {
 
@@ -736,37 +760,37 @@ public class CircleActivity extends Activity {
                             mRootRef.child("Chat").child(d.getKey()).child(groupId).child("timestamp").setValue(ServerValue.TIMESTAMP);
 
 
-                        DatabaseReference task_message_push = mRootRef.child("Task")
-                                .child(dataSnapshot.getKey()).push();
+                            DatabaseReference task_message_push = mRootRef.child("Task")
+                                    .child(dataSnapshot.getKey()).push();
 
-                        String push_id_task = task_message_push.getKey();
+                            String push_id_task = task_message_push.getKey();
 
-                        unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(), null, "", "normale", mAuth.getCurrentUser().getUid(), false, nome, "");
+                            unisa.it.pc1.provacirclemenu.model.Task task = new unisa.it.pc1.provacirclemenu.model.Task(message, new Date(), null, "", "normale", mAuth.getCurrentUser().getUid(), false, nome, "");
 
 
 
-                                mRootRef.child("Task").child(d.getKey()).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            mRootRef.child("Task").child(d.getKey()).child(push_id_task).setValue(task).addOnCompleteListener(new OnCompleteListener<Void>() {
 
-                                    @Override
-                                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                                @Override
+                                public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
 
-                                        if (task.isSuccessful()) {
+                                    if (task.isSuccessful()) {
 
-                                        } else {
+                                    } else {
 
-                                        }
                                     }
-                                });
+                                }
+                            });
                         }
 
                     }
-                    }
+                }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+                }
+            });
 
 
 
@@ -781,7 +805,7 @@ public class CircleActivity extends Activity {
                 }
             });
 
-            }
+        }
     }
 
 }

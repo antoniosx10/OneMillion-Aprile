@@ -21,7 +21,8 @@
             android:id="@+id/main_tabs"
             android:layout_width="match_parent"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            android:layout_height="wrap_content"></android.support.design.widget.TabLayout>
+            android:layout_height="wrap_content">
+        </android.support.design.widget.TabLayout>
 
 
     </android.support.design.widget.AppBarLayout>
@@ -30,6 +31,7 @@
         android:id="@+id/tabPage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/appBarLayout"></android.support.v4.view.ViewPager>
+        android:layout_below="@+id/appBarLayout">
+    </android.support.v4.view.ViewPager>
 
 </RelativeLayout>

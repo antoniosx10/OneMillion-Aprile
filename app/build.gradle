@@ -43,6 +43,7 @@ dependencies {
 
     compile 'com.abangfadli.shotwatch:shotwatch:1.0.4'
     compile 'com.github.Hitomis:CircleMenu:v1.1.0'
+    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile files('libs/opencsv-4.2.jar')
 
 }

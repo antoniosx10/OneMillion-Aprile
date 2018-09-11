@@ -54,6 +54,7 @@ public class TaskFragment extends Fragment {
         userFirebase = FirebaseAuth.getInstance();
         mMessagesDBRef = FirebaseDatabase.getInstance().getReference().child("Task").child(userFirebase.getUid());
 
+        mMessagesList = queryMessagesAndAddthemToList();
 
     }
 
@@ -85,38 +86,6 @@ public class TaskFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        mMessagesList = queryMessagesAndAddthemToList();
-
-        mMessagesDBRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                Task task = dataSnapshot.getValue(Task.class);
-                mMessagesList.add(task);
-                recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
         itemTouchHelperCallback = new ItemTouchHelper.Callback() {
@@ -264,6 +233,7 @@ public class TaskFragment extends Fragment {
     private ArrayList<Task> queryMessagesAndAddthemToList(){
 
         final ArrayList<Task> lista = new ArrayList<Task>();
+
         mMessagesDBRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -284,7 +254,6 @@ public class TaskFragment extends Fragment {
                     getFragmentManager().beginTransaction().detach(TaskFragment.this).attach(TaskFragment.this).commit();
                     firstTime = true;
 
-                    Log.d("Entrato", "in firsttime");
                 }
             }
 
@@ -301,7 +270,8 @@ public class TaskFragment extends Fragment {
     private void queryDeleteTask(String id) {
 
         mMessagesDBRef.child(id).removeValue();
-
+        mMessagesList = queryMessagesAndAddthemToList();
+        recyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override

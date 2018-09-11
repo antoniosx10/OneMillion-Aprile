@@ -13,7 +13,7 @@
         android:layout_width="170dp"
         android:layout_height="170dp"
         android:layout_weight="2"
-        android:src="@mipmap/ic_launcher_round" />
+        android:src="@drawable/ic_account_circle_black_24dp" />
 
     <android.support.v7.widget.CardView
 
@@ -106,8 +106,8 @@
         android:layout_width="201dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="185dp"
-        android:background="@drawable/shadow_button"
         android:baselineAligned="false"
+        android:background="@color/colorPrimary"
         android:text="Cambia immagine"
         android:textColor="#ffffff" />
 

@@ -88,8 +88,8 @@ public class ListenerService extends Service {
         mUsersRef.child(mAuth.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot userData) {
-                 utente = userData.getValue(User.class);
-                 utente.setDisplayName(userData.child("displayName").getValue(String.class));
+                utente = userData.getValue(User.class);
+                utente.setDisplayName(userData.child("displayName").getValue(String.class));
             }
 
             @Override
@@ -312,53 +312,53 @@ public class ListenerService extends Service {
 
     /**
 
-    class BitmapFromURLTask extends AsyncTask<ArrayList<Chatter>, Void, Bitmap[]> {
+     class BitmapFromURLTask extends AsyncTask<ArrayList<Chatter>, Void, Bitmap[]> {
 
-        protected Bitmap[] doInBackground(ArrayList<Chatter>... urls) {
-            Bitmap[] imgs = new Bitmap[5];
-            for (int j = 0; j < urls[0].size(); j++) {
-                if (utenti.get(j) != null) {
-                    try {
-                        URL url = null;
-                        if(utenti.get(j) instanceof User) {
-                            User userUrl = (User) urls[0].get(j);
-                            url = new URL(userUrl.getThumb_image());
-                        } else {
-                            Group groupUrl = (Group) urls[0].get(j);
-                            url = new URL(groupUrl.getThumb_image());
-                        }
-                        HttpURLConnection connection = null;
-                        connection = (HttpURLConnection) url.openConnection();
-                        connection.setDoInput(true);
-                        connection.connect();
-                        InputStream input = null;
-                        input = connection.getInputStream();
-                        Bitmap myBitmap = BitmapFactory.decodeStream(input);
-                        Log.d("Bit", "" + myBitmap);
-                        imgs[j] = myBitmap;
+     protected Bitmap[] doInBackground(ArrayList<Chatter>... urls) {
+     Bitmap[] imgs = new Bitmap[5];
+     for (int j = 0; j < urls[0].size(); j++) {
+     if (utenti.get(j) != null) {
+     try {
+     URL url = null;
+     if(utenti.get(j) instanceof User) {
+     User userUrl = (User) urls[0].get(j);
+     url = new URL(userUrl.getThumb_image());
+     } else {
+     Group groupUrl = (Group) urls[0].get(j);
+     url = new URL(groupUrl.getThumb_image());
+     }
+     HttpURLConnection connection = null;
+     connection = (HttpURLConnection) url.openConnection();
+     connection.setDoInput(true);
+     connection.connect();
+     InputStream input = null;
+     input = connection.getInputStream();
+     Bitmap myBitmap = BitmapFactory.decodeStream(input);
+     Log.d("Bit", "" + myBitmap);
+     imgs[j] = myBitmap;
 
-                    } catch (Exception e) {
+     } catch (Exception e) {
 
-                    }
-                } else {
-                    imgs[j] = BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_black_24dp);
-                    Log.d("BitElse", "");
-                }
-            }
-            return imgs;
-        }
+     }
+     } else {
+     imgs[j] = BitmapFactory.decodeResource(getResources(), R.drawable.ic_person_black_24dp);
+     Log.d("BitElse", "");
+     }
+     }
+     return imgs;
+     }
 
-        protected void onPostExecute(Bitmap[] imgs) {
-            try {
-                Log.d("SSD", imgs[0] + "");
-                sendUtenti(imgs);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    } **/
+     protected void onPostExecute(Bitmap[] imgs) {
+     try {
+     Log.d("SSD", imgs[0] + "");
+     sendUtenti(imgs);
+     } catch (IOException e) {
+     e.printStackTrace();
+     } catch (ExecutionException e) {
+     e.printStackTrace();
+     } catch (InterruptedException e) {
+     e.printStackTrace();
+     }
+     }
+     } **/
 }

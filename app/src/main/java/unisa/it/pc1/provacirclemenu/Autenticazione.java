@@ -278,6 +278,8 @@ public class Autenticazione extends AppCompatActivity {
     private void createUserInDb(String userId, String displayName, String number){
         String uid = mAuth.getUid();
 
+        mUsersDBref = FirebaseDatabase.getInstance().getReference().child("Users");
+
 
         String device_token = FirebaseInstanceId.getInstance().getToken();
 

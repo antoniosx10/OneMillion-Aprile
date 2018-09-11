@@ -70,23 +70,6 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
         holder.nome.setText(mData.get(position).getDisplayName());
         Picasso.with(mContext).load(mData.get(position).getThumb_image()).placeholder(R.drawable.ic_account_circle_black_24dp).into(holder.foto);
 
-/**
-        userDatabase.child(mData.get(position).getUserId()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.hasChild("online")){
-                    String online = (String) dataSnapshot.child("online").getValue();
-                    holder.setOnline(online);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
- **/
-
         final String list_user_id = mData.get(position).getUserId();
 
         Query lastMessageQuery = mMessageDatabase.child(list_user_id).limitToLast(1);
@@ -135,18 +118,11 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
         private TextView nome;
         private CircleImageView foto;
         private TextView messaggio;
-        //private ImageView online_img;
-
 
         public MyViewHolder(View itemView) {
             super(itemView);
-
             nome = itemView.findViewById(R.id.user_single_name);
             foto = itemView.findViewById(R.id.user_single_image);
-            //online_img = itemView.findViewById(R.id.user_single_online_icon);
-
-
-
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -159,7 +135,6 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
 
 
         }
-
         public void setMessage(String message, boolean isSeen){
 
             messaggio = itemView.findViewById(R.id.user_single_status);
@@ -172,25 +147,11 @@ public class RecyclerViewAdapterContact extends RecyclerView.Adapter<unisa.it.pc
             }
 
         }
-/**
-        public void setOnline(String online){
-
-           if(online.equalsIgnoreCase("true")){
-               online_img.setVisibility(ImageView.VISIBLE);
-           }else{
-               online_img.setVisibility(ImageView.INVISIBLE);
-
-           }
-
-        }
- **/
     }
-
     @Override
     public long getItemId(int position) {
         return position;
     }
-
     @Override
     public int getItemViewType(int position) {
         return position;

@@ -6,41 +6,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Autenticazione">
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight=".3"
                 android:background="@color/colorAccent"></View>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"></View>
-
         </LinearLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
             <ImageView
                 android:layout_width="70dp"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
                 android:layout_weight=".6"
                 android:src="@drawable/common_full_open_on_phone" />
-
             <EditText
                 android:id="@+id/displayName"
                 android:layout_width="match_parent"
@@ -49,12 +41,10 @@
                 android:hint="Nome"
                 android:inputType="textPersonName"
                 android:singleLine="false" />
-
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1">
-
                 <android.support.v7.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -63,20 +53,17 @@
                     app:cardBackgroundColor="#FBF7F7"
                     app:cardCornerRadius="5dp"
                     app:cardElevation="5dp">
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="30dp"
                         android:orientation="vertical">
-
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:paddingLeft="25dp"
                             android:paddingRight="25dp">
-
                             <EditText
                                 android:id="@+id/numbered"
                                 android:layout_width="wrap_content"
@@ -87,7 +74,6 @@
                                 android:drawablePadding="15dp"
                                 android:hint="Enter mobile number"
                                 android:inputType="phone" />
-
                             <ImageView
                                 android:id="@+id/verifiedsign"
                                 android:layout_width="wrap_content"
@@ -96,9 +82,7 @@
                                 android:layout_marginLeft="15dp"
                                 android:src="@drawable/ic_check_circle_black_24dp"
                                 android:visibility="invisible" />
-
                         </LinearLayout>
-
                         <EditText
                             android:id="@+id/verificationed"
                             android:layout_width="wrap_content"
@@ -110,7 +94,6 @@
                             android:inputType="number"
                             android:padding="10dp"
                             android:visibility="invisible" />
-
                         <android.support.design.widget.FloatingActionButton
                             android:id="@+id/sendverifybt"
                             android:layout_width="wrap_content"
@@ -120,7 +103,6 @@
                             android:src="@drawable/ic_send_white_24dp"
                             android:tag="@string/tag_send"
                             app:backgroundTint="@color/colorAccent" />
-
                         <TextView
                             android:id="@+id/timertv"
                             android:layout_width="wrap_content"
@@ -129,17 +111,9 @@
                             android:layout_margin="25sp"
                             android:clickable="true"
                             android:textSize="20sp" />
-
                     </LinearLayout>
-
                 </android.support.v7.widget.CardView>
-
             </ScrollView>
-
         </LinearLayout>
-
-
     </FrameLayout>
-
-
 </android.support.design.widget.CoordinatorLayout>

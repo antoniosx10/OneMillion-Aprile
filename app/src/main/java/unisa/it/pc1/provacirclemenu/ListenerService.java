@@ -252,6 +252,15 @@ public class ListenerService extends Service {
                         }
                     });
                 }
+                try {
+                    sendUtenti();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override

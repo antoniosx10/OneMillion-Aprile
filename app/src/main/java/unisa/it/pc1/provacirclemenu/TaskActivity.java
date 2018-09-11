@@ -79,11 +79,13 @@ public class TaskActivity extends Activity {
 
         }
 
-        descrizione.setText(task.getDescrizione());
+        if(!task.getDescrizione().equalsIgnoreCase("")){
+            descrizione.setText(task.getDescrizione());
+        }
 
 
 
-        if(task.getCategoria().equalsIgnoreCase("importante")){
+        if(task.getCategoria().equalsIgnoreCase("important")){
             categoria.setVisibility(View.VISIBLE);
         }else{
             if(task.getCategoria().equalsIgnoreCase("da controllare")){

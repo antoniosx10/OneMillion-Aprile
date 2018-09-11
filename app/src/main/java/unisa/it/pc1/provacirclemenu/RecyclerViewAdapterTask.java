@@ -53,7 +53,7 @@ public class RecyclerViewAdapterTask extends RecyclerView.Adapter<RecyclerViewAd
             holder.deadline.setText(deadLineDate);
         }
 
-        if(mData.get(position).getCategoria().equalsIgnoreCase("importante")){
+        if(mData.get(position).getCategoria().equalsIgnoreCase("important")){
             holder.categoria_img.setVisibility(ImageView.VISIBLE);
         }else if(mData.get(position).getCategoria().equalsIgnoreCase("normale")){
 

@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginLeft="5dp"
     android:background="@drawable/shadow_item">
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -27,8 +28,9 @@
         android:layout_toRightOf="@+id/group_single_image" />
 
     <TextView
+        android:maxLength="60"
         android:id="@+id/group_single_status"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/group_single_name"
         android:layout_below="@+id/group_single_name"

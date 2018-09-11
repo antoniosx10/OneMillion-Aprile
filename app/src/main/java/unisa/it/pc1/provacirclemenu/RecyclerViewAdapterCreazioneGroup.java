@@ -62,6 +62,7 @@ public class RecyclerViewAdapterCreazioneGroup  extends RecyclerView.Adapter<Rec
         holder.nome.setText(mData.get(position).getDisplayName());
         Picasso.with(mContext).load(mData.get(position).getThumb_image()).placeholder(R.drawable.ic_account_circle_black_24dp).into(holder.foto);
 
+        holder.messaggio.setText("Aggiungi al gruppo");
 
         final User user = mData.get(position);
         holder.itemView.setBackgroundColor(user.isSelected() ? Color.CYAN : Color.WHITE);
@@ -96,7 +97,6 @@ public class RecyclerViewAdapterCreazioneGroup  extends RecyclerView.Adapter<Rec
         private TextView nome;
         private CircleImageView foto;
         private TextView messaggio;
-        //private ImageView online_img;
 
 
         public MyViewHolder(View itemView) {
@@ -104,7 +104,7 @@ public class RecyclerViewAdapterCreazioneGroup  extends RecyclerView.Adapter<Rec
 
             nome = itemView.findViewById(R.id.user_single_name);
             foto = itemView.findViewById(R.id.user_single_image);
-            //online_img = itemView.findViewById(R.id.user_single_online_icon);
+            messaggio = itemView.findViewById(R.id.user_single_status);
 
 
         }

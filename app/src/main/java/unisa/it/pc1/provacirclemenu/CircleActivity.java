@@ -405,7 +405,7 @@ public class CircleActivity extends Activity {
 
         String tempNome;
         for(int j = 0; j < 5; j++){
-            imgsDrawable.add(getResources().getDrawable(R.drawable.ic_account_circle_black_24dp));
+            imgsDrawable.add(getResources().getDrawable(R.drawable.ic_remove_circle_black_24dp));
         }
         for(int i= 0; i < utenti.size(); i++){
                 if(utenti.get(i) instanceof User) {
